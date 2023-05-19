@@ -1,0 +1,588 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 56;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		DA61AEED2A1840F900048DAB /* DegreeCalculatorApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA61AEEC2A1840F900048DAB /* DegreeCalculatorApp.swift */; };
+		DA61AEEF2A1840F900048DAB /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA61AEEE2A1840F900048DAB /* ContentView.swift */; };
+		DA61AEF12A1840FB00048DAB /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = DA61AEF02A1840FB00048DAB /* Assets.xcassets */; };
+		DA61AEF42A1840FB00048DAB /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = DA61AEF32A1840FB00048DAB /* Preview Assets.xcassets */; };
+		DA61AEFE2A1840FB00048DAB /* DegreeCalculatorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA61AEFD2A1840FB00048DAB /* DegreeCalculatorTests.swift */; };
+		DA61AF082A1840FB00048DAB /* DegreeCalculatorUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA61AF072A1840FB00048DAB /* DegreeCalculatorUITests.swift */; };
+		DA61AF0A2A1840FB00048DAB /* DegreeCalculatorUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA61AF092A1840FB00048DAB /* DegreeCalculatorUITestsLaunchTests.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		DA61AEFA2A1840FB00048DAB /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = DA61AEE12A1840F900048DAB /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = DA61AEE82A1840F900048DAB;
+			remoteInfo = DegreeCalculator;
+		};
+		DA61AF042A1840FB00048DAB /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = DA61AEE12A1840F900048DAB /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = DA61AEE82A1840F900048DAB;
+			remoteInfo = DegreeCalculator;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		DA61AEE92A1840F900048DAB /* DegreeCalculator.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = DegreeCalculator.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		DA61AEEC2A1840F900048DAB /* DegreeCalculatorApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DegreeCalculatorApp.swift; sourceTree = "<group>"; };
+		DA61AEEE2A1840F900048DAB /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		DA61AEF02A1840FB00048DAB /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		DA61AEF32A1840FB00048DAB /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
+		DA61AEF92A1840FB00048DAB /* DegreeCalculatorTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = DegreeCalculatorTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		DA61AEFD2A1840FB00048DAB /* DegreeCalculatorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DegreeCalculatorTests.swift; sourceTree = "<group>"; };
+		DA61AF032A1840FB00048DAB /* DegreeCalculatorUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = DegreeCalculatorUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		DA61AF072A1840FB00048DAB /* DegreeCalculatorUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DegreeCalculatorUITests.swift; sourceTree = "<group>"; };
+		DA61AF092A1840FB00048DAB /* DegreeCalculatorUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DegreeCalculatorUITestsLaunchTests.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		DA61AEE62A1840F900048DAB /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		DA61AEF62A1840FB00048DAB /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		DA61AF002A1840FB00048DAB /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		DA61AEE02A1840F900048DAB = {
+			isa = PBXGroup;
+			children = (
+				DA61AEEB2A1840F900048DAB /* DegreeCalculator */,
+				DA61AEFC2A1840FB00048DAB /* DegreeCalculatorTests */,
+				DA61AF062A1840FB00048DAB /* DegreeCalculatorUITests */,
+				DA61AEEA2A1840F900048DAB /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		DA61AEEA2A1840F900048DAB /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				DA61AEE92A1840F900048DAB /* DegreeCalculator.app */,
+				DA61AEF92A1840FB00048DAB /* DegreeCalculatorTests.xctest */,
+				DA61AF032A1840FB00048DAB /* DegreeCalculatorUITests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		DA61AEEB2A1840F900048DAB /* DegreeCalculator */ = {
+			isa = PBXGroup;
+			children = (
+				DA61AEEC2A1840F900048DAB /* DegreeCalculatorApp.swift */,
+				DA61AEEE2A1840F900048DAB /* ContentView.swift */,
+				DA61AEF02A1840FB00048DAB /* Assets.xcassets */,
+				DA61AEF22A1840FB00048DAB /* Preview Content */,
+			);
+			path = DegreeCalculator;
+			sourceTree = "<group>";
+		};
+		DA61AEF22A1840FB00048DAB /* Preview Content */ = {
+			isa = PBXGroup;
+			children = (
+				DA61AEF32A1840FB00048DAB /* Preview Assets.xcassets */,
+			);
+			path = "Preview Content";
+			sourceTree = "<group>";
+		};
+		DA61AEFC2A1840FB00048DAB /* DegreeCalculatorTests */ = {
+			isa = PBXGroup;
+			children = (
+				DA61AEFD2A1840FB00048DAB /* DegreeCalculatorTests.swift */,
+			);
+			path = DegreeCalculatorTests;
+			sourceTree = "<group>";
+		};
+		DA61AF062A1840FB00048DAB /* DegreeCalculatorUITests */ = {
+			isa = PBXGroup;
+			children = (
+				DA61AF072A1840FB00048DAB /* DegreeCalculatorUITests.swift */,
+				DA61AF092A1840FB00048DAB /* DegreeCalculatorUITestsLaunchTests.swift */,
+			);
+			path = DegreeCalculatorUITests;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		DA61AEE82A1840F900048DAB /* DegreeCalculator */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = DA61AF0D2A1840FB00048DAB /* Build configuration list for PBXNativeTarget "DegreeCalculator" */;
+			buildPhases = (
+				DA61AEE52A1840F900048DAB /* Sources */,
+				DA61AEE62A1840F900048DAB /* Frameworks */,
+				DA61AEE72A1840F900048DAB /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = DegreeCalculator;
+			productName = DegreeCalculator;
+			productReference = DA61AEE92A1840F900048DAB /* DegreeCalculator.app */;
+			productType = "com.apple.product-type.application";
+		};
+		DA61AEF82A1840FB00048DAB /* DegreeCalculatorTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = DA61AF102A1840FB00048DAB /* Build configuration list for PBXNativeTarget "DegreeCalculatorTests" */;
+			buildPhases = (
+				DA61AEF52A1840FB00048DAB /* Sources */,
+				DA61AEF62A1840FB00048DAB /* Frameworks */,
+				DA61AEF72A1840FB00048DAB /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				DA61AEFB2A1840FB00048DAB /* PBXTargetDependency */,
+			);
+			name = DegreeCalculatorTests;
+			productName = DegreeCalculatorTests;
+			productReference = DA61AEF92A1840FB00048DAB /* DegreeCalculatorTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		DA61AF022A1840FB00048DAB /* DegreeCalculatorUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = DA61AF132A1840FB00048DAB /* Build configuration list for PBXNativeTarget "DegreeCalculatorUITests" */;
+			buildPhases = (
+				DA61AEFF2A1840FB00048DAB /* Sources */,
+				DA61AF002A1840FB00048DAB /* Frameworks */,
+				DA61AF012A1840FB00048DAB /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				DA61AF052A1840FB00048DAB /* PBXTargetDependency */,
+			);
+			name = DegreeCalculatorUITests;
+			productName = DegreeCalculatorUITests;
+			productReference = DA61AF032A1840FB00048DAB /* DegreeCalculatorUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		DA61AEE12A1840F900048DAB /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1430;
+				LastUpgradeCheck = 1430;
+				TargetAttributes = {
+					DA61AEE82A1840F900048DAB = {
+						CreatedOnToolsVersion = 14.3;
+					};
+					DA61AEF82A1840FB00048DAB = {
+						CreatedOnToolsVersion = 14.3;
+						TestTargetID = DA61AEE82A1840F900048DAB;
+					};
+					DA61AF022A1840FB00048DAB = {
+						CreatedOnToolsVersion = 14.3;
+						TestTargetID = DA61AEE82A1840F900048DAB;
+					};
+				};
+			};
+			buildConfigurationList = DA61AEE42A1840F900048DAB /* Build configuration list for PBXProject "DegreeCalculator" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = DA61AEE02A1840F900048DAB;
+			productRefGroup = DA61AEEA2A1840F900048DAB /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				DA61AEE82A1840F900048DAB /* DegreeCalculator */,
+				DA61AEF82A1840FB00048DAB /* DegreeCalculatorTests */,
+				DA61AF022A1840FB00048DAB /* DegreeCalculatorUITests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		DA61AEE72A1840F900048DAB /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				DA61AEF42A1840FB00048DAB /* Preview Assets.xcassets in Resources */,
+				DA61AEF12A1840FB00048DAB /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		DA61AEF72A1840FB00048DAB /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		DA61AF012A1840FB00048DAB /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		DA61AEE52A1840F900048DAB /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				DA61AEEF2A1840F900048DAB /* ContentView.swift in Sources */,
+				DA61AEED2A1840F900048DAB /* DegreeCalculatorApp.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		DA61AEF52A1840FB00048DAB /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				DA61AEFE2A1840FB00048DAB /* DegreeCalculatorTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		DA61AEFF2A1840FB00048DAB /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				DA61AF0A2A1840FB00048DAB /* DegreeCalculatorUITestsLaunchTests.swift in Sources */,
+				DA61AF082A1840FB00048DAB /* DegreeCalculatorUITests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		DA61AEFB2A1840FB00048DAB /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = DA61AEE82A1840F900048DAB /* DegreeCalculator */;
+			targetProxy = DA61AEFA2A1840FB00048DAB /* PBXContainerItemProxy */;
+		};
+		DA61AF052A1840FB00048DAB /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = DA61AEE82A1840F900048DAB /* DegreeCalculator */;
+			targetProxy = DA61AF042A1840FB00048DAB /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		DA61AF0B2A1840FB00048DAB /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.4;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		DA61AF0C2A1840FB00048DAB /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.4;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		DA61AF0E2A1840FB00048DAB /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"DegreeCalculator/Preview Content\"";
+				DEVELOPMENT_TEAM = XD79E3HMQG;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = org.eskil.DegreeCalculator;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		DA61AF0F2A1840FB00048DAB /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"DegreeCalculator/Preview Content\"";
+				DEVELOPMENT_TEAM = XD79E3HMQG;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = org.eskil.DegreeCalculator;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		DA61AF112A1840FB00048DAB /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = XD79E3HMQG;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.4;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = org.eskil.DegreeCalculatorTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/DegreeCalculator.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/DegreeCalculator";
+			};
+			name = Debug;
+		};
+		DA61AF122A1840FB00048DAB /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = XD79E3HMQG;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.4;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = org.eskil.DegreeCalculatorTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/DegreeCalculator.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/DegreeCalculator";
+			};
+			name = Release;
+		};
+		DA61AF142A1840FB00048DAB /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = XD79E3HMQG;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = org.eskil.DegreeCalculatorUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = DegreeCalculator;
+			};
+			name = Debug;
+		};
+		DA61AF152A1840FB00048DAB /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = XD79E3HMQG;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = org.eskil.DegreeCalculatorUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = DegreeCalculator;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		DA61AEE42A1840F900048DAB /* Build configuration list for PBXProject "DegreeCalculator" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				DA61AF0B2A1840FB00048DAB /* Debug */,
+				DA61AF0C2A1840FB00048DAB /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		DA61AF0D2A1840FB00048DAB /* Build configuration list for PBXNativeTarget "DegreeCalculator" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				DA61AF0E2A1840FB00048DAB /* Debug */,
+				DA61AF0F2A1840FB00048DAB /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		DA61AF102A1840FB00048DAB /* Build configuration list for PBXNativeTarget "DegreeCalculatorTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				DA61AF112A1840FB00048DAB /* Debug */,
+				DA61AF122A1840FB00048DAB /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		DA61AF132A1840FB00048DAB /* Build configuration list for PBXNativeTarget "DegreeCalculatorUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				DA61AF142A1840FB00048DAB /* Debug */,
+				DA61AF152A1840FB00048DAB /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = DA61AEE12A1840F900048DAB /* Project object */;
+}
