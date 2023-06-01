@@ -1,13 +1,13 @@
 //
-//  ContentView.swift
+//  DegreeCalculator.swift
 //  DegreeCalculator
 //
-//  Created by Eskil Olsen on 5/19/23.
+//  Created by Eskil Olsen on 6/1/23.
 //
 
 import SwiftUI
 
-struct ContentView: View {
+struct DegreeCalculator: View {
     @EnvironmentObject var modelData: ModelData
 
     var body: some View {
@@ -128,9 +128,9 @@ struct ContentView: View {
     }
 }
 
-struct ContentView_Previews: PreviewProvider {
+struct DegreeCalculator_Previews: PreviewProvider {
     static var previews: some View {
-        ContentView()
+        DegreeCalculator()
             .environmentObject(ModelData())
     }
 }

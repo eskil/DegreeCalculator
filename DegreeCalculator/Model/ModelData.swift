@@ -15,7 +15,22 @@ import Foundation
  */
 
 final class ModelData: ObservableObject {
-    @Published var entries: [String] = [" 39°15.2' +", "  1° 6.7' =", " 40°21.9'"]
+    @Published var entries: [Entry] = [Entry(left: Value(degrees: 39, minutes: 15.2),
+                                             right: Value(degrees: 1, minutes: 21.9),
+                                             op: Operator.Add),
+                                       Entry(left: Value(degrees: 40, minutes: 37.1),
+                                             right: Value(degrees: 350, minutes: 51.9),
+                                             op: Operator.Subtract)]
+                                             //" 39°15.2' +", "  1° 6.7' =", " 40°21.9'"]
+    @Published var entered: String = ""
+    
+    func add(_ char: Character) {
+        entered += String(char)
+    }
+    
+    func send(_ button: Any) {
+        print("button")
+    }
 }
 
 

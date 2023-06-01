@@ -7,19 +7,32 @@
 
 import Foundation
 
-struct Value: Codable, CustomStringConvertible {
+struct Value: Codable, Hashable, CustomStringConvertible {
     var degrees: Int
-    var minutes: Double
+    var minutes: Decimal
     
     public var description: String { return "\(degrees)°\(minutes)'" }
 }
 
-enum Operator: String, Codable {
+enum Operator: String, CustomStringConvertible, Hashable, Codable {
     case Add
     case Subtract
+    
+    public var description: String {
+        switch self {
+        case .Add:
+            return "+"
+        case .Subtract:
+            return "-"
+        }
+    }
 }
 
-struct Entry: CustomStringConvertible, Codable {
+struct Entry: CustomStringConvertible, Hashable, Codable {
+    static func == (lhs: Entry, rhs: Entry) -> Bool {
+        return lhs.value == rhs.value
+    }
+    
     var left: Value?
     var right: Value?
     var op: Operator?
@@ -31,7 +44,7 @@ struct Entry: CustomStringConvertible, Codable {
             }
             
             var degrees: Int = 0
-            var minutes: Double = 0.0
+            var minutes: Decimal = 0.0
             
             switch op! {
             case Operator.Add:
