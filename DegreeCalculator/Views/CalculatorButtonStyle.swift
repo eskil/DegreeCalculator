@@ -9,12 +9,13 @@ import Foundation
 import SwiftUI
 
 struct CalculatorButtonStyle: ButtonStyle {
+    var foregroundColor: Color = Color.white
     var backgroundColor: Color = Color.gray
     
     func makeBody(configuration: Configuration) -> some View {
         configuration
             .label
-            .foregroundColor(.white)
+            .foregroundColor(foregroundColor)
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .background(backgroundColor)
             .cornerRadius(4)

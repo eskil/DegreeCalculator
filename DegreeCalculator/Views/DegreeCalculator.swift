@@ -9,7 +9,8 @@ import SwiftUI
 
 struct DegreeCalculator: View {
     @EnvironmentObject var modelData: ModelData
-
+    @State var padTop = 0.0
+    
     var body: some View {
         VStack {
             GeometryReader { geo in
@@ -26,7 +27,7 @@ struct DegreeCalculator: View {
                             }
                             if let val = entry.right {
                                 Text(val.description + " " + "=")
-                                    .frame(maxWidth: .infinity, alignment: .leading)
+                                    .frame(maxWidth: .infinity, alignment: .leading)                                
                                 Rectangle()
                                     .frame(height: 1)
                                     .foregroundColor(.black)
@@ -72,14 +73,14 @@ struct DegreeCalculator: View {
             
             Grid(alignment: .topLeading, horizontalSpacing: 1, verticalSpacing: 1) {
                 GridRow {
-                    Button(action: { modelData.send(self) }) { Text("AC") }
+                    Button(action: { modelData.clearAll() }) { Text("AC") }
                         .buttonStyle(CalculatorButtonStyle(backgroundColor: Color.red))
-                    Button { } label: { Text("C")}
+                    Button(action: { modelData.clear() }) { Text("C")}
                         .buttonStyle(CalculatorButtonStyle(backgroundColor: Color.orange))
-                    Button { } label: { Text("DEL")}
+                    Button(action: { modelData.delete() }) { Text("DEL")}
                         .buttonStyle(CalculatorButtonStyle(backgroundColor: Color.orange))
-                    Button { } label: { Text("+/-")}
-                        .buttonStyle(CalculatorButtonStyle(backgroundColor: Color.brown))
+                    Button(action: { modelData.ans() }) { Text("ANS")}
+                         .buttonStyle(CalculatorButtonStyle(backgroundColor: Color.brown))
                }
                 GridRow {
                     Button(action: { modelData.add("7") }) { Text("7") }
@@ -88,8 +89,8 @@ struct DegreeCalculator: View {
                         .buttonStyle(CalculatorButtonStyle())
                     Button(action: { modelData.add("9") }) { Text("9") }
                         .buttonStyle(CalculatorButtonStyle())
-                    Button { } label: { Text("ANS")}
-                         .buttonStyle(CalculatorButtonStyle(backgroundColor: Color.brown))
+                    Button(action: { modelData.add("+") }) { Text("+") }
+                        .buttonStyle(CalculatorButtonStyle(foregroundColor: Color.black, backgroundColor: Color.yellow))
                }
                 GridRow {
                     Button(action: { modelData.add("4") }) { Text("4") }
@@ -98,8 +99,8 @@ struct DegreeCalculator: View {
                         .buttonStyle(CalculatorButtonStyle())
                     Button(action: { modelData.add("6") }) { Text("6") }
                         .buttonStyle(CalculatorButtonStyle())
-                    Button(action: { modelData.add("+") }) { Text("+") }
-                        .buttonStyle(CalculatorButtonStyle(backgroundColor: Color.yellow))
+                    Button(action: { modelData.add("-") }) { Text("-") }
+                        .buttonStyle(CalculatorButtonStyle(foregroundColor: Color.black, backgroundColor: Color.yellow))
                 }
                 GridRow {
                     Button(action: { modelData.add("1") }) { Text("1") }
@@ -109,7 +110,7 @@ struct DegreeCalculator: View {
                     Button(action: { modelData.add("3") }) { Text("3") }
                         .buttonStyle(CalculatorButtonStyle())
                     Button(action: { modelData.add("-") }) { Text("-") }
-                        .buttonStyle(CalculatorButtonStyle(backgroundColor: Color.yellow))
+                        .buttonStyle(CalculatorButtonStyle(backgroundColor: Color.white))
                 }
                 GridRow {
                     Button(action: { modelData.add("0") }) { Text("0") }
@@ -118,10 +119,20 @@ struct DegreeCalculator: View {
                         .buttonStyle(CalculatorButtonStyle(backgroundColor: Color.gray))
                     Button(action: { modelData.add("°") }) { Text("°") }
                         .buttonStyle(CalculatorButtonStyle(backgroundColor: Color.gray))
+                    /* See https://stackoverflow.com/a/68291983/21866895
+                     for how the Geometry reader here is done. It reads the Button's height and then padds by that (negative) to move up.
+                     */
                     Button(action: { modelData.add("=") }) { Text("=") }
                         .buttonStyle(CalculatorButtonStyle(backgroundColor: Color.green))
+                        .background(
+                            GeometryReader { geo in
+                                Color.clear.onAppear {
+                                    padTop = -geo.size.height-1.0
+                                }
+                            }
+                        )
+                        .padding(.top, padTop)
                 }
-                
             }
             .padding([.bottom], 20)
         }
@@ -130,7 +141,11 @@ struct DegreeCalculator: View {
 
 struct DegreeCalculator_Previews: PreviewProvider {
     static var previews: some View {
-        DegreeCalculator()
-            .environmentObject(ModelData())
+        ForEach(["iPhone 11 Pro", "iPhone 13 Pro", "iPhone 14 Pro", "iPhone SE (3rd generation)", "iPad (10th generation)"], id: \.self) { deviceName in
+            DegreeCalculator()
+                .environmentObject(ModelData())
+                .previewDevice(PreviewDevice(rawValue: deviceName))
+                .previewDisplayName(deviceName)
+        }
     }
 }

@@ -28,8 +28,25 @@ final class ModelData: ObservableObject {
         entered += String(char)
     }
     
-    func send(_ button: Any) {
-        print("button")
+    func clearAll() {
+        entries = []
+        entered = ""
+    }
+    
+    func clear() {
+        entered = ""
+    }
+    
+    func delete() {
+        entered.removeLast()
+    }
+    
+    func ans() {
+        if let last = entries.last {
+            if let val = last.value {
+                entered = val.description
+            }
+        }
     }
 }
 
