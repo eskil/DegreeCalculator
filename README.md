@@ -1,4 +1,4 @@
-== DegreeCalculator
+## DegreeCalculator 
 
 A simple degree/minutes(fractions) add/subtract calculator.
 
