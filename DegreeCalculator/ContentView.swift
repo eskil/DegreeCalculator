@@ -11,7 +11,7 @@ struct ContentView: View {
     @State var modelData = ModelData()
 
     var body: some View {
-        DegreeCalculator().environmentObject(modelData)
+        Calculator().environmentObject(modelData)
     }
 }
 

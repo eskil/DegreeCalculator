@@ -17,7 +17,8 @@
 		DACF74592A18675D00826755 /* CalculatorButtonStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = DACF74582A18675D00826755 /* CalculatorButtonStyle.swift */; };
 		DACF745C2A1A834200826755 /* ModelData.swift in Sources */ = {isa = PBXBuildFile; fileRef = DACF745B2A1A834200826755 /* ModelData.swift */; };
 		DACF745E2A266EC000826755 /* DegreeCore.swift in Sources */ = {isa = PBXBuildFile; fileRef = DACF745D2A266EC000826755 /* DegreeCore.swift */; };
-		DACF74602A2958D300826755 /* DegreeCalculator.swift in Sources */ = {isa = PBXBuildFile; fileRef = DACF745F2A2958D300826755 /* DegreeCalculator.swift */; };
+		DACF74602A2958D300826755 /* Calculator.swift in Sources */ = {isa = PBXBuildFile; fileRef = DACF745F2A2958D300826755 /* Calculator.swift */; };
+		DACF74662A2A923300826755 /* CalculatorButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = DACF74652A2A923300826755 /* CalculatorButton.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -51,7 +52,8 @@
 		DACF74582A18675D00826755 /* CalculatorButtonStyle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalculatorButtonStyle.swift; sourceTree = "<group>"; };
 		DACF745B2A1A834200826755 /* ModelData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModelData.swift; sourceTree = "<group>"; };
 		DACF745D2A266EC000826755 /* DegreeCore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DegreeCore.swift; sourceTree = "<group>"; };
-		DACF745F2A2958D300826755 /* DegreeCalculator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DegreeCalculator.swift; sourceTree = "<group>"; };
+		DACF745F2A2958D300826755 /* Calculator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Calculator.swift; sourceTree = "<group>"; };
+		DACF74652A2A923300826755 /* CalculatorButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalculatorButton.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -141,7 +143,8 @@
 			isa = PBXGroup;
 			children = (
 				DACF74582A18675D00826755 /* CalculatorButtonStyle.swift */,
-				DACF745F2A2958D300826755 /* DegreeCalculator.swift */,
+				DACF745F2A2958D300826755 /* Calculator.swift */,
+				DACF74652A2A923300826755 /* CalculatorButton.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -286,9 +289,10 @@
 			buildActionMask = 2147483647;
 			files = (
 				DA61AEEF2A1840F900048DAB /* ContentView.swift in Sources */,
+				DACF74662A2A923300826755 /* CalculatorButton.swift in Sources */,
 				DACF745C2A1A834200826755 /* ModelData.swift in Sources */,
 				DACF745E2A266EC000826755 /* DegreeCore.swift in Sources */,
-				DACF74602A2958D300826755 /* DegreeCalculator.swift in Sources */,
+				DACF74602A2958D300826755 /* Calculator.swift in Sources */,
 				DACF74592A18675D00826755 /* CalculatorButtonStyle.swift in Sources */,
 				DA61AEED2A1840F900048DAB /* DegreeCalculatorApp.swift in Sources */,
 			);

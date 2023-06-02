@@ -14,6 +14,18 @@ import Foundation
  https://www.hackingwithswift.com/example-code/strings/how-to-load-a-string-from-a-file-in-your-bundle
  */
 
+enum CalculatorFunction: Int {
+    case ANS
+    case ALL_CLEAR
+    case CLEAR
+    case DELETE
+    case ADD
+    case SUBTRACT
+    case EQUAL
+    case ENTRY
+    
+}
+
 final class ModelData: ObservableObject {
     @Published var entries: [Entry] = [Entry(left: Value(degrees: 39, minutes: 15.2),
                                              right: Value(degrees: 1, minutes: 21.9),
@@ -23,12 +35,41 @@ final class ModelData: ObservableObject {
                                              op: Operator.Subtract)]
                                              //" 39°15.2' +", "  1° 6.7' =", " 40°21.9'"]
     @Published var entered: String = ""
-    
-    func add(_ char: Character) {
-        entered += String(char)
+    @Published var value: Value?
+    @Published var entry: Entry?
+
+    func addEntry(_ string: String) {
+        if string == "°" {
+            return setDegree()
+        } else if string == "." {
+            return setFraction()
+        } else {
+            entered += string
+        }
     }
     
-    func clearAll() {
+    func callFunction(_ f: CalculatorFunction, label: String) {
+        switch f {
+        case .ANS:
+            return ans()
+        case .ALL_CLEAR:
+            return allClear()
+        case .CLEAR:
+            return clear()
+        case .DELETE:
+            return delete()
+        case .ADD:
+            return add()
+        case .SUBTRACT:
+            return subtract()
+        case .EQUAL:
+            return equal()
+        case .ENTRY:
+            return addEntry(label)
+        }
+    }
+    
+    func allClear() {
         entries = []
         entered = ""
     }
@@ -47,6 +88,45 @@ final class ModelData: ObservableObject {
                 entered = val.description
             }
         }
+    }
+    
+    func add() {
+        if value == nil {
+            return
+        }
+        if entry == nil {
+            entry = Entry(left: value, op: Operator.Add)
+        } else {
+            
+        }
+    }
+
+    func subtract() {
+        if value == nil {
+            return
+        }
+        if entry == nil {
+            entry = Entry(left: value, op: Operator.Subtract)
+        } else {
+            
+        }
+    }
+    
+    func equal() {
+        entered += "="
+    }
+    
+    func setDegree() {
+        if entered.contains("°") {
+            return
+        }
+        if entered.contains(".") {
+            return
+        }
+    }
+    
+    func setFraction() {
+        
     }
 }
 

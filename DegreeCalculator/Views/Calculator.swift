@@ -1,5 +1,5 @@
 //
-//  DegreeCalculator.swift
+//  Calculator.swift
 //  DegreeCalculator
 //
 //  Created by Eskil Olsen on 6/1/23.
@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct DegreeCalculator: View {
+struct Calculator: View {
     @EnvironmentObject var modelData: ModelData
     @State var padTop = 0.0
     
@@ -73,54 +73,33 @@ struct DegreeCalculator: View {
 
             Grid(alignment: .topLeading, horizontalSpacing: 1, verticalSpacing: 1) {
                 GridRow {
-                    Button(action: { modelData.clearAll() }) { Text("AC") }
-                        .buttonStyle(CalculatorButtonStyle(backgroundColor: Color.red))
-                    Button(action: { modelData.clear() }) { Text("C")}
-                        .buttonStyle(CalculatorButtonStyle(backgroundColor: Color.orange))
-                    Button(action: { modelData.delete() }) { Text("DEL")}
-                        .buttonStyle(CalculatorButtonStyle(backgroundColor: Color.orange))
-                    Button(action: { modelData.ans() }) { Text("ANS")}
-                         .buttonStyle(CalculatorButtonStyle(backgroundColor: Color.brown))
+                    CalculatorButton(label: "AC", function: CalculatorFunction.ALL_CLEAR)
+                    CalculatorButton(label: "C", function: CalculatorFunction.CLEAR)
+                    CalculatorButton(label: "DEL", function: CalculatorFunction.DELETE)
+                    CalculatorButton(label: "ANS", function: CalculatorFunction.ANS)
                }
                 GridRow {
-                    Button(action: { modelData.add("7") }) { Text("7") }
-                        .buttonStyle(CalculatorButtonStyle())
-                    Button(action: { modelData.add("8") }) { Text("8") }
-                        .buttonStyle(CalculatorButtonStyle())
-                    Button(action: { modelData.add("9") }) { Text("9") }
-                        .buttonStyle(CalculatorButtonStyle())
-                    Button(action: { modelData.add("+") }) { Text("+") }
-                        .buttonStyle(CalculatorButtonStyle(foregroundColor: Color.black, backgroundColor: Color.yellow))
+                    CalculatorButton(label: "7", function: CalculatorFunction.ENTRY)
+                    CalculatorButton(label: "8", function: CalculatorFunction.ENTRY)
+                    CalculatorButton(label: "9", function: CalculatorFunction.ENTRY)
+                    CalculatorButton(label: "+", function: CalculatorFunction.ADD)
                }
                 GridRow {
-                    Button(action: { modelData.add("4") }) { Text("4") }
-                        .buttonStyle(CalculatorButtonStyle())
-                    Button(action: { modelData.add("5") }) { Text("5") }
-                        .buttonStyle(CalculatorButtonStyle())
-                    Button(action: { modelData.add("6") }) { Text("6") }
-                        .buttonStyle(CalculatorButtonStyle())
-                    Button(action: { modelData.add("-") }) { Text("-") }
-                        .buttonStyle(CalculatorButtonStyle(foregroundColor: Color.black, backgroundColor: Color.yellow))
+                    CalculatorButton(label: "4", function: CalculatorFunction.ENTRY)
+                    CalculatorButton(label: "5", function: CalculatorFunction.ENTRY)
+                    CalculatorButton(label: "6", function: CalculatorFunction.ENTRY)
+                    CalculatorButton(label: "-", function: CalculatorFunction.SUBTRACT)
                 }
                 GridRow {
-                    Button(action: { modelData.add("1") }) { Text("1") }
-                        .buttonStyle(CalculatorButtonStyle())
-                    Button(action: { modelData.add("2") }) { Text("2") }
-                        .buttonStyle(CalculatorButtonStyle())
-                    Button(action: { modelData.add("3") }) { Text("3") }
-                        .buttonStyle(CalculatorButtonStyle())
-                    Button(action: { modelData.add("-") }) { Text("-") }
-                        .buttonStyle(CalculatorButtonStyle(backgroundColor: Color.white))
+                    CalculatorButton(label: "1", function: CalculatorFunction.ENTRY)
+                    CalculatorButton(label: "2", function: CalculatorFunction.ENTRY)
+                    CalculatorButton(label: "3", function: CalculatorFunction.ENTRY)
                 }
                 GridRow {
-                    Button(action: { modelData.add("0") }) { Text("0") }
-                        .buttonStyle(CalculatorButtonStyle())
-                    Button(action: { modelData.add(".") }) { Text(".") }
-                        .buttonStyle(CalculatorButtonStyle(backgroundColor: Color.gray))
-                    Button(action: { modelData.add("°") }) { Text("°") }
-                        .buttonStyle(CalculatorButtonStyle(backgroundColor: Color.gray))
-                    Button(action: { modelData.add("=") }) { Text("=") }
-                        .buttonStyle(CalculatorButtonStyle(backgroundColor: Color.green))
+                    CalculatorButton(label: "0", function: CalculatorFunction.ENTRY)
+                    CalculatorButton(label: ".", function: CalculatorFunction.ENTRY)
+                    CalculatorButton(label: "°", function: CalculatorFunction.ENTRY)
+                    CalculatorButton(label: "=", function: CalculatorFunction.EQUAL)
                         .background(
                             GeometryReader { geo in
                                 /* See https://stackoverflow.com/a/68291983/21866895
@@ -144,10 +123,10 @@ struct DegreeCalculator: View {
     }
 }
 
-struct DegreeCalculator_Previews: PreviewProvider {
+struct Calculator_Previews: PreviewProvider {
     static var previews: some View {
         ForEach(["iPhone 11 Pro", "iPhone 13 Pro", "iPhone 14 Pro", "iPhone SE (3rd generation)", "iPad (10th generation)"], id: \.self) { deviceName in
-            DegreeCalculator()
+            Calculator()
                 .environmentObject(ModelData())
                 .previewDevice(PreviewDevice(rawValue: deviceName))
                 .previewDisplayName(deviceName)
