@@ -18,7 +18,7 @@ struct CalculatorButtonStyle: ButtonStyle {
             .foregroundColor(foregroundColor)
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .background(backgroundColor)
-            .cornerRadius(4)
-            .padding(4.0)
+            .cornerRadius(3)
+            .padding(1.0)
     }
 }

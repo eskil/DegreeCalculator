@@ -70,7 +70,7 @@ struct DegreeCalculator: View {
             }
             
             Divider()
-            
+
             Grid(alignment: .topLeading, horizontalSpacing: 1, verticalSpacing: 1) {
                 GridRow {
                     Button(action: { modelData.clearAll() }) { Text("AC") }
@@ -119,13 +119,15 @@ struct DegreeCalculator: View {
                         .buttonStyle(CalculatorButtonStyle(backgroundColor: Color.gray))
                     Button(action: { modelData.add("°") }) { Text("°") }
                         .buttonStyle(CalculatorButtonStyle(backgroundColor: Color.gray))
-                    /* See https://stackoverflow.com/a/68291983/21866895
-                     for how the Geometry reader here is done. It reads the Button's height and then padds by that (negative) to move up.
-                     */
                     Button(action: { modelData.add("=") }) { Text("=") }
                         .buttonStyle(CalculatorButtonStyle(backgroundColor: Color.green))
                         .background(
                             GeometryReader { geo in
+                                /* See https://stackoverflow.com/a/68291983/21866895
+                                 for how the Geometry reader here is done.
+                                 It reads the Button's height and then padds by that (negative) to move up.
+                                 The extra -1.0 seems to be needed.
+                                 */
                                 Color.clear.onAppear {
                                     padTop = -geo.size.height-1.0
                                 }
@@ -135,7 +137,10 @@ struct DegreeCalculator: View {
                 }
             }
             .padding([.bottom], 20)
+            .background(Color.black)
         }
+        .background(Color(UIColor.lightGray))
+
     }
 }
 
