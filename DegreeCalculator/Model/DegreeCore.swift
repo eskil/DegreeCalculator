@@ -10,7 +10,6 @@ import Foundation
 struct Value: Codable, Hashable, CustomStringConvertible {
     var degrees: Int
     var minutes: Decimal
-    
     public var description: String { return "\(degrees)°\(minutes)'" }
 }
 
@@ -33,66 +32,130 @@ struct Entry: CustomStringConvertible, Hashable, Codable {
         return lhs.value == rhs.value
     }
     
-    var left: Value?
-    var right: Value?
+    var nodes: [Entry]
     var op: Operator?
-
+    var v: Value?
+    
     var value: Value? {
         get {
-            if op == nil || right == nil || left == nil {
+            if v != nil {
+                return v
+            }
+            if nodes.count == 0 {
                 return nil
             }
             
-            var degrees: Int = 0
-            var minutes: Decimal = 0.0
-            
-            switch op! {
-            case Operator.Add:
-                minutes = left!.minutes + right!.minutes
-                degrees = left!.degrees + right!.degrees
-            case Operator.Subtract:
-                minutes = left!.minutes - right!.minutes
-                degrees = left!.degrees - right!.degrees
+            if op == nil || nodes.count == 1 {
+                return nodes[0].value
             }
-            
-            // This could be done via % 60 and % 360 and checking for negative.
-            // However this is not runtime sensitive and this extremely literal
-            // version is an easy to understand/read reflection of how a person does this math.
-            while minutes > 60.0 {
-                degrees += 1
-                minutes -= 60.0
+
+            if let lv = nodes[0].value, let rv = nodes[1].value {
+                var degrees: Int = 0
+                var minutes: Decimal = 0.0
+                
+                switch op! {
+                case Operator.Add:
+                    degrees = lv.degrees + rv.degrees
+                    minutes = lv.minutes + rv.minutes
+                case Operator.Subtract:
+                    degrees = lv.degrees - rv.degrees
+                    minutes = lv.minutes - rv.minutes
+                }
+                
+                // This could be done via % 60 and % 360 and checking
+                // for negative. But this is not runtime sensitive and
+                // this extremely literal version is an easy to
+                // understand/read reflection of how a person does
+                // this math.
+                
+                while minutes > 60.0 {
+                    degrees += 1
+                    minutes -= 60.0
+                }
+                while minutes < 0.0  {
+                    minutes += 60.0
+                    degrees -= 1
+                }
+                while degrees >= 360 {
+                    degrees -= 360
+                }
+                while degrees < 0 {
+                    degrees += 360
+                }
+                return Value(degrees: degrees, minutes: minutes)
+            } else {
+                return nodes[0].value
             }
-            while minutes < 0.0  {
-                minutes += 60.0
-                degrees -= 1
-            }
-            while degrees > 360 {
-                degrees -= 360
-            }
-            while degrees < 0 {
-                degrees += 360
-            }
-            return Value(degrees: degrees, minutes: minutes)
         }
     }
+
+    init(_ value: Value) {
+        self.op = nil
+        self.nodes = []
+        self.v = value
+    }
+
+    /*
+    init(op: Operator?, left: Value?, right: Value?) {
+        self.op = op
+        self.nodes = []
+        if let l = left {
+            self.nodes.append(Entry(value: l))
+        }
+        if let r = right {
+            self.nodes.append(Entry(value: r))
+        }
+    }
+
+    init(op: Operator?, left: Value?, right: Entry?) {
+        self.op = op
+        self.nodes = []
+        if let l = left {
+            self.nodes.append(Entry(value: l))
+        }
+        if let r = right {
+            self.nodes.append(r)
+        }
+    }
+     */
     
+    init(op: Operator?, left: Entry?, right: Entry?) {
+        self.op = op
+        self.nodes = []
+        if let l = left {
+            self.nodes.append(l)
+        }
+        if let r = right {
+            self.nodes.append(r)
+        }
+    }
+
     public var description: String {
         var result: [String] = []
-        
-        if let a = left {
-            result.append("\(a)")
+        if let v = v {
+            result.append("\(v.description)")
         } else {
-            result.append("nil")
-        }
-        if let b = op {
-            result.append("\(b)")
-        } else {
-            result.append("nil")
-        }
-        if let c = right {
-            result.append("\(c)")
-        } else {
-            result.append("nil")
+            if nodes.count > 0 {
+                result.append("(")
+            }
+            if nodes.count == 0 {
+                result.append("<empty>")
+            } else {
+                result.append("\(nodes[0].description)")
+            }
+            if let b = op {
+                result.append("\(b)")
+            } else {
+                result.append("<noop>")
+            }
+            if nodes.count == 1 {
+                result.append("<empty>")
+            } else {
+                result.append("\(nodes[1].description)")
+            }
+            if nodes.count > 0 {
+                result.append(")")
+            }
         }
         return result.joined(separator: " ")
     }

@@ -16,25 +16,27 @@ struct Calculator: View {
             GeometryReader { geo in
                 ScrollView {
                     ScrollViewReader { value in
-                    Text(modelData.entered)
+                        Text(modelData.entered)
                             .frame(maxWidth: .infinity, alignment: .leading)
-
+                        
                         ForEach(modelData.entries, id: \.self) { entry in
                             // https://sarunw.com/posts/how-to-make-swiftui-view-fill-container-width-and-height/
-                            if let val = entry.left, let op = entry.op {
+                            if let val = entry.nodes[0].value, let op = entry.op {
                                 Text(val.description + " " + op.description)
                                     .frame(maxWidth: .infinity, alignment: .leading)
                             }
-                            if let val = entry.right {
-                                Text(val.description + " " + "=")
-                                    .frame(maxWidth: .infinity, alignment: .leading)                                
-                                Rectangle()
-                                    .frame(height: 1)
-                                    .foregroundColor(.black)
-                                    .padding(.trailing, 132)
-                                    .padding(.leading, 0)
-                                    .padding(.top, -14)
-                                    .padding(.bottom, 0)
+                            if entry.nodes.count > 0 {
+                                if let val = entry.nodes[1].value {
+                                    Text(val.description + " " + "=")
+                                        .frame(maxWidth: .infinity, alignment: .leading)
+                                    Rectangle()
+                                        .frame(height: 1)
+                                        .foregroundColor(.black)
+                                        .padding(.trailing, 132)
+                                        .padding(.leading, 0)
+                                        .padding(.top, -14)
+                                        .padding(.bottom, 0)
+                                }
                             }
                             if let val = entry.value {
                                 Text(val.description)

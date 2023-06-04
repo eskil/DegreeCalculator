@@ -27,12 +27,25 @@ enum CalculatorFunction: Int {
 }
 
 final class ModelData: ObservableObject {
-    @Published var entries: [Entry] = [Entry(left: Value(degrees: 39, minutes: 15.2),
-                                             right: Value(degrees: 1, minutes: 21.9),
-                                             op: Operator.Add),
-                                       Entry(left: Value(degrees: 40, minutes: 37.1),
-                                             right: Value(degrees: 350, minutes: 51.9),
-                                             op: Operator.Subtract)]
+    @Published var entries: [Entry] = [
+        Entry(op: Operator.Add,
+              left: Entry(Value(degrees: 39, minutes: 15.2)),
+              right: Entry(Value(degrees: 1, minutes: 21.9))),
+        Entry(op: Operator.Add,
+                       left: Entry(Value(degrees: 39, minutes: 15.2)),
+                       right: Entry(op: Operator.Subtract,
+                                    left: Entry(Value(degrees: 1, minutes: 21.9)),
+                                    right: Entry(op: Operator.Add,
+                                                 left: Entry(Value(degrees: 49, minutes: 37.1)),
+                                                 right: Entry(Value(degrees: 350, minutes: 51.9))))),
+        Entry(op: Operator.Add,
+                       left: Entry(op: Operator.Subtract,
+                                   left: Entry(op: Operator.Add,
+                                               left: Entry(Value(degrees: 39, minutes: 15.2)),
+                                               right: Entry(Value(degrees: 1, minutes: 21.9))),
+                                   right: Entry(Value(degrees: 49, minutes: 37.1))),
+                       right: Entry(Value(degrees: 350, minutes: 51.9)))
+    ]
                                              //" 39°15.2' +", "  1° 6.7' =", " 40°21.9'"]
     @Published var entered: String = ""
     @Published var value: Value?
@@ -90,26 +103,23 @@ final class ModelData: ObservableObject {
         }
     }
     
-    func add() {
-        if value == nil {
-            return
-        }
-        if entry == nil {
-            entry = Entry(left: value, op: Operator.Add)
+    func startExpr(op: Operator) {
+        if let value = value {
+            if entry == nil {
+                entry = Entry(op: op, left: Entry(value), right: nil)
+            }
         } else {
-            
+            NSLog("No value on left side")
         }
+
+    }
+    
+    func add() {
+        startExpr(op: Operator.Add)
     }
 
     func subtract() {
-        if value == nil {
-            return
-        }
-        if entry == nil {
-            entry = Entry(left: value, op: Operator.Subtract)
-        } else {
-            
-        }
+        startExpr(op: Operator.Subtract)
     }
     
     func equal() {
