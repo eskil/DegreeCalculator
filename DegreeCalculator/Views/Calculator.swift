@@ -12,6 +12,7 @@ struct Calculator: View {
     @State var padTop = 0.0
     
     struct Line: Hashable {
+        var id = 0
         var value: String
         var op: String?
     }
@@ -45,7 +46,11 @@ struct Calculator: View {
 
             result = result + tmp
         }
-        return result + [Line(value: modelData.entered, op: nil)]
+        result = result + [Line(value: modelData.entered, op: nil)]
+        for index in result.indices {
+            result[index].id = index
+        }
+        return result
     }
     
     var body: some View {
@@ -53,7 +58,7 @@ struct Calculator: View {
             GeometryReader { geo in
                 ScrollView {
                     ScrollViewReader { scroll_reader in
-                        ForEach(lines, id: \.self) { line in
+                        ForEach(lines, id: \.id) { line in
                             // https://sarunw.com/posts/how-to-make-swiftui-view-fill-container-width-and-height/
                             if let op = line.op {
                                 if op == "=" {
@@ -101,10 +106,9 @@ struct Calculator: View {
                         }
                          */
                     }
-                    .frame(maxWidth: .infinity)
-                    .font(.system(.largeTitle, design: .monospaced))
                 }
                 //.frame(width: geo.size.width, height: geo.size.height/2)
+                .font(.system(.largeTitle, design: .monospaced))
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .padding(20.0)
             }
