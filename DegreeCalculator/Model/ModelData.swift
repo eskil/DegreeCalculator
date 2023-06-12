@@ -128,8 +128,11 @@ final class ModelData: ObservableObject {
     
     private func prepExpr() -> Expr {
         // If the string is emptish, this will create a 0d0'0
+        // First add a d symbol, which will add a leading 0
         setDegree()
+        // Then add ' symbol, which will add 0 after degree is there's no numbers
         setMinutes()
+        // Then add a 0 after the last '
         addEntry("0")
         
         let value = parseValue(entered)
@@ -137,10 +140,14 @@ final class ModelData: ObservableObject {
     }
     
     func startExpr(op: Operator) {
+        if entered.isEmpty {
+            NSLog("can't start operator on empty expression")
+            return
+        }
         let node = prepExpr()
         
         if var root = entries.last {
-            if root.op == nil  && root.nodes.count == 0 {
+            if root.op == nil  {
                 // Fresh root
                 root.op = op
                 root.nodes.append(node)
