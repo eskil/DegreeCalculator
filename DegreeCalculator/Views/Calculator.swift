@@ -72,7 +72,6 @@ struct Calculator: View {
                                             .padding(.leading, 0)
                                             .padding(.top, -14)
                                             .padding(.bottom, 0)
-                                            .id(line.id)
                                     } else if op == "==" {
                                         Text(line.value + " ")
                                             .frame(maxWidth: .infinity, alignment: .leading)
@@ -91,20 +90,17 @@ struct Calculator: View {
                                             .padding(.leading, 0)
                                             .padding(.top, -14)
                                             .padding(.bottom, 0)
-                                            .id(line.id)
 
                                     } else {
                                         Text(line.value + " " + op)
                                             .frame(maxWidth: .infinity, alignment: .leading)
                                             .foregroundColor(.white)
-                                            .id(line.id)
                                         
                                     }
                                 } else {
                                     Text(line.value)
                                         .frame(maxWidth: .infinity, alignment: .leading)
                                         .foregroundColor(.yellow)
-                                        .id(line.id)
                                 }
                             }
                             .id(line.id)
