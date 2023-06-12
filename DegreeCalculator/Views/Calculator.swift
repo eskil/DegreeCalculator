@@ -40,8 +40,6 @@ struct Calculator: View {
             if let result = entry.value {
                 tmp.append(Line(value: line.value, op: "="))
                 tmp.append(Line(value: result.description, op: "=="))
-            } else {
-                // tmp.append(Line(value: line.value))
             }
 
             result = result + tmp
@@ -50,6 +48,7 @@ struct Calculator: View {
         for index in result.indices {
             result[index].id = index
         }
+        NSLog("computed lines")
         return result
     }
     
@@ -60,51 +59,64 @@ struct Calculator: View {
                     ScrollViewReader { scroll_reader in
                         ForEach(lines, id: \.id) { line in
                             // https://sarunw.com/posts/how-to-make-swiftui-view-fill-container-width-and-height/
-                            if let op = line.op {
-                                if op == "=" {
-                                    Text(line.value + " " + op)
-                                        .frame(maxWidth: .infinity, alignment: .leading)
-                                    Rectangle()
-                                        .frame(height: 1)
-                                        .foregroundColor(.black)
-                                        .padding(.trailing, 132)
-                                        .padding(.leading, 0)
-                                        .padding(.top, -14)
-                                        .padding(.bottom, 0)
-                                } else if op == "==" {
-                                    Text(line.value + " ")
-                                        .frame(maxWidth: .infinity, alignment: .leading)
-                                    Rectangle()
-                                        .frame(height: 1)
-                                        .foregroundColor(.black)
-                                        .padding(.trailing, 132)
-                                        .padding(.leading, 0)
-                                        .padding(.top, -14)
-                                        .padding(.bottom, 0)
-                                    Rectangle()
-                                        .frame(height: 1)
-                                        .foregroundColor(.black)
-                                        .padding(.trailing, 132)
-                                        .padding(.leading, 0)
-                                        .padding(.top, -14)
-                                        .padding(.bottom, 0)
+                            VStack {
+                                if let op = line.op {
+                                    if op == "=" {
+                                        Text(line.value + " " + op)
+                                            .frame(maxWidth: .infinity, alignment: .leading)
+                                            .foregroundColor(.white)
+                                        Rectangle()
+                                            .frame(height: 1)
+                                            .foregroundColor(.white)
+                                            .padding(.trailing, 132)
+                                            .padding(.leading, 0)
+                                            .padding(.top, -14)
+                                            .padding(.bottom, 0)
+                                            .id(line.id)
+                                    } else if op == "==" {
+                                        Text(line.value + " ")
+                                            .frame(maxWidth: .infinity, alignment: .leading)
+                                            .foregroundColor(.white)
+                                        Rectangle()
+                                            .frame(height: 1)
+                                            .foregroundColor(.white)
+                                            .padding(.trailing, 132)
+                                            .padding(.leading, 0)
+                                            .padding(.top, -14)
+                                            .padding(.bottom, 0)
+                                        Rectangle()
+                                            .frame(height: 1)
+                                            .foregroundColor(.white)
+                                            .padding(.trailing, 132)
+                                            .padding(.leading, 0)
+                                            .padding(.top, -14)
+                                            .padding(.bottom, 0)
+                                            .id(line.id)
+
+                                    } else {
+                                        Text(line.value + " " + op)
+                                            .frame(maxWidth: .infinity, alignment: .leading)
+                                            .foregroundColor(.white)
+                                            .id(line.id)
+                                        
+                                    }
                                 } else {
-                                    Text(line.value + " " + op)
+                                    Text(line.value)
                                         .frame(maxWidth: .infinity, alignment: .leading)
+                                        .foregroundColor(.yellow)
+                                        .id(line.id)
                                 }
-                            } else {
-                                Text(line.value)
-                                    .frame(maxWidth: .infinity, alignment: .leading)
-                                    .foregroundColor(.white)
                             }
+                            .id(line.id)
                         }
                         
-                        /*
                         // https://stackoverflow.com/questions/58376681/swiftui-automatically-scroll-to-bottom-in-scrollview-bottom-first
-                        .onChange(of: lines.count) { _ in
-                            scroll_reader.scrollTo(lines.count, anchor: .bottom)
+                        .onChange(of: modelData.entered) { _ in
+                            NSLog("change on model.entered count is \(lines.count)")
+                            // The -1 is to scroll to id:5 when list has 6 elements - starts at 0.
+                            // Alternatively, assign id:1, 2...
+                            scroll_reader.scrollTo(lines.count-1, anchor: .bottom)
                         }
-                         */
                     }
                 }
                 //.frame(width: geo.size.width, height: geo.size.height/2)
@@ -113,7 +125,7 @@ struct Calculator: View {
                 .padding(20.0)
             }
             
-            Divider()
+            // Divider()
 
             Grid(alignment: .topLeading, horizontalSpacing: 1, verticalSpacing: 1) {
                 GridRow {
@@ -162,7 +174,7 @@ struct Calculator: View {
             .padding([.bottom], 20)
             .background(Color.black)
         }
-        .background(Color(UIColor.lightGray))
+        .background(.black) //Color(UIColor.lightGray))
 
     }
 }
