@@ -193,11 +193,11 @@ struct Expr: CustomStringConvertible, Hashable, Codable {
     
     public func inOrder(visit: (Expr) -> Void) {
         if nodes.count > 0 {
-            visit(nodes[0])
+            nodes[0].inOrder(visit: visit)
         }
         visit(self)
         if nodes.count > 1 {
-            visit(nodes[1])
+            nodes[1].inOrder(visit: visit)
         }
     }
 }
