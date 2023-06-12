@@ -28,13 +28,15 @@ enum CalculatorFunction: Int {
 
 final class ModelData: ObservableObject {
     @Published var entries: [Expr] = [
-        Expr(),
+        // These comments are various test cases I used regularly.
         /*
+        // Basic, add two values
         Expr(op: Operator.Add,
               left: Expr(Value(degrees: 39, minutes: 15.2)),
               right: Expr(Value(degrees: 1, minutes: 21.9))),
         */
         /*
+        // Unsupported right-leaning tree
         Expr(op: Operator.Add,
                        left: Expr(Value(degrees: 39, minutes: 15.2)),
                        right: Expr(op: Operator.Subtract,
@@ -42,17 +44,36 @@ final class ModelData: ObservableObject {
                                     right: Expr(op: Operator.Add,
                                                  left: Expr(Value(degrees: 49, minutes: 37.1)),
                                                  right: Expr(Value(degrees: 350, minutes: 51.9))))),
+         */
+        /*
+        // Supported left-leaning tree
         Expr(op: Operator.Add,
                        left: Expr(op: Operator.Subtract,
                                    left: Expr(op: Operator.Add,
                                                left: Expr(Value(degrees: 39, minutes: 15.2)),
                                                right: Expr(Value(degrees: 1, minutes: 21.9))),
                                    right: Expr(Value(degrees: 49, minutes: 37.1))),
-                       right: Expr(Value(degrees: 350, minutes: 51.9)))
+                       right: Expr(Value(degrees: 350, minutes: 51.9))),
          */
+        /*
+        // Unclosed tree
+        Expr(op: Operator.Subtract,
+             left: Expr(op: Operator.Add,
+                        left: Expr(Value(degrees: 1, minutes: 2.3)),
+                        right: Expr(Value(degrees: 4, minutes: 5.6))),
+             right: nil),
+         */
+        // The initial value is a empty expression that we're inserting into.
+        Expr(),
     ]
     
+    // This is the string that is currently being edited. By keeping it as a simple string, we can delete
+    // (edit) it by simply removing chars.
     @Published var entered: String = ""
+    
+    // We keep entered strings in a stack, so that when we delete an operator, we can pop back to this.
+    // But we can probably drop this and just pop back to the discarded volume.
+    var enteredStack: [String] = []
     
     func addEntry(_ string: String) {
         if string == "°" {
@@ -98,6 +119,7 @@ final class ModelData: ObservableObject {
     func allClear() {
         entries = [Expr()]
         entered = ""
+        enteredStack = []
     }
     
     func clear() {
@@ -105,7 +127,30 @@ final class ModelData: ObservableObject {
     }
     
     func delete() {
-        entered.removeLast()
+        if entered.isEmpty {
+            // FIXME: fix this...
+            if let root = entries.last {
+                let left = root.nodes[0]
+                NSLog("left = \(left.description)")
+                if left.op == nil {
+                    // If left has no op, it's a value, so we're at the first entry of the expression - reset tree.
+                    let newRoot = Expr()
+                    entries.removeLast()
+                    entries.append(newRoot)
+                } else {
+                    // Otherwise, left side forms new root, but we go back to the "pre-operator" state
+                    let newRoot = Expr(op: left.op, left: left.nodes[0], right: nil)
+                    entries.removeLast()
+                    entries.append(newRoot)
+                }
+                if let s = enteredStack.popLast() {
+                    entered = s
+                }
+            }
+        } else {
+            entered.removeLast()
+        }
+        debugLog("DEL")
     }
     
     func ans() {
@@ -139,6 +184,18 @@ final class ModelData: ObservableObject {
         return Expr(value)
     }
     
+    private func debugLog(_ name: String) {
+        do {
+            let encoder = JSONEncoder()
+            encoder.outputFormatting = .prettyPrinted
+            let data = try encoder.encode(entries)
+            NSLog("JSON for \(name)")
+            NSLog(String(data: data, encoding: .utf8)!)
+        } catch {
+            NSLog("oops")
+        }
+    }
+    
     func startExpr(op: Operator) {
         if entered.isEmpty {
             NSLog("can't start operator on empty expression")
@@ -164,16 +221,9 @@ final class ModelData: ObservableObject {
             NSLog("entries has no root?")
         }
         
-        do {
-            let encoder = JSONEncoder()
-            encoder.outputFormatting = .prettyPrinted
-            let data = try encoder.encode(entries)
-            NSLog("JSON for op:")
-            NSLog(String(data: data, encoding: .utf8)!)
-        } catch {
-            NSLog("oops")
-        }
+        debugLog("op \(op.description)")
         
+        enteredStack.append(entered)
         entered = ""
     }
     
@@ -205,16 +255,9 @@ final class ModelData: ObservableObject {
             NSLog("entries has no root?")
         }
         
-        do {
-            let encoder = JSONEncoder()
-            encoder.outputFormatting = .prettyPrinted
-            let data = try encoder.encode(entries)
-            NSLog("JSON for op:")
-            NSLog(String(data: data, encoding: .utf8)!)
-        } catch {
-            NSLog("oops")
-        }
-        
+        debugLog("=")
+
+        enteredStack = []
         entered = ""
     }
     
@@ -247,7 +290,6 @@ final class ModelData: ObservableObject {
                 entered += "00"
             }
         }
-        // TODO: if there's 1 digit only, add a leading 0
         entered += "'"
     }
 }
