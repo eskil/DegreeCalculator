@@ -27,37 +27,50 @@ enum CalculatorFunction: Int {
 }
 
 final class ModelData: ObservableObject {
-    @Published var entries: [Entry] = [
-        Entry(op: Operator.Add,
-              left: Entry(Value(degrees: 39, minutes: 15.2)),
-              right: Entry(Value(degrees: 1, minutes: 21.9))),
-        Entry(op: Operator.Add,
-                       left: Entry(Value(degrees: 39, minutes: 15.2)),
-                       right: Entry(op: Operator.Subtract,
-                                    left: Entry(Value(degrees: 1, minutes: 21.9)),
-                                    right: Entry(op: Operator.Add,
-                                                 left: Entry(Value(degrees: 49, minutes: 37.1)),
-                                                 right: Entry(Value(degrees: 350, minutes: 51.9))))),
-        Entry(op: Operator.Add,
-                       left: Entry(op: Operator.Subtract,
-                                   left: Entry(op: Operator.Add,
-                                               left: Entry(Value(degrees: 39, minutes: 15.2)),
-                                               right: Entry(Value(degrees: 1, minutes: 21.9))),
-                                   right: Entry(Value(degrees: 49, minutes: 37.1))),
-                       right: Entry(Value(degrees: 350, minutes: 51.9)))
+    @Published var entries: [Expr] = [
+        Expr(),
+        /*
+        Expr(op: Operator.Add,
+              left: Expr(Value(degrees: 39, minutes: 15.2)),
+              right: Expr(Value(degrees: 1, minutes: 21.9))),
+        */
+        /*
+        Expr(op: Operator.Add,
+                       left: Expr(Value(degrees: 39, minutes: 15.2)),
+                       right: Expr(op: Operator.Subtract,
+                                    left: Expr(Value(degrees: 1, minutes: 21.9)),
+                                    right: Expr(op: Operator.Add,
+                                                 left: Expr(Value(degrees: 49, minutes: 37.1)),
+                                                 right: Expr(Value(degrees: 350, minutes: 51.9))))),
+        Expr(op: Operator.Add,
+                       left: Expr(op: Operator.Subtract,
+                                   left: Expr(op: Operator.Add,
+                                               left: Expr(Value(degrees: 39, minutes: 15.2)),
+                                               right: Expr(Value(degrees: 1, minutes: 21.9))),
+                                   right: Expr(Value(degrees: 49, minutes: 37.1))),
+                       right: Expr(Value(degrees: 350, minutes: 51.9)))
+         */
     ]
-                                             //" 39°15.2' +", "  1° 6.7' =", " 40°21.9'"]
+    
     @Published var entered: String = ""
-    @Published var value: Value?
-    @Published var entry: Entry?
-
+    
     func addEntry(_ string: String) {
         if string == "°" {
-            return setDegree()
-        } else if string == "." {
-            return setFraction()
+            setDegree()
+        } else if string == "'" {
+            setMinutes()
         } else {
-            entered += string
+            // If we have a ' and it's the last, we can add a number. But if not, we've already
+            // maxed our string
+            if entered.contains("'") {
+                if let c = entered.last {
+                    if c == "'" {
+                        entered += string
+                    }
+                }
+            } else {
+                entered += string
+            }
         }
     }
     
@@ -83,7 +96,7 @@ final class ModelData: ObservableObject {
     }
     
     func allClear() {
-        entries = []
+        entries = [Expr()]
         entered = ""
     }
     
@@ -96,22 +109,65 @@ final class ModelData: ObservableObject {
     }
     
     func ans() {
-        if let last = entries.last {
+        if entries.count > 1 {
+            let last = entries[entries.count-2]
             if let val = last.value {
                 entered = val.description
             }
         }
     }
     
+    func parseValue(_ s: String) -> Value {
+        let trimmed = entered.trimmingCharacters(in: .whitespaces)
+        let dgm = trimmed.split(separator: "°")
+        let degrees = Int(dgm[0]) ?? 0
+        let mins = dgm[1].split(separator: "'")
+        let minutes = Decimal(Int(mins[0]) ?? 0) + (Decimal((Int(mins[1]) ?? 0)) / 10.0)
+        return Value(degrees: degrees, minutes: minutes)
+    }
+    
+    private func prepExpr() -> Expr {
+        // If the string is emptish, this will create a 0d0'0
+        setDegree()
+        setMinutes()
+        addEntry("0")
+        
+        let value = parseValue(entered)
+        return Expr(value)
+    }
+    
     func startExpr(op: Operator) {
-        if let value = value {
-            if entry == nil {
-                entry = Entry(op: op, left: Entry(value), right: nil)
+        let node = prepExpr()
+        
+        if var root = entries.last {
+            if root.op == nil  && root.nodes.count == 0 {
+                // Fresh root
+                root.op = op
+                root.nodes.append(node)
+                entries.removeLast()
+                entries.append(root)
+            } else if root.op != nil && root.nodes.count == 1 {
+                // Root has a left side & operator, add right side value and new operator
+                root.nodes.append(node)
+                let newRoot = Expr(op: op, left: root, right: nil)
+                entries.removeLast()
+                entries.append(newRoot)
             }
         } else {
-            NSLog("No value on left side")
+            NSLog("entries has no root?")
         }
-
+        
+        do {
+            let encoder = JSONEncoder()
+            encoder.outputFormatting = .prettyPrinted
+            let data = try encoder.encode(entries)
+            NSLog("JSON for op:")
+            NSLog(String(data: data, encoding: .utf8)!)
+        } catch {
+            NSLog("oops")
+        }
+        
+        entered = ""
     }
     
     func add() {
@@ -123,20 +179,69 @@ final class ModelData: ObservableObject {
     }
     
     func equal() {
-        entered += "="
+        if let root = entries.last {
+            if root.nodes.count == 0 {
+                return
+            }
+        }
+        let node = prepExpr()
+        
+        if var root = entries.last {
+            if root.op != nil && root.nodes.count == 1 {
+                // Root has a left side & operator, add right side value and new operator
+                root.nodes.append(node)
+                entries.removeLast()
+                entries.append(root)
+                entries.append(Expr())
+            }
+        } else {
+            NSLog("entries has no root?")
+        }
+        
+        do {
+            let encoder = JSONEncoder()
+            encoder.outputFormatting = .prettyPrinted
+            let data = try encoder.encode(entries)
+            NSLog("JSON for op:")
+            NSLog(String(data: data, encoding: .utf8)!)
+        } catch {
+            NSLog("oops")
+        }
+        
+        entered = ""
     }
     
     func setDegree() {
+        if entered.contains("'") {
+            return
+        }
         if entered.contains("°") {
             return
         }
-        if entered.contains(".") {
-            return
+        if entered.isEmpty {
+            entered = "0°" + entered
+        } else {
+            entered += "°"
         }
     }
     
-    func setFraction() {
-        
+    func setMinutes() {
+        // We already set minutes
+        if entered.contains("'") {
+            return
+        }
+        // If there's no degrees, insert 0 degrees up front
+        if entered.contains("°") == false {
+            entered = "0°" + entered
+        }
+        // If the last char isn't a number, we're entering "'", so put a 0 up front
+        if let c = entered.last {
+            if c.isNumber == false {
+                entered += "00"
+            }
+        }
+        // TODO: if there's 1 digit only, add a leading 0
+        entered += "'"
     }
 }
 

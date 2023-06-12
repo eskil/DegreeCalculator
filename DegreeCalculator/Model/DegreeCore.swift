@@ -10,7 +10,32 @@ import Foundation
 struct Value: Codable, Hashable, CustomStringConvertible {
     var degrees: Int
     var minutes: Decimal
-    public var description: String { return "\(degrees)°\(minutes)'" }
+    
+    init() {
+        degrees = 0
+        minutes = 0.0
+    }
+
+    init(degrees: Int, minutes: Decimal) {
+        self.degrees = degrees
+        self.minutes = minutes
+    }
+    
+    public var description: String {
+        let formatter = NumberFormatter()
+        formatter.numberStyle = .decimal
+        formatter.maximumIntegerDigits = 2
+        formatter.minimumIntegerDigits = 2
+        formatter.decimalSeparator = "'"
+        formatter.maximumFractionDigits = 1
+        formatter.minimumFractionDigits = 1
+        let number = NSDecimalNumber(decimal: minutes)
+        if let s = formatter.string(from: number) {
+            return String(format: "%3d°%@", degrees, s)
+        } else {
+            return String(format: "%3d°", degrees)
+        }
+    }
 }
 
 enum Operator: String, CustomStringConvertible, Hashable, Codable {
@@ -27,12 +52,12 @@ enum Operator: String, CustomStringConvertible, Hashable, Codable {
     }
 }
 
-struct Entry: CustomStringConvertible, Hashable, Codable {
-    static func == (lhs: Entry, rhs: Entry) -> Bool {
+struct Expr: CustomStringConvertible, Hashable, Codable {
+    static func == (lhs: Expr, rhs: Expr) -> Bool {
         return lhs.value == rhs.value
     }
     
-    var nodes: [Entry]
+    var nodes: [Expr]
     var op: Operator?
     var v: Value?
     
@@ -46,7 +71,7 @@ struct Entry: CustomStringConvertible, Hashable, Codable {
             }
             
             if op == nil || nodes.count == 1 {
-                return nodes[0].value
+                return nil
             }
 
             if let lv = nodes[0].value, let rv = nodes[1].value {
@@ -89,6 +114,12 @@ struct Entry: CustomStringConvertible, Hashable, Codable {
         }
     }
 
+    init() {
+        self.op = nil
+        self.nodes = []
+        self.v = nil
+    }
+    
     init(_ value: Value) {
         self.op = nil
         self.nodes = []
@@ -100,18 +131,18 @@ struct Entry: CustomStringConvertible, Hashable, Codable {
         self.op = op
         self.nodes = []
         if let l = left {
-            self.nodes.append(Entry(value: l))
+            self.nodes.append(Expr(value: l))
         }
         if let r = right {
-            self.nodes.append(Entry(value: r))
+            self.nodes.append(Expr(value: r))
         }
     }
 
-    init(op: Operator?, left: Value?, right: Entry?) {
+    init(op: Operator?, left: Value?, right: Expr?) {
         self.op = op
         self.nodes = []
         if let l = left {
-            self.nodes.append(Entry(value: l))
+            self.nodes.append(Expr(value: l))
         }
         if let r = right {
             self.nodes.append(r)
@@ -119,7 +150,7 @@ struct Entry: CustomStringConvertible, Hashable, Codable {
     }
      */
     
-    init(op: Operator?, left: Entry?, right: Entry?) {
+    init(op: Operator?, left: Expr?, right: Expr?) {
         self.op = op
         self.nodes = []
         if let l = left {
@@ -158,5 +189,15 @@ struct Entry: CustomStringConvertible, Hashable, Codable {
             }
         }
         return result.joined(separator: " ")
+    }
+    
+    public func inOrder(visit: (Expr) -> Void) {
+        if nodes.count > 0 {
+            visit(nodes[0])
+        }
+        visit(self)
+        if nodes.count > 1 {
+            visit(nodes[1])
+        }
     }
 }

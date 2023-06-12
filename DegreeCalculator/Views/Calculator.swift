@@ -11,23 +11,53 @@ struct Calculator: View {
     @EnvironmentObject var modelData: ModelData
     @State var padTop = 0.0
     
+    struct Line: Hashable {
+        var value: String
+        var op: String?
+    }
+    
+    var lines: [Line] {
+        var result: [Line] = []
+        modelData.entries.forEach { entry in
+            var line: Line = Line(value: "")
+            var tmp: [Line] = []
+
+            // In order traverse the tree and add the left side value to "line", then the op
+            // and emit that line.
+            entry.inOrder { expr in
+                if let v = expr.v {
+                    line.value = v.description
+                }
+                if let op = expr.op {
+                    line.op = op.description
+                    tmp.append(Line(value: line.value, op: line.op))
+                    line = Line(value: "")
+                }
+            }
+            // Finally, if there's a result on the entry, add that since the expression is "proper and done". Otherwise just add the line being worked on.
+            // I'm not feeling this, I feel like maybe the "line" should start with the entered string.
+            if let result = entry.value {
+                tmp.append(Line(value: line.value, op: "="))
+                tmp.append(Line(value: result.description, op: "=="))
+            } else {
+                // tmp.append(Line(value: line.value))
+            }
+
+            result = result + tmp
+        }
+        return result + [Line(value: modelData.entered, op: nil)]
+    }
+    
     var body: some View {
         VStack {
             GeometryReader { geo in
                 ScrollView {
-                    ScrollViewReader { value in
-                        Text(modelData.entered)
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                        
-                        ForEach(modelData.entries, id: \.self) { entry in
+                    ScrollViewReader { scroll_reader in
+                        ForEach(lines, id: \.self) { line in
                             // https://sarunw.com/posts/how-to-make-swiftui-view-fill-container-width-and-height/
-                            if let val = entry.nodes[0].value, let op = entry.op {
-                                Text(val.description + " " + op.description)
-                                    .frame(maxWidth: .infinity, alignment: .leading)
-                            }
-                            if entry.nodes.count > 0 {
-                                if let val = entry.nodes[1].value {
-                                    Text(val.description + " " + "=")
+                            if let op = line.op {
+                                if op == "=" {
+                                    Text(line.value + " " + op)
                                         .frame(maxWidth: .infinity, alignment: .leading)
                                     Rectangle()
                                         .frame(height: 1)
@@ -36,35 +66,43 @@ struct Calculator: View {
                                         .padding(.leading, 0)
                                         .padding(.top, -14)
                                         .padding(.bottom, 0)
+                                } else if op == "==" {
+                                    Text(line.value + " ")
+                                        .frame(maxWidth: .infinity, alignment: .leading)
+                                    Rectangle()
+                                        .frame(height: 1)
+                                        .foregroundColor(.black)
+                                        .padding(.trailing, 132)
+                                        .padding(.leading, 0)
+                                        .padding(.top, -14)
+                                        .padding(.bottom, 0)
+                                    Rectangle()
+                                        .frame(height: 1)
+                                        .foregroundColor(.black)
+                                        .padding(.trailing, 132)
+                                        .padding(.leading, 0)
+                                        .padding(.top, -14)
+                                        .padding(.bottom, 0)
+                                } else {
+                                    Text(line.value + " " + op)
+                                        .frame(maxWidth: .infinity, alignment: .leading)
                                 }
-                            }
-                            if let val = entry.value {
-                                Text(val.description)
+                            } else {
+                                Text(line.value)
                                     .frame(maxWidth: .infinity, alignment: .leading)
-                                Rectangle()
-                                    .frame(height: 1)
-                                    .foregroundColor(.black)
-                                    .padding(.trailing, 132)
-                                    .padding(.leading, 0)
-                                    .padding(.top, -14)
-                                    .padding(.bottom, 0)
-                                Rectangle()
-                                    .frame(height: 1)
-                                    .foregroundColor(.black)
-                                    .padding(.trailing, 132)
-                                    .padding(.leading, 0)
-                                    .padding(.top, -18)
-                                    .padding(.bottom, 0)
+                                    .foregroundColor(.white)
                             }
                         }
+                        
+                        /*
                         // https://stackoverflow.com/questions/58376681/swiftui-automatically-scroll-to-bottom-in-scrollview-bottom-first
-                        .onChange(of: modelData.entries.count) { _ in
-                            value.scrollTo(modelData.entries.count - 1)
+                        .onChange(of: lines.count) { _ in
+                            scroll_reader.scrollTo(lines.count, anchor: .bottom)
                         }
+                         */
                     }
                     .frame(maxWidth: .infinity)
                     .font(.system(.largeTitle, design: .monospaced))
-                    
                 }
                 //.frame(width: geo.size.width, height: geo.size.height/2)
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -99,8 +137,8 @@ struct Calculator: View {
                 }
                 GridRow {
                     CalculatorButton(label: "0", function: CalculatorFunction.ENTRY)
-                    CalculatorButton(label: ".", function: CalculatorFunction.ENTRY)
                     CalculatorButton(label: "°", function: CalculatorFunction.ENTRY)
+                    CalculatorButton(label: "'", function: CalculatorFunction.ENTRY)
                     CalculatorButton(label: "=", function: CalculatorFunction.EQUAL)
                         .background(
                             GeometryReader { geo in
