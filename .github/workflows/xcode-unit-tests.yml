@@ -8,6 +8,6 @@ jobs:
     steps:
     - uses: actions/checkout@v1
     - name: Select Xcode
-      run: sudo xcode-select -switch /Applications/Xcode_14.0.app && /usr/bin/xcodebuild -version
+      run: sudo xcode-select -switch /Applications/Xcode_14.3.app && /usr/bin/xcodebuild -version
     - name: Run tests
       run: xcodebuild test -project DegreeCalculator.xcodeproj -scheme DegreeCalculator -sdk iphonesimulator -destination 'platform=iOS Simulator,name=iPhone 14,OS=16.4 | xcpretty && exit ${PIPESTATUS[0]}
