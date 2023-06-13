@@ -70,10 +70,7 @@ final class ModelData: ObservableObject {
     // This is the string that is currently being edited. By keeping it as a simple string, we can delete
     // (edit) it by simply removing chars.
     @Published var entered: String = ""
-    
-    // We keep entered strings in a stack, so that when we delete an operator, we can pop back to this.
-    // But we can probably drop this and just pop back to the discarded volume.
-    var enteredStack: [String] = []
+
     
     func addEntry(_ string: String) {
         if string == "°" {
@@ -119,7 +116,6 @@ final class ModelData: ObservableObject {
     func allClear() {
         entries = [Expr()]
         entered = ""
-        enteredStack = []
     }
     
     func clear() {
@@ -132,20 +128,26 @@ final class ModelData: ObservableObject {
             if let root = entries.last {
                 let left = root.nodes[0]
                 NSLog("left = \(left.description)")
+                
+                // Reset the entered string to right.v, left.v or .v in that order of preference.
+                if left.nodes.count == 2, let rightv = left.nodes[1].v {
+                    entered = rightv.description
+                } else if left.nodes.count == 1, let leftv = left.nodes[0].v {
+                    entered = leftv.description
+                } else if let v = left.v {
+                    entered = v.description
+                }
+                
+                var newRoot: Expr
                 if left.op == nil {
                     // If left has no op, it's a value, so we're at the first entry of the expression - reset tree.
-                    let newRoot = Expr()
-                    entries.removeLast()
-                    entries.append(newRoot)
+                    newRoot = Expr()
                 } else {
                     // Otherwise, left side forms new root, but we go back to the "pre-operator" state
-                    let newRoot = Expr(op: left.op, left: left.nodes[0], right: nil)
-                    entries.removeLast()
-                    entries.append(newRoot)
+                    newRoot = Expr(op: left.op, left: left.nodes[0], right: nil)
                 }
-                if let s = enteredStack.popLast() {
-                    entered = s
-                }
+                entries.removeLast()
+                entries.append(newRoot)
             }
         } else {
             entered.removeLast()
@@ -163,6 +165,8 @@ final class ModelData: ObservableObject {
     }
     
     func parseValue(_ s: String) -> Value {
+        // Simple parse by just splitting on ° and '. This work since
+        // prepExpr inserts ° and ' and trailing 0.
         let trimmed = entered.trimmingCharacters(in: .whitespaces)
         let dgm = trimmed.split(separator: "°")
         let degrees = Int(dgm[0]) ?? 0
@@ -223,7 +227,6 @@ final class ModelData: ObservableObject {
         
         debugLog("op \(op.description)")
         
-        enteredStack.append(entered)
         entered = ""
     }
     
@@ -257,7 +260,6 @@ final class ModelData: ObservableObject {
         
         debugLog("=")
 
-        enteredStack = []
         entered = ""
     }
     
