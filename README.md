@@ -1,4 +1,9 @@
-## DegreeCalculator
+DegreeCalculator
+================
+
+[![GitHub CI](https://github.com/eskil/DegreeCalculator/actions/workflows/xcode-unit-tests.yml/badge.svg)](https://github.com/eskil/DegreeCalculator/actions/workflows/xcode-unit-tests.yml)
+[![Last Updated](https://img.shields.io/github/last-commit/eskil/DegreeCalculator.svg)](https://github.com/eskil/DegreeCalculator/commits/master)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 A simple degree/minutes(fractions) add/subtract calculator.
 
