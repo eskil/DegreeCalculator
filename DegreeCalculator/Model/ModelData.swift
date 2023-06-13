@@ -126,6 +126,9 @@ final class ModelData: ObservableObject {
         if entered.isEmpty {
             // FIXME: fix this...
             if let root = entries.last {
+                if root.nodes.isEmpty && root.op == nil {
+                    return
+                }
                 let left = root.nodes[0]
                 NSLog("left = \(left.description)")
                 
