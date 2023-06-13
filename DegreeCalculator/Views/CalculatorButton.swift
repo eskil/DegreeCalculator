@@ -41,6 +41,7 @@ struct CalculatorButton: View {
             modelData.callFunction(function, label: label)
         }) {
             Text(label)
+                .font(.system(.largeTitle, design: .monospaced))
         }
         .buttonStyle(CalculatorButtonStyle(foregroundColor: fg, backgroundColor: bg))
     }

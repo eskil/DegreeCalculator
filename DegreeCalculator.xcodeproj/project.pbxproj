@@ -20,6 +20,7 @@
 		DACF745E2A266EC000826755 /* DegreeCore.swift in Sources */ = {isa = PBXBuildFile; fileRef = DACF745D2A266EC000826755 /* DegreeCore.swift */; };
 		DACF74602A2958D300826755 /* Calculator.swift in Sources */ = {isa = PBXBuildFile; fileRef = DACF745F2A2958D300826755 /* Calculator.swift */; };
 		DACF74662A2A923300826755 /* CalculatorButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = DACF74652A2A923300826755 /* CalculatorButton.swift */; };
+		DAE002602A38EF1800502C2E /* ModelDataTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAE0025F2A38EF1800502C2E /* ModelDataTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -57,6 +58,7 @@
 		DACF745D2A266EC000826755 /* DegreeCore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DegreeCore.swift; sourceTree = "<group>"; };
 		DACF745F2A2958D300826755 /* Calculator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Calculator.swift; sourceTree = "<group>"; };
 		DACF74652A2A923300826755 /* CalculatorButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalculatorButton.swift; sourceTree = "<group>"; };
+		DAE0025F2A38EF1800502C2E /* ModelDataTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModelDataTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -87,6 +89,7 @@
 		DA61AEE02A1840F900048DAB = {
 			isa = PBXGroup;
 			children = (
+				DAE002612A38FA4300502C2E /* Assets */,
 				DAA33A902A38169600EA7A2B /* DegreeCalculator.xctestplan */,
 				DA61AEEB2A1840F900048DAB /* DegreeCalculator */,
 				DA61AEFC2A1840FB00048DAB /* DegreeCalculatorTests */,
@@ -131,6 +134,7 @@
 			children = (
 				DA61AEFD2A1840FB00048DAB /* DegreeCalculatorTests.swift */,
 				DAA33A8E2A38080F00EA7A2B /* DegreeCoreTests.swift */,
+				DAE0025F2A38EF1800502C2E /* ModelDataTests.swift */,
 			);
 			path = DegreeCalculatorTests;
 			sourceTree = "<group>";
@@ -161,6 +165,13 @@
 				DACF745D2A266EC000826755 /* DegreeCore.swift */,
 			);
 			path = Model;
+			sourceTree = "<group>";
+		};
+		DAE002612A38FA4300502C2E /* Assets */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Assets;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -309,6 +320,7 @@
 			files = (
 				DAA33A8F2A38080F00EA7A2B /* DegreeCoreTests.swift in Sources */,
 				DA61AEFE2A1840FB00048DAB /* DegreeCalculatorTests.swift in Sources */,
+				DAE002602A38EF1800502C2E /* ModelDataTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -456,6 +468,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"DegreeCalculator/Preview Content\"";
@@ -486,6 +499,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"DegreeCalculator/Preview Content\"";
