@@ -63,6 +63,16 @@ struct Calculator: View {
         return result
     }
     
+    var Underscore: some View {
+        Rectangle()
+            .frame(height: 1)
+            .foregroundColor(.white)
+            .padding(.trailing, 132)
+            .padding(.leading, 0)
+            .padding(.top, -14)
+            .padding(.bottom, 0)
+    }
+    
     var body: some View {
         VStack {
             GeometryReader { geo in
@@ -76,32 +86,13 @@ struct Calculator: View {
                                         Text(line.value + " " + op)
                                             .frame(maxWidth: .infinity, alignment: .leading)
                                             .foregroundColor(.white)
-                                        Rectangle()
-                                            .frame(height: 1)
-                                            .foregroundColor(.white)
-                                            .padding(.trailing, 132)
-                                            .padding(.leading, 0)
-                                            .padding(.top, -14)
-                                            .padding(.bottom, 0)
+                                        Underscore
                                     } else if op == "==" {
                                         Text(line.value + " ")
                                             .frame(maxWidth: .infinity, alignment: .leading)
                                             .foregroundColor(.white)
-                                        Rectangle()
-                                            .frame(height: 1)
-                                            .foregroundColor(.white)
-                                            .padding(.trailing, 132)
-                                            .padding(.leading, 0)
-                                            .padding(.top, -14)
-                                            .padding(.bottom, 0)
-                                        Rectangle()
-                                            .frame(height: 1)
-                                            .foregroundColor(.white)
-                                            .padding(.trailing, 132)
-                                            .padding(.leading, 0)
-                                            .padding(.top, -14)
-                                            .padding(.bottom, 0)
-
+                                        Underscore
+                                        Underscore
                                     } else {
                                         Text(line.value + " " + op)
                                             .frame(maxWidth: .infinity, alignment: .leading)
