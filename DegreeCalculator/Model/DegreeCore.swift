@@ -21,6 +21,7 @@ struct Value: Codable, Hashable, CustomStringConvertible {
         self.minutes = minutes
     }
     
+    // Format to <degrees>°<mm>'<s> format.
     public var description: String {
         let formatter = NumberFormatter()
         formatter.numberStyle = .decimal
@@ -31,9 +32,9 @@ struct Value: Codable, Hashable, CustomStringConvertible {
         formatter.minimumFractionDigits = 1
         let number = NSDecimalNumber(decimal: minutes)
         if let s = formatter.string(from: number) {
-            return String(format: "%3d°%@", degrees, s)
+            return String(format: "%d°%@", degrees, s)
         } else {
-            return String(format: "%3d°", degrees)
+            return String(format: "%d°", degrees)
         }
     }
 }

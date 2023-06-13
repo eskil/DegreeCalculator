@@ -7,6 +7,17 @@
 
 import SwiftUI
 
+extension String {
+    func leftPadding(toLength: Int, withPad character: Character) -> String {
+        let newLength = self.count
+        if newLength < toLength {
+            return String(repeatElement(character, count: toLength - newLength)) + self
+        } else {
+            return self
+        }
+    }
+}
+
 struct Calculator: View {
     @EnvironmentObject var modelData: ModelData
     @State var padTop = 0.0
@@ -27,7 +38,7 @@ struct Calculator: View {
             // and emit that line.
             entry.inOrder { expr in
                 if let v = expr.v {
-                    line.value = v.description
+                    line.value = v.description.leftPadding(toLength: 8, withPad: " ")
                 }
                 if let op = expr.op {
                     line.op = op.description
@@ -39,7 +50,7 @@ struct Calculator: View {
             // I'm not feeling this, I feel like maybe the "line" should start with the entered string.
             if let result = entry.value {
                 tmp.append(Line(value: line.value, op: "="))
-                tmp.append(Line(value: result.description, op: "=="))
+                tmp.append(Line(value: result.description.leftPadding(toLength: 8, withPad: " "), op: "=="))
             }
 
             result = result + tmp
