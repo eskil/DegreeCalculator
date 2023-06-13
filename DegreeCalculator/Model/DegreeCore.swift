@@ -115,48 +115,34 @@ struct Expr: CustomStringConvertible, Hashable, Codable {
         }
     }
 
+    // Expr can be empty, no children and no op
     init() {
         self.op = nil
         self.nodes = []
         self.v = nil
     }
     
+    // Expr can be a Value (leaf), no childre and no op
     init(_ value: Value) {
         self.op = nil
         self.nodes = []
         self.v = value
     }
-
-    /*
-    init(op: Operator?, left: Value?, right: Value?) {
-        self.op = op
-        self.nodes = []
-        if let l = left {
-            self.nodes.append(Expr(value: l))
-        }
-        if let r = right {
-            self.nodes.append(Expr(value: r))
-        }
-    }
-
-    init(op: Operator?, left: Value?, right: Expr?) {
-        self.op = op
-        self.nodes = []
-        if let l = left {
-            self.nodes.append(Expr(value: l))
-        }
-        if let r = right {
-            self.nodes.append(r)
-        }
-    }
-     */
     
-    init(op: Operator?, left: Expr?, right: Expr?) {
+    // Expressions are built left side first.
+    init(op: Operator?, left: Expr?) {
         self.op = op
         self.nodes = []
         if let l = left {
             self.nodes.append(l)
         }
+    }
+    
+    // Expressions are built left side first.
+    init(op: Operator?, left: Expr, right: Expr?) {
+        self.op = op
+        self.nodes = []
+        self.nodes.append(left)
         if let r = right {
             self.nodes.append(r)
         }
@@ -170,20 +156,20 @@ struct Expr: CustomStringConvertible, Hashable, Codable {
             if nodes.count > 0 {
                 result.append("(")
             }
-            if nodes.count == 0 {
-                result.append("<empty>")
-            } else {
+            if nodes.count > 0 {
                 result.append("\(nodes[0].description)")
+            } else {
+                result.append("<empty>")
             }
             if let b = op {
                 result.append("\(b)")
             } else {
                 result.append("<noop>")
             }
-            if nodes.count == 1 {
-                result.append("<empty>")
-            } else {
+            if nodes.count > 1 {
                 result.append("\(nodes[1].description)")
+            } else {
+                result.append("<empty>")
             }
             if nodes.count > 0 {
                 result.append(")")

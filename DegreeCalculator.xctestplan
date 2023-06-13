@@ -1,0 +1,37 @@
+{
+  "configurations" : [
+    {
+      "id" : "0DA2E647-702B-4F71-AD60-703550F053D0",
+      "name" : "Test Scheme Action",
+      "options" : {
+
+      }
+    }
+  ],
+  "defaultOptions" : {
+    "targetForVariableExpansion" : {
+      "containerPath" : "container:DegreeCalculator.xcodeproj",
+      "identifier" : "DA61AEE82A1840F900048DAB",
+      "name" : "DegreeCalculator"
+    }
+  },
+  "testTargets" : [
+    {
+      "parallelizable" : true,
+      "target" : {
+        "containerPath" : "container:DegreeCalculator.xcodeproj",
+        "identifier" : "DA61AEF82A1840FB00048DAB",
+        "name" : "DegreeCalculatorTests"
+      }
+    },
+    {
+      "parallelizable" : true,
+      "target" : {
+        "containerPath" : "container:DegreeCalculator.xcodeproj",
+        "identifier" : "DA61AF022A1840FB00048DAB",
+        "name" : "DegreeCalculatorUITests"
+      }
+    }
+  ],
+  "version" : 1
+}
