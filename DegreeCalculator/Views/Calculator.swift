@@ -38,7 +38,7 @@ struct Calculator: View {
             // and emit that line.
             entry.inOrder { expr in
                 if let v = expr.v {
-                    line.value = v.description.leftPadding(toLength: 8, withPad: " ")
+                    line.value = v.description.leftPadding(toLength: 11, withPad: " ")
                 }
                 if let op = expr.op {
                     line.op = op.description
@@ -50,7 +50,7 @@ struct Calculator: View {
             // I'm not feeling this, I feel like maybe the "line" should start with the entered string.
             if let result = entry.value {
                 tmp.append(Line(value: line.value, op: "="))
-                tmp.append(Line(value: result.description.leftPadding(toLength: 8, withPad: " "), op: "=="))
+                tmp.append(Line(value: result.description.leftPadding(toLength: 11, withPad: " "), op: "=="))
             }
 
             result = result + tmp
@@ -67,8 +67,8 @@ struct Calculator: View {
         Rectangle()
             .frame(height: 1)
             .foregroundColor(.white)
-            .padding(.trailing, 132)
-            .padding(.leading, 0)
+            .padding(.trailing, 48)
+            .padding(.leading, 48)
             .padding(.top, -14)
             .padding(.bottom, 0)
     }
@@ -83,6 +83,7 @@ struct Calculator: View {
                             VStack {
                                 if let op = line.op {
                                     if op == "=" {
+                                        // FIXME: this view could be generalised
                                         Text(line.value + " " + op)
                                             .frame(maxWidth: .infinity, alignment: .leading)
                                             .foregroundColor(.white)
@@ -113,6 +114,8 @@ struct Calculator: View {
                             NSLog("change on model.entered count is \(lines.count)")
                             // The -1 is to scroll to id:5 when list has 6 elements - starts at 0.
                             // Alternatively, assign id:1, 2...
+                            // FIXME: this cases lines to be calculated twice which is a waste. But for some reason,
+                            // computing it once in the ScrollView makes the scroll not work. So leaving this for now.
                             scroll_reader.scrollTo(lines.count-1, anchor: .bottom)
                         }
                     }
