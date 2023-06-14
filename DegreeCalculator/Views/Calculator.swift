@@ -110,8 +110,9 @@ struct Calculator: View {
                         }
                         
                         // https://stackoverflow.com/questions/58376681/swiftui-automatically-scroll-to-bottom-in-scrollview-bottom-first
+
                         .onChange(of: modelData.entered) { _ in
-                            NSLog("change on model.entered count is \(lines.count)")
+                            NSLog("change on entered lines count is \(lines.count)")
                             // The -1 is to scroll to id:5 when list has 6 elements - starts at 0.
                             // Alternatively, assign id:1, 2...
                             // FIXME: this cases lines to be calculated twice which is a waste. But for some reason,
@@ -125,7 +126,6 @@ struct Calculator: View {
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .padding(20.0)
             }
-            
             // Divider()
 
             Grid(alignment: .topLeading, horizontalSpacing: 1, verticalSpacing: 1) {
@@ -153,8 +153,8 @@ struct Calculator: View {
                     CalculatorButton(label: "3", function: CalculatorFunction.ENTRY)
                 }
                 GridRow {
-                    CalculatorButton(label: "0", function: CalculatorFunction.ENTRY)
                     CalculatorButton(label: "°", function: CalculatorFunction.ENTRY)
+                    CalculatorButton(label: "0", function: CalculatorFunction.ENTRY)
                     CalculatorButton(label: "'", function: CalculatorFunction.ENTRY)
                     CalculatorButton(label: "=", function: CalculatorFunction.EQUAL)
                         .background(

@@ -7,21 +7,196 @@
 
 import XCTest
 
+@testable import DegreeCalculator
+
 final class ModelDataTests: XCTestCase {
+    var md: ModelData! = nil
 
-    override func setUpWithError() throws {
-        // Put setup code here. This method is called before the invocation of each test method in the class.
+    override func setUp() {
+        md = ModelData()
     }
 
-    override func tearDownWithError() throws {
-        // Put teardown code here. This method is called after the invocation of each test method in the class.
+    override func tearDown() {
+        md = nil
     }
 
-    func testExample() throws {
-        // This is an example of a functional test case.
-        // Use XCTAssert and related functions to verify your tests produce the correct results.
-        // Any test you write for XCTest can be annotated as throws and async.
-        // Mark your test throws to produce an unexpected failure when your test encounters an uncaught error.
-        // Mark your test async to allow awaiting for asynchronous code to complete. Check the results with assertions afterwards.
+    // Test behaviour of clear, specifically that entered is reset and entries is unchanged.
+    func testClear() throws {
+        md.callFunction(CalculatorFunction.CLEAR, label: "")
+        XCTAssertEqual(md.entries, [Expr()])
+        XCTAssertEqual(md.entered, "")
+        
+        let entries = [Expr(Value(degrees: 1, minutes: 2.3))]
+        md.entries = entries
+        md.entered = "1"
+        md.callFunction(CalculatorFunction.CLEAR, label: "")
+        XCTAssertEqual(md.entries, entries)
+        XCTAssertEqual(md.entered, "")
+    }
+
+    // Test behaviour of all-clear, specifically that entered and entries is reset
+    func testAllClear() throws {
+        md.callFunction(CalculatorFunction.ALL_CLEAR, label: "")
+        XCTAssertEqual(md.entries, [Expr()])
+        XCTAssertEqual(md.entered, "")
+        
+        let entries = [Expr(Value(degrees: 1, minutes: 2.3))]
+        md.entries = entries
+        md.entered = "1"
+        md.callFunction(CalculatorFunction.ALL_CLEAR, label: "")
+        XCTAssertEqual(md.entries, [Expr()])
+        XCTAssertEqual(md.entered, "")
+    }
+    
+    func testEntyBasic() throws {
+        md.entered = ""
+        md.callFunction(CalculatorFunction.ENTRY, label: "1")
+        md.callFunction(CalculatorFunction.ENTRY, label: "2")
+        XCTAssertEqual(md.entries, [Expr()])
+        XCTAssertEqual(md.entered, "12")
+    }
+    
+    // Test a full and proper 1d2'3 build
+    func testEntryFullBuild() throws {
+        md.entered = ""
+        md.callFunction(CalculatorFunction.ENTRY, label: "1")
+        XCTAssertEqual(md.entries, [Expr()])
+        XCTAssertEqual(md.entered, "1")
+        
+        md.callFunction(CalculatorFunction.ENTRY, label: "°")
+        XCTAssertEqual(md.entries, [Expr()])
+        XCTAssertEqual(md.entered, "1°")
+        
+        md.callFunction(CalculatorFunction.ENTRY, label: "2")
+        XCTAssertEqual(md.entries, [Expr()])
+        XCTAssertEqual(md.entered, "1°2")
+        
+        md.callFunction(CalculatorFunction.ENTRY, label: "'")
+        XCTAssertEqual(md.entries, [Expr()])
+        XCTAssertEqual(md.entered, "1°2'")
+        
+        md.callFunction(CalculatorFunction.ENTRY, label: "3")
+        XCTAssertEqual(md.entries, [Expr()])
+        XCTAssertEqual(md.entered, "1°2'3")
+    }
+    
+    // Test shortcut building by pressing d and ' without numbers
+    func testEntryShortcutDegreesMinutes() throws {
+        md.entered = ""
+        md.callFunction(CalculatorFunction.ENTRY, label: "°")
+        XCTAssertEqual(md.entries, [Expr()])
+        XCTAssertEqual(md.entered, "0°")
+        
+        md.callFunction(CalculatorFunction.ENTRY, label: "'")
+        XCTAssertEqual(md.entries, [Expr()])
+        XCTAssertEqual(md.entered, "0°0'")
+        
+        md.callFunction(CalculatorFunction.ENTRY, label: "1")
+        XCTAssertEqual(md.entries, [Expr()])
+        XCTAssertEqual(md.entered, "0°0'1")
+    }
+
+    // Test shortcut building by pressing ' without numbers or degrees
+    func testEntryShortcutMinutes() throws {
+        md.entered = ""
+
+        md.callFunction(CalculatorFunction.ENTRY, label: "'")
+        XCTAssertEqual(md.entries, [Expr()])
+        XCTAssertEqual(md.entered, "0°0'")
+        
+        md.callFunction(CalculatorFunction.ENTRY, label: "1")
+        XCTAssertEqual(md.entries, [Expr()])
+        XCTAssertEqual(md.entered, "0°0'1")
+    }
+    
+    // Test adding second d and ' at various times is a noop
+    func testDoubleDegreeMinuteEntryNoop() throws {
+        md.entered = ""
+        md.callFunction(CalculatorFunction.ENTRY, label: "1")
+        XCTAssertEqual(md.entries, [Expr()])
+        XCTAssertEqual(md.entered, "1")
+        
+        md.callFunction(CalculatorFunction.ENTRY, label: "°")
+        XCTAssertEqual(md.entries, [Expr()])
+        XCTAssertEqual(md.entered, "1°")
+
+        // Immediate repeated degree
+        md.callFunction(CalculatorFunction.ENTRY, label: "°")
+        XCTAssertEqual(md.entries, [Expr()])
+        XCTAssertEqual(md.entered, "1°")
+
+        md.callFunction(CalculatorFunction.ENTRY, label: "2")
+        XCTAssertEqual(md.entries, [Expr()])
+        XCTAssertEqual(md.entered, "1°2")
+
+        // Repeated degree later in string that immediate repeat
+        md.callFunction(CalculatorFunction.ENTRY, label: "°")
+        XCTAssertEqual(md.entries, [Expr()])
+        XCTAssertEqual(md.entered, "1°2")
+        
+        md.callFunction(CalculatorFunction.ENTRY, label: "'")
+        XCTAssertEqual(md.entries, [Expr()])
+        XCTAssertEqual(md.entered, "1°2'")
+
+        // Immediate repeated minute
+        md.callFunction(CalculatorFunction.ENTRY, label: "'")
+        XCTAssertEqual(md.entries, [Expr()])
+        XCTAssertEqual(md.entered, "1°2'")
+
+        md.callFunction(CalculatorFunction.ENTRY, label: "3")
+        XCTAssertEqual(md.entries, [Expr()])
+        XCTAssertEqual(md.entered, "1°2'3")
+        
+        // Repeated minute later in string that immediate repeat
+        md.callFunction(CalculatorFunction.ENTRY, label: "'")
+        XCTAssertEqual(md.entries, [Expr()])
+        XCTAssertEqual(md.entered, "1°2'3")
+        
+        // Repeated degree later in string that immediate repeat
+        md.callFunction(CalculatorFunction.ENTRY, label: "°")
+        XCTAssertEqual(md.entries, [Expr()])
+        XCTAssertEqual(md.entered, "1°2'3")
+    }
+    
+    func testDelete() {
+        md.entered = "12"
+        md.callFunction(CalculatorFunction.DELETE, label: "")
+        XCTAssertEqual(md.entered, "1")
+        md.callFunction(CalculatorFunction.DELETE, label: "")
+        XCTAssertEqual(md.entered, "")
+        md.callFunction(CalculatorFunction.DELETE, label: "")
+        XCTAssertEqual(md.entered, "")
+    }
+    
+    func testDeleteOneExpr() {
+        md.entered = ""
+        md.entries = [Expr(op: Operator.Add, left: Expr(Value(degrees: 1, minutes: 2.3)))]
+        md.callFunction(CalculatorFunction.DELETE, label: "")
+        XCTAssertEqual(md.entered, "1°02'3")
+        XCTAssertEqual(md.entries, [Expr(op: nil, left: Expr(Value(degrees: 1, minutes: 2.3)))])
+    }
+    
+    func testDeleteTwoExpr() {
+        md.entered = ""
+        md.entries = [Expr(op: Operator.Subtract,
+                           left: Expr(op: Operator.Add,
+                                      left: Expr(Value(degrees: 1, minutes: 2.3)),
+                                      right: Expr(Value(degrees: 4, minutes: 5.6))))]
+        md.callFunction(CalculatorFunction.DELETE, label: "")
+        XCTAssertEqual(md.entered, "4°05'6")
+        XCTAssertEqual(md.entries, [Expr(op: Operator.Add,
+                                         left: Expr(Value(degrees: 1, minutes: 2.3)))])
+    }
+    
+    func testParseValue() {
+        XCTAssertEqual(md.parseValue("1°2'3"), Value(degrees: 1, minutes: 2.3))
+        XCTAssertEqual(md.parseValue("1°2"), Value(degrees: 1, minutes: 2.0))
+        XCTAssertEqual(md.parseValue("1°"), Value(degrees: 1, minutes: 0))
+        XCTAssertEqual(md.parseValue("°"), Value(degrees: 0, minutes: 0))
+        XCTAssertEqual(md.parseValue("°'"), Value(degrees: 0, minutes: 0))
+        XCTAssertEqual(md.parseValue(""), Value(degrees: 0, minutes: 0))
+        XCTAssertEqual(md.parseValue("a°"), Value(degrees: 0, minutes: 0))
+        XCTAssertEqual(md.parseValue("a°b'c"), Value(degrees: 0, minutes: 0))
+        XCTAssertEqual(md.parseValue("a°b'"), Value(degrees: 0, minutes: 0))
     }
 }

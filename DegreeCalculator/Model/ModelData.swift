@@ -71,27 +71,7 @@ final class ModelData: ObservableObject {
     // (edit) it by simply removing chars.
     @Published var entered: String = ""
 
-    
-    func addEntry(_ string: String) {
-        if string == "°" {
-            setDegree()
-        } else if string == "'" {
-            setMinutes()
-        } else {
-            // If we have a ' and it's the last, we can add a number. But if not, we've already
-            // maxed our string
-            if entered.contains("'") {
-                if let c = entered.last {
-                    if c == "'" {
-                        entered += string
-                    }
-                }
-            } else {
-                entered += string
-            }
-        }
-    }
-    
+    // Main access point for the model data
     func callFunction(_ f: CalculatorFunction, label: String) {
         switch f {
         case .ANS:
@@ -113,24 +93,44 @@ final class ModelData: ObservableObject {
         }
     }
     
+    func addEntry(_ string: String) {
+        if string == "°" {
+            setDegree()
+        } else if string == "'" {
+            setMinutes()
+        } else {
+            // If we have a ' and it's the last, we can add a number. But if not, we've already
+            // maxed our string
+            if entered.contains("'") {
+                if let c = entered.last {
+                    if c == "'" {
+                        entered += string
+                    }
+                }
+            } else {
+                entered += string
+            }
+        }
+    }
+    
     func allClear() {
         entries = [Expr()]
         entered = ""
     }
     
     func clear() {
+        // FIXME: if entered is empty it should delete the current expression.
+        // Eg. "enter 1d2'3+", pressing clear should remove that.
         entered = ""
     }
     
     func delete() {
         if entered.isEmpty {
-            // FIXME: fix this...
             if let root = entries.last {
                 if root.nodes.isEmpty && root.op == nil {
                     return
                 }
                 let left = root.nodes[0]
-                NSLog("left = \(left.description)")
                 
                 // Reset the entered string to right.v, left.v or .v in that order of preference.
                 if left.nodes.count == 2, let rightv = left.nodes[1].v {
@@ -168,17 +168,29 @@ final class ModelData: ObservableObject {
     }
     
     func parseValue(_ s: String) -> Value {
-        // Simple parse by just splitting on ° and '. This work since
+        // Simple parse by just splitting on ° and '. This works since
         // prepExpr inserts ° and ' and trailing 0.
-        let trimmed = entered.trimmingCharacters(in: .whitespaces)
+        var degrees = 0
+        var minutes: Decimal = 0.0
+        
+        let trimmed = s.trimmingCharacters(in: .whitespaces)
         let dgm = trimmed.split(separator: "°")
-        let degrees = Int(dgm[0]) ?? 0
-        let mins = dgm[1].split(separator: "'")
-        let minutes = Decimal(Int(mins[0]) ?? 0) + (Decimal((Int(mins[1]) ?? 0)) / 10.0)
+        if dgm.count > 0 {
+            degrees = Int(dgm[0]) ?? 0
+            if dgm.count == 2 {
+                let mins = dgm[1].split(separator: "'")
+                if mins.count == 2 {
+                    minutes = Decimal(Int(mins[0]) ?? 0) + (Decimal((Int(mins[1]) ?? 0)) / 10.0)
+                } else {
+                    minutes = Decimal(Int(mins[0]) ?? 0)
+                }
+            }
+        }
+        
         return Value(degrees: degrees, minutes: minutes)
     }
     
-    private func prepExpr() -> Expr {
+    func prepExpr() -> Expr {
         // If the string is emptish, this will create a 0d0'0
         // First add a d symbol, which will add a leading 0
         setDegree()
@@ -205,7 +217,10 @@ final class ModelData: ObservableObject {
     
     func startExpr(op: Operator) {
         if entered.isEmpty {
-            NSLog("can't start operator on empty expression")
+            ans()
+        }
+        if entered.isEmpty {
+            // No previous answer
             return
         }
         let node = prepExpr()
@@ -292,7 +307,7 @@ final class ModelData: ObservableObject {
         // If the last char isn't a number, we're entering "'", so put a 0 up front
         if let c = entered.last {
             if c.isNumber == false {
-                entered += "00"
+                entered += "0"
             }
         }
         entered += "'"
