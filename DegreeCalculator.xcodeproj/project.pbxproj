@@ -89,8 +89,8 @@
 		DA61AEE02A1840F900048DAB = {
 			isa = PBXGroup;
 			children = (
-				DAE002612A38FA4300502C2E /* Assets */,
 				DAA33A902A38169600EA7A2B /* DegreeCalculator.xctestplan */,
+				DAE002612A38FA4300502C2E /* Assets */,
 				DA61AEEB2A1840F900048DAB /* DegreeCalculator */,
 				DA61AEFC2A1840FB00048DAB /* DegreeCalculatorTests */,
 				DA61AF062A1840FB00048DAB /* DegreeCalculatorUITests */,

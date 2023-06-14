@@ -7,12 +7,15 @@ DegreeCalculator
 
 A simple degree/minutes(fractions) add/subtract calculator.
 
-This is written for celestial navigation (only add/subtract and
-minutes as fractions) and for me to experiment with and try learning
-SwiftUI.
+This is written for celestial navigation using tables, so the requirements are
+* only add/subtract 
+* minutes as fractions
 
-![screenshot showing app in use](Screenshot.png?raw=true "A-star demo")
+It was also for me to experiment with and try learning some Swift and SwiftUI.
+
+![screenshot showing app in use](Screenshot.png?raw=true "screenshot showing app")
 
 Todo
 
-[ ] unit tests for everything
+[x] unit tests for DegreeCore
+[ ] unit tests for ModelData's functions
