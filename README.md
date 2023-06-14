@@ -19,3 +19,7 @@ Todo
 
 - [x] unit tests for DegreeCore
 - [ ] unit tests for ModelData's functions
+
+Bugs
+- [ ] disallow > 3 ints for degrees when typing
+- [ ] if entering 600'0, it displays 0d00'0 instead of 10d00'0
