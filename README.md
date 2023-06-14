@@ -17,5 +17,5 @@ It was also for me to experiment with and try learning some Swift and SwiftUI.
 
 Todo
 
-[x] unit tests for DegreeCore
-[ ] unit tests for ModelData's functions
+- [x] unit tests for DegreeCore
+- [ ] unit tests for ModelData's functions
