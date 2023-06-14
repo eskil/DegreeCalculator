@@ -110,13 +110,12 @@ struct Calculator: View {
                         }
                         
                         // https://stackoverflow.com/questions/58376681/swiftui-automatically-scroll-to-bottom-in-scrollview-bottom-first
-
-                        .onChange(of: modelData.entered) { _ in
+                        // FIXME: this causes "lines" to be calculated multiple times which is a waste. And doing a single "let lines = lines" earlier doesn't work, since .onChange likely has some wrapper to cache values and thus accesses it... blabla. In short, doing the onChange on lines is needed for some corner case where ANS needs to scoll (ie. entered is unchanges) and all in all, we compute lines 3-4 times on each keypress :-/
+                        // I could add a generation counter to the ModelData and +1 on each change, then monitor that... But this "is fine".
+                        .onChange(of: lines) { _ in
                             NSLog("change on entered lines count is \(lines.count)")
                             // The -1 is to scroll to id:5 when list has 6 elements - starts at 0.
                             // Alternatively, assign id:1, 2...
-                            // FIXME: this cases lines to be calculated twice which is a waste. But for some reason,
-                            // computing it once in the ScrollView makes the scroll not work. So leaving this for now.
                             scroll_reader.scrollTo(lines.count-1, anchor: .bottom)
                         }
                     }
