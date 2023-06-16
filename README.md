@@ -19,7 +19,7 @@ Todo
 
 - [x] unit tests for DegreeCore
 - [ ] unit tests for ModelData's functions
-- [ ] treat op without input as ANS
+- [x] treat op without input as ANS
 
 Bugs
 - [ ] disallow > 3 ints for degrees when typing
