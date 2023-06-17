@@ -225,4 +225,17 @@ final class ModelDataTests: XCTestCase {
         XCTAssertEqual(md.prepExpr(), Expr(Value(degrees: 1, minutes: 2.3)))
         XCTAssertEqual(md.entered, "1°2'3")
     }
+    
+    func testAns() {
+        md.entered = ""
+        md.callFunction(CalculatorFunction.ANS, label: "")
+        XCTAssertEqual(md.entered, "")
+        
+        md.entries = [Expr(op: Operator.Add,
+                           left: Expr(Value(degrees: 1, minutes: 2.3)),
+                           right: Expr(Value(degrees: 4, minutes: 5.6))),
+                      Expr()]
+        md.callFunction(CalculatorFunction.ANS, label: "")
+        XCTAssertEqual(md.entered, "5°07'9")
+    }
 }
