@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>DegreeCalculator.ipa</key>
+	<array>
+		<dict>
+			<key>architectures</key>
+			<array>
+				<string>arm64</string>
+			</array>
+			<key>buildNumber</key>
+			<string>1</string>
+			<key>certificate</key>
+			<dict>
+				<key>SHA1</key>
+				<string>469B9428EFDB3EA1EF0450C0B8E87C58A0C09FF2</string>
+				<key>dateExpires</key>
+				<string>4/22/24</string>
+				<key>type</key>
+				<string>Apple Development</string>
+			</dict>
+			<key>entitlements</key>
+			<dict>
+				<key>application-identifier</key>
+				<string>84E2M29ME2.org.eskil.DegreeCalculator</string>
+				<key>com.apple.developer.team-identifier</key>
+				<string>XD79E3HMQG</string>
+				<key>get-task-allow</key>
+				<true/>
+			</dict>
+			<key>name</key>
+			<string>DegreeCalculator.app</string>
+			<key>profile</key>
+			<dict>
+				<key>UUID</key>
+				<string>2eddb2f7-4dea-4265-a03a-f2924a448a10</string>
+				<key>dateExpires</key>
+				<string>5/18/24</string>
+				<key>name</key>
+				<string>iOS Team Provisioning Profile: *</string>
+			</dict>
+			<key>team</key>
+			<dict>
+				<key>id</key>
+				<string>XD79E3HMQG</string>
+				<key>name</key>
+				<string>Eskil Olsen</string>
+			</dict>
+			<key>versionNumber</key>
+			<string>1.0</string>
+		</dict>
+	</array>
+</dict>
+</plist>

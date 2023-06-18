@@ -1,0 +1,124 @@
+2023-06-17 00:50:46 +0000  Initial pipeline context: <IDEDistributionProcessingPipelineContext: 0x2d5e65d80; archive(resolved)="<IDEArchive: 0x60001cf8c1e0>", distributionTask(resolved)="2", distributionDestination(resolved)="1", distributionMethod(resolved)="<IDEDistributionMethodDevelopmentSigned: 0x60000a923f10>", team(resolved)="<IDEProvisioningDisambiguatableBasicTeam: 0x60000be7ed80; teamID='XD79E3HMQG', teamName='Eskil Olsen', teamType='Individual', username='eskil.olsen@gmail.com', isFreeProvisioningTeam='0'>">
+	Chain (14, self inclusive):
+	<IDEDistributionProcessingPipelineContext: 0x2d5e65d80; archive = "<IDEArchive: 0x60001cf8c1e0>", distributionMethod="<IDEDistributionMethodDevelopmentSigned: 0x60000a923f10>", team="<IDEProvisioningDisambiguatableBasicTeam: 0x60000be7ed80; teamID='XD79E3HMQG', teamName='Eskil Olsen', teamType='Individual', username='eskil.olsen@gmail.com', isFreeProvisioningTeam='0'>">
+	<IDEDistributionProcessingPipelineContext: 0x2d5e66230; archive = "<IDEArchive: 0x60001cf8c1e0>", distributionMethod="<IDEDistributionMethodDevelopmentSigned: 0x60000a923f10>", team="<IDEProvisioningDisambiguatableBasicTeam: 0x60000be7ed80; teamID='XD79E3HMQG', teamName='Eskil Olsen', teamType='Individual', username='eskil.olsen@gmail.com', isFreeProvisioningTeam='0'>">
+	<IDEDistributionContext: 0x14f007c40; archive = "<IDEArchive: 0x60001cf8c1e0>", distributionMethod="<IDEDistributionMethodDevelopmentSigned: 0x60000a923f10>", team="<IDEProvisioningDisambiguatableBasicTeam: 0x60000be7ed80; teamID='XD79E3HMQG', teamName='Eskil Olsen', teamType='Individual', username='eskil.olsen@gmail.com', isFreeProvisioningTeam='0'>">
+	<IDEDistributionContext: 0x14f0145a0; archive = "<IDEArchive: 0x60001cf8c1e0>", distributionMethod="<IDEDistributionMethodDevelopmentSigned: 0x60000a923f10>", team="<IDEProvisioningDisambiguatableBasicTeam: 0x60000be7ed80; teamID='XD79E3HMQG', teamName='Eskil Olsen', teamType='Individual', username='eskil.olsen@gmail.com', isFreeProvisioningTeam='0'>">
+	<IDEDistributionContext: 0x14f0152c0; archive = "<IDEArchive: 0x60001cf8c1e0>", distributionMethod="<IDEDistributionMethodDevelopmentSigned: 0x60000a923f10>", team="<IDEProvisioningDisambiguatableBasicTeam: 0x60000be7ed80; teamID='XD79E3HMQG', teamName='Eskil Olsen', teamType='Individual', username='eskil.olsen@gmail.com', isFreeProvisioningTeam='0'>">
+	<IDEDistributionContext: 0x14f0ff290; archive = "<IDEArchive: 0x60001cf8c1e0>", distributionMethod="<IDEDistributionMethodDevelopmentSigned: 0x60000a923f10>", team="<IDEProvisioningDisambiguatableBasicTeam: 0x60000be7ed80; teamID='XD79E3HMQG', teamName='Eskil Olsen', teamType='Individual', username='eskil.olsen@gmail.com', isFreeProvisioningTeam='0'>">
+	<IDEDistributionContext: 0x2d2bf44c0; archive = "<IDEArchive: 0x60001cf8c1e0>", distributionMethod="<IDEDistributionMethodDevelopmentSigned: 0x60000a923f10>", team="<IDEProvisioningDisambiguatableBasicTeam: 0x60000be7ed80; teamID='XD79E3HMQG', teamName='Eskil Olsen', teamType='Individual', username='eskil.olsen@gmail.com', isFreeProvisioningTeam='0'>">
+	<IDEDistributionContext: 0x2d2b82950; archive = "<IDEArchive: 0x60001cf8c1e0>", distributionMethod="<IDEDistributionMethodDevelopmentSigned: 0x60000a923f10>", team="<IDEProvisioningDisambiguatableBasicTeam: 0x60000be7ed80; teamID='XD79E3HMQG', teamName='Eskil Olsen', teamType='Individual', username='eskil.olsen@gmail.com', isFreeProvisioningTeam='0'>">
+	<IDEDistributionContext: 0x2d5e55db0; archive = "<IDEArchive: 0x60001cf8c1e0>", distributionMethod="<IDEDistributionMethodDevelopmentSigned: 0x60000a923f10>", team="<IDEProvisioningDisambiguatableBasicTeam: 0x60000be7ed80; teamID='XD79E3HMQG', teamName='Eskil Olsen', teamType='Individual', username='eskil.olsen@gmail.com', isFreeProvisioningTeam='0'>">
+	<IDEDistributionContext: 0x2d5e5a3e0; archive = "<IDEArchive: 0x60001cf8c1e0>", distributionMethod="<IDEDistributionMethodDevelopmentSigned: 0x60000a923f10>", team="(null)">
+	<IDEDistributionContext: 0x2d2c8fd20; archive = "<IDEArchive: 0x60001cf8c1e0>", distributionMethod="<IDEDistributionMethodDevelopmentSigned: 0x60000a923f10>", team="(null)">
+	<IDEDistributionContext: 0x2d2cf3f90; archive = "<IDEArchive: 0x60001cf8c1e0>", distributionMethod="<IDEDistributionMethodDevelopmentSigned: 0x60000a923f10>", team="(null)">
+	<IDEDistributionContext: 0x2d5eb2080; archive = "<IDEArchive: 0x60001cf8c1e0>", distributionMethod="<IDEDistributionMethodDevelopmentSigned: 0x60000a923f10>", team="(null)">
+	<IDEDistributionContext: 0x2d2b04080; archive = "<IDEArchive: 0x60001cf8c1e0>", distributionMethod="(null)", team="(null)">
+</IDEDistributionProcessingPipelineContext: 0x2d5e65d80>
+2023-06-17 00:50:46 +0000  Processing step: IDEDistributionCreateDestRootStep
+2023-06-17 00:50:46 +0000  Processing step: IDEDistributionCopyItemStep
+2023-06-17 00:50:46 +0000  Running /usr/bin/ditto '-V' '/Users/eskil/Library/Developer/Xcode/Archives/2023-06-16/DegreeCalculator 6-16-23, 5.42 PM.xcarchive/Products/Applications/DegreeCalculator.app' '/var/folders/6d/fxwcxnyx6fn8g6rkxbfz3y9c0000gn/T/XcodeDistPipeline.~~~45udKF/Root/Payload/DegreeCalculator.app'
+2023-06-17 00:50:46 +0000  >>> Copying /Users/eskil/Library/Developer/Xcode/Archives/2023-06-16/DegreeCalculator 6-16-23, 5.42 PM.xcarchive/Products/Applications/DegreeCalculator.app 
+2023-06-17 00:50:46 +0000  copying file ./_CodeSignature/CodeResources ... 
+2023-06-17 00:50:46 +0000  2775 bytes for ./_CodeSignature/CodeResources
+2023-06-17 00:50:46 +0000  copying file ./AppIcon60x60@2x.png ... 
+2023-06-17 00:50:46 +0000  3898 bytes for ./AppIcon60x60@2x.png
+2023-06-17 00:50:46 +0000  copying file ./DegreeCalculator ... 
+2023-06-17 00:50:46 +0000  185136 bytes for ./DegreeCalculator
+2023-06-17 00:50:46 +0000  copying file ./Assets.car ... 
+2023-06-17 00:50:46 +0000  48216 bytes for ./Assets.car
+2023-06-17 00:50:46 +0000  copying file ./AppIcon76x76@2x~ipad.png ... 
+2023-06-17 00:50:46 +0000  4835 bytes for ./AppIcon76x76@2x~ipad.png
+2023-06-17 00:50:46 +0000  copying file ./embedded.mobileprovision ... 
+2023-06-17 00:50:46 +0000  17458 bytes for ./embedded.mobileprovision
+2023-06-17 00:50:46 +0000  copying file ./Info.plist ... 
+2023-06-17 00:50:46 +0000  1438 bytes for ./Info.plist
+2023-06-17 00:50:46 +0000  copying file ./PkgInfo ... 
+2023-06-17 00:50:46 +0000  8 bytes for ./PkgInfo
+2023-06-17 00:50:46 +0000  /usr/bin/ditto exited with 0
+2023-06-17 00:50:46 +0000  Processing step: IDEDistributionEmbedProfileStep
+2023-06-17 00:50:46 +0000  Processing step: IDEDistributionInfoPlistStep
+2023-06-17 00:50:46 +0000  Skipping step: IDEDistributionInfoPlistStep because it said so
+2023-06-17 00:50:46 +0000  Processing step: IDEDistributionAppThinningPlistStep
+2023-06-17 00:50:46 +0000  Skipping step: IDEDistributionAppThinningPlistStep because it said so
+2023-06-17 00:50:46 +0000  Processing step: IDEDistributionCompileBitcodeStep
+2023-06-17 00:50:46 +0000  Skipping step: IDEDistributionCompileBitcodeStep because it said so
+2023-06-17 00:50:46 +0000  Processing step: IDEDistributionCodeSlimmingStep
+2023-06-17 00:50:46 +0000  Processing step: IDEDistributionCopyBCSymbolMapsStep
+2023-06-17 00:50:46 +0000  Skipping step: IDEDistributionCopyBCSymbolMapsStep because it said so
+2023-06-17 00:50:46 +0000  Processing step: IDEDistributionSymbolsStep
+2023-06-17 00:50:46 +0000  Skipping step: IDEDistributionSymbolsStep because it said so
+2023-06-17 00:50:46 +0000  Processing step: IDEDistributionAppThinningStep
+2023-06-17 00:50:46 +0000  Skipping step: IDEDistributionAppThinningStep because it said so
+2023-06-17 00:50:46 +0000  Processing step: IDEDistributionArchThinningStep
+2023-06-17 00:50:46 +0000  Running /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/lipo '/var/folders/6d/fxwcxnyx6fn8g6rkxbfz3y9c0000gn/T/XcodeDistPipeline.~~~45udKF/Root/Payload/DegreeCalculator.app/DegreeCalculator' '-verify_arch' 'arm64e'
+2023-06-17 00:50:46 +0000  /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/lipo exited with 1
+2023-06-17 00:50:46 +0000  Skipping architecture thinning for item "DegreeCalculator" because arch "arm64e" wasn't found
+2023-06-17 00:50:46 +0000  Processing step: IDEDistributionODRStep
+2023-06-17 00:50:46 +0000  Processing step: IDEDistributionStripXattrsStep
+2023-06-17 00:50:46 +0000  Running /usr/bin/xattr '-crs' '/var/folders/6d/fxwcxnyx6fn8g6rkxbfz3y9c0000gn/T/XcodeDistPipeline.~~~45udKF/Root/Payload/DegreeCalculator.app'
+2023-06-17 00:50:46 +0000  /usr/bin/xattr exited with 0
+2023-06-17 00:50:46 +0000  Processing step: IDEDistributionCodesignStep
+2023-06-17 00:50:46 +0000  Entitlements for <IDEDistributionItem: 0x60001cfde640; bundleID='org.eskil.DegreeCalculator', path='<DVTFilePath:0x6000083ba140:'/Users/eskil/Library/Developer/Xcode/Archives/2023-06-16/DegreeCalculator 6-16-23, 5.42 PM.xcarchive/Products/Applications/DegreeCalculator.app'>', codeSigningInfo='<_DVTCodeSigningInformation_Path: 0x600004a19270; isSigned='1', isAdHocSigned='0', signingCertificate='<DVTSigningCertificate: 0x600005c6b650; name='Apple Development: Eskil Olsen (LRYL7V26BL)', hash='469B9428EFDB3EA1EF0450C0B8E87C58A0C09FF2', serialNumber='6D74823ECC6C80FCFF2B3AA698991793', certificateKinds='(
+    "1.2.840.113635.100.6.1.12",
+    "1.2.840.113635.100.6.1.2"
+), issueDate='2023-04-24 00:24:44 +0000''>', entitlements='{
+    "application-identifier" = "84E2M29ME2.org.eskil.DegreeCalculator";
+    "com.apple.developer.team-identifier" = XD79E3HMQG;
+    "get-task-allow" = 1;
+}', teamID='XD79E3HMQG', identifier='org.eskil.DegreeCalculator', executablePath='<DVTFilePath:0x60000c0bd500:'/Users/eskil/Library/Developer/Xcode/Archives/2023-06-16/DegreeCalculator 6-16-23, 5.42 PM.xcarchive/Products/Applications/DegreeCalculator.app/DegreeCalculator'>', hardenedRuntime='0'>'>: {
+    "application-identifier" = "84E2M29ME2.org.eskil.DegreeCalculator";
+    "com.apple.developer.team-identifier" = XD79E3HMQG;
+    "get-task-allow" = 1;
+}
+2023-06-17 00:50:46 +0000  Entitlements for <IDEDistributionItem: 0x60001cfde640; bundleID='org.eskil.DegreeCalculator', path='<DVTFilePath:0x6000083ba140:'/Users/eskil/Library/Developer/Xcode/Archives/2023-06-16/DegreeCalculator 6-16-23, 5.42 PM.xcarchive/Products/Applications/DegreeCalculator.app'>', codeSigningInfo='<_DVTCodeSigningInformation_Path: 0x600004a19270; isSigned='1', isAdHocSigned='0', signingCertificate='<DVTSigningCertificate: 0x600005c9c4d0; name='Apple Development: Eskil Olsen (LRYL7V26BL)', hash='469B9428EFDB3EA1EF0450C0B8E87C58A0C09FF2', serialNumber='6D74823ECC6C80FCFF2B3AA698991793', certificateKinds='(
+    "1.2.840.113635.100.6.1.12",
+    "1.2.840.113635.100.6.1.2"
+), issueDate='2023-04-24 00:24:44 +0000''>', entitlements='{
+    "application-identifier" = "84E2M29ME2.org.eskil.DegreeCalculator";
+    "com.apple.developer.team-identifier" = XD79E3HMQG;
+    "get-task-allow" = 1;
+}', teamID='XD79E3HMQG', identifier='org.eskil.DegreeCalculator', executablePath='<DVTFilePath:0x60000c0bd500:'/Users/eskil/Library/Developer/Xcode/Archives/2023-06-16/DegreeCalculator 6-16-23, 5.42 PM.xcarchive/Products/Applications/DegreeCalculator.app/DegreeCalculator'>', hardenedRuntime='0'>'> are: {
+    "application-identifier" = "84E2M29ME2.org.eskil.DegreeCalculator";
+    "com.apple.developer.team-identifier" = XD79E3HMQG;
+    "get-task-allow" = 1;
+}
+2023-06-17 00:50:46 +0000  Writing entitlements for <IDEDistributionItem: 0x60001cfde640; bundleID='org.eskil.DegreeCalculator', path='<DVTFilePath:0x6000083ba140:'/Users/eskil/Library/Developer/Xcode/Archives/2023-06-16/DegreeCalculator 6-16-23, 5.42 PM.xcarchive/Products/Applications/DegreeCalculator.app'>', codeSigningInfo='<_DVTCodeSigningInformation_Path: 0x600004a19270; isSigned='1', isAdHocSigned='0', signingCertificate='<DVTSigningCertificate: 0x600005c9d600; name='Apple Development: Eskil Olsen (LRYL7V26BL)', hash='469B9428EFDB3EA1EF0450C0B8E87C58A0C09FF2', serialNumber='6D74823ECC6C80FCFF2B3AA698991793', certificateKinds='(
+    "1.2.840.113635.100.6.1.12",
+    "1.2.840.113635.100.6.1.2"
+), issueDate='2023-04-24 00:24:44 +0000''>', entitlements='{
+    "application-identifier" = "84E2M29ME2.org.eskil.DegreeCalculator";
+    "com.apple.developer.team-identifier" = XD79E3HMQG;
+    "get-task-allow" = 1;
+}', teamID='XD79E3HMQG', identifier='org.eskil.DegreeCalculator', executablePath='<DVTFilePath:0x60000c0bd500:'/Users/eskil/Library/Developer/Xcode/Archives/2023-06-16/DegreeCalculator 6-16-23, 5.42 PM.xcarchive/Products/Applications/DegreeCalculator.app/DegreeCalculator'>', hardenedRuntime='0'>'> to: /var/folders/6d/fxwcxnyx6fn8g6rkxbfz3y9c0000gn/T/XcodeDistPipeline.~~~45udKF/entitlements~~~3zOoHa
+2023-06-17 00:50:46 +0000  Running /usr/bin/codesign '-vvv' '--force' '--sign' '469B9428EFDB3EA1EF0450C0B8E87C58A0C09FF2' '--entitlements' '/var/folders/6d/fxwcxnyx6fn8g6rkxbfz3y9c0000gn/T/XcodeDistPipeline.~~~45udKF/entitlements~~~3zOoHa' '--generate-entitlement-der' '--preserve-metadata=identifier,flags,runtime' '/var/folders/6d/fxwcxnyx6fn8g6rkxbfz3y9c0000gn/T/XcodeDistPipeline.~~~45udKF/Root/Payload/DegreeCalculator.app'
+2023-06-17 00:50:46 +0000  /var/folders/6d/fxwcxnyx6fn8g6rkxbfz3y9c0000gn/T/XcodeDistPipeline.~~~45udKF/Root/Payload/DegreeCalculator.app: replacing existing signature
+2023-06-17 00:50:46 +0000  /var/folders/6d/fxwcxnyx6fn8g6rkxbfz3y9c0000gn/T/XcodeDistPipeline.~~~45udKF/Root/Payload/DegreeCalculator.app: signed app bundle with Mach-O thin (arm64) [org.eskil.DegreeCalculator]
+2023-06-17 00:50:46 +0000  /usr/bin/codesign exited with 0
+2023-06-17 00:50:46 +0000  Processing step: IDEDistributionZipODRItemStep
+2023-06-17 00:50:46 +0000  Skipping step: IDEDistributionZipODRItemStep because it said so
+2023-06-17 00:50:46 +0000  Processing step: IDEDistributionCreateIPAStep
+2023-06-17 00:50:46 +0000  Running /usr/bin/ditto '-V' '-c' '-k' '--norsrc' '/var/folders/6d/fxwcxnyx6fn8g6rkxbfz3y9c0000gn/T/XcodeDistPipeline.~~~45udKF/Root' '/var/folders/6d/fxwcxnyx6fn8g6rkxbfz3y9c0000gn/T/XcodeDistPipeline.~~~45udKF/Packages/DegreeCalculator.ipa'
+2023-06-17 00:50:46 +0000  >>> Copying /var/folders/6d/fxwcxnyx6fn8g6rkxbfz3y9c0000gn/T/XcodeDistPipeline.~~~45udKF/Root 
+2023-06-17 00:50:46 +0000  copying file ./Payload/DegreeCalculator.app/_CodeSignature/CodeResources ... 
+2023-06-17 00:50:46 +0000  2775 bytes for ./Payload/DegreeCalculator.app/_CodeSignature/CodeResources
+2023-06-17 00:50:46 +0000  copying file ./Payload/DegreeCalculator.app/AppIcon60x60@2x.png ... 
+2023-06-17 00:50:46 +0000  3898 bytes for ./Payload/DegreeCalculator.app/AppIcon60x60@2x.png
+2023-06-17 00:50:46 +0000  copying file ./Payload/DegreeCalculator.app/DegreeCalculator ... 
+2023-06-17 00:50:46 +0000  185136 bytes for ./Payload/DegreeCalculator.app/DegreeCalculator
+copying file ./Payload/DegreeCalculator.app/Assets.car ... 
+2023-06-17 00:50:46 +0000  48216 bytes for ./Payload/DegreeCalculator.app/Assets.car
+copying file ./Payload/DegreeCalculator.app/AppIcon76x76@2x~ipad.png ... 
+2023-06-17 00:50:46 +0000  4835 bytes for ./Payload/DegreeCalculator.app/AppIcon76x76@2x~ipad.png
+2023-06-17 00:50:46 +0000  copying file ./Payload/DegreeCalculator.app/embedded.mobileprovision ... 
+2023-06-17 00:50:46 +0000  17458 bytes for ./Payload/DegreeCalculator.app/embedded.mobileprovision
+2023-06-17 00:50:46 +0000  copying file ./Payload/DegreeCalculator.app/Info.plist ... 
+2023-06-17 00:50:46 +0000  1438 bytes for ./Payload/DegreeCalculator.app/Info.plist
+2023-06-17 00:50:46 +0000  copying file ./Payload/DegreeCalculator.app/PkgInfo ... 
+8 bytes for ./Payload/DegreeCalculator.app/PkgInfo
+2023-06-17 00:50:46 +0000  /usr/bin/ditto exited with 0
+2023-06-17 00:50:46 +0000  Processing step: IDEDistributionAppStoreInformationStep
+2023-06-17 00:50:46 +0000  Skipping step: IDEDistributionAppStoreInformationStep because it said so
+2023-06-17 00:50:46 +0000  Processing step: IDEDistributionGenerateProcessedDistributionItems
+2023-06-17 00:50:46 +0000  IDEDistributionItem init <DVTFilePath:0x60000c0b3b80:'/var/folders/6d/fxwcxnyx6fn8g6rkxbfz3y9c0000gn/T/XcodeDistPipeline.~~~45udKF/Root/Payload/DegreeCalculator.app'>
+2023-06-17 00:50:46 +0000  Processing step: IDEDistributionCreateManifestStep

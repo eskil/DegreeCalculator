@@ -152,8 +152,8 @@ struct Calculator: View {
                     CalculatorButton(label: "3", function: CalculatorFunction.ENTRY)
                 }
                 GridRow {
-                    CalculatorButton(label: "°", function: CalculatorFunction.ENTRY)
                     CalculatorButton(label: "0", function: CalculatorFunction.ENTRY)
+                    CalculatorButton(label: "°", function: CalculatorFunction.ENTRY)
                     CalculatorButton(label: "'", function: CalculatorFunction.ENTRY)
                     CalculatorButton(label: "=", function: CalculatorFunction.EQUAL)
                         .background(
