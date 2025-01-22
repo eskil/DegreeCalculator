@@ -235,7 +235,31 @@ final class ModelDataTests: XCTestCase {
                            left: Expr(Value(degrees: 1, minutes: 2.3)),
                            right: Expr(Value(degrees: 4, minutes: 5.6))),
                       Expr()]
+        md.callFunction(CalculatorFunction.EQUAL, label: "")
         md.callFunction(CalculatorFunction.ANS, label: "")
         XCTAssertEqual(md.entered, "5°07'9")
+    }
+    
+    func testMinus360() {
+        md.entered = "361°02'3"
+        // Check that Minus 360 adds a subtract operation for 360
+        md.callFunction(CalculatorFunction.M360, label: "")
+        XCTAssertEqual(md.entries, [Expr(op: Operator.Subtract,
+                                             left: Expr(Value(degrees: 361, minutes: 2.3)),
+                                             right: Expr(Value(degrees: 360, minutes: 0.0))),
+                                    Expr()])
+        XCTAssertEqual(md.entered, "")
+    }
+
+    func testMinus360_resets_operator() {
+        md.entered = "361°02'3"
+        md.callFunction(CalculatorFunction.ADD, label: "")
+        // Check that Minus 360 adds a subtract operation for 360
+        md.callFunction(CalculatorFunction.M360, label: "")
+        XCTAssertEqual(md.entries, [Expr(op: Operator.Subtract,
+                                             left: Expr(Value(degrees: 361, minutes: 2.3)),
+                                             right: Expr(Value(degrees: 360, minutes: 0.0))),
+                                    Expr()])
+        XCTAssertEqual(md.entered, "")
     }
 }

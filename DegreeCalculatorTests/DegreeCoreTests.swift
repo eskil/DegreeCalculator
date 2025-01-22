@@ -82,11 +82,42 @@ final class DegreeCoreTests: XCTestCase {
         XCTAssertEqual(expr.value, expected)
     }
     
+    func testDivideValues_base_case() throws {
+        let lhs = Expr(Value(degrees: 1023, minutes: 6.3))
+        let rhs = Expr(Value(degrees: 3, minutes:0.0))
+        let expected = Value(degrees: 341, minutes: 2.1)
+        let expr = Expr(op: Operator.Divide, left: lhs, right: rhs)
+        XCTAssertEqual(expr.value, expected)
+    }
+
+    func testDivideValues_ignores_minutes() throws {
+        let lhs = Expr(Value(degrees: 1023, minutes: 6.3))
+        let rhs = Expr(Value(degrees: 3, minutes:99.9))
+        let expected = Value(degrees: 341, minutes: 2.1)
+        let expr = Expr(op: Operator.Divide, left: lhs, right: rhs)
+        XCTAssertEqual(expr.value, expected)
+    }
+
+    
+    func testDivideValues_degrees_divvy_into_minutes() throws {
+        let lhs = Expr(Value(degrees: 9, minutes: 0.0))
+        let rhs = Expr(Value(degrees: 2, minutes: 0.0))
+        let expected = Value(degrees: 4, minutes: 30.0)
+        let expr = Expr(op: Operator.Divide, left: lhs, right: rhs)
+        XCTAssertEqual(expr.value, expected)
+    }
+
     func testDegreesAndMinutesOverflow() throws {
         let lhs = Expr(Value(degrees: 354, minutes: 54.5))
         let rhs = Expr(Value(degrees: 6, minutes: 6.6))
-        let expected = Value(degrees: 1, minutes: 1.1)
         let expr = Expr(op: Operator.Add, left: lhs, right: rhs)
+        /*
+         Search for NOTE: disable auto overflow subtractions as we add -360 button instead
+
+        let expected = Value(degrees: 1, minutes: 1.1)
+        XCTAssertEqual(expr.value, expected)
+        */
+        let expected = Value(degrees: 361, minutes: 1.1)
         XCTAssertEqual(expr.value, expected)
     }
     

@@ -21,6 +21,8 @@ enum CalculatorFunction: Int {
     case DELETE
     case ADD
     case SUBTRACT
+    case DIV
+    case M360
     case EQUAL
     case ENTRY
     
@@ -28,7 +30,8 @@ enum CalculatorFunction: Int {
 
 final class ModelData: ObservableObject {
     @Published var entries: [Expr] = [
-        // These comments are various test cases I used regularly.
+        // These comments are various test cases I used regularly. Uncomment
+        // and the calculator will startup with this as the input.
         /*
         // Basic, add two values
         Expr(op: Operator.Add,
@@ -70,6 +73,9 @@ final class ModelData: ObservableObject {
     // This is the string that is currently being edited. By keeping it as a simple string, we can delete
     // (edit) it by simply removing chars.
     @Published var entered: String = ""
+    
+    // When last operator is divide, disable degrees/minutes input
+    @Published var disableDegreesAndMinutes: Bool = false
 
     // Main access point for the model data
     func callFunction(_ f: CalculatorFunction, label: String) {
@@ -86,6 +92,10 @@ final class ModelData: ObservableObject {
             return add()
         case .SUBTRACT:
             return subtract()
+        case .DIV:
+            return divide()
+        case .M360:
+            return minus_360()
         case .EQUAL:
             return equal()
         case .ENTRY:
@@ -145,6 +155,8 @@ final class ModelData: ObservableObject {
                 if left.op == nil {
                     // If left has no op, it's a value, so we're at the first entry of the expression - reset tree.
                     newRoot = Expr()
+                    // Reenable this in case it was disabled while inputting a number for division
+                    disableDegreesAndMinutes = false
                 } else {
                     // Otherwise, left side forms new root, but we go back to the "pre-operator" state
                     newRoot = Expr(op: left.op, left: left.nodes[0], right: nil)
@@ -256,7 +268,30 @@ final class ModelData: ObservableObject {
         startExpr(op: Operator.Subtract)
     }
     
+    func divide() {
+        startExpr(op: Operator.Divide)
+        disableDegreesAndMinutes = true
+    }
+    
+    func minus_360() {
+        // If there's an op, del() so eg. "+" gets removed.
+        if let root = entries.last {
+            if root.op != nil && root.nodes.count == 1 {
+                delete()
+            }
+        }
+        // Start a subtractions
+        startExpr(op: Operator.Subtract)
+        // and erase whatever was entered and insert 360 degrees
+        entered = "360"
+        setDegree()
+        return equal()
+    }
+    
     func equal() {
+        // Reenable this in case it was disabled while inputting a number for division
+        disableDegreesAndMinutes = false
+
         if let root = entries.last {
             if root.nodes.count == 0 {
                 return
