@@ -93,8 +93,7 @@ struct Expr: CustomStringConvertible, Hashable, Codable {
                 // this extremely literal version is an easy to
                 // understand/read reflection of how a person does
                 // this math.
-                
-                while minutes > 60.0 {
+                while minutes >= 60.0 {
                     degrees += 1
                     minutes -= 60.0
                 }
