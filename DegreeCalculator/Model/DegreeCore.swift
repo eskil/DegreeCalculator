@@ -42,6 +42,7 @@ struct Value: Codable, Hashable, CustomStringConvertible {
 enum Operator: String, CustomStringConvertible, Hashable, Codable {
     case Add
     case Subtract
+    case Divide
     
     public var description: String {
         switch self {
@@ -49,6 +50,8 @@ enum Operator: String, CustomStringConvertible, Hashable, Codable {
             return "+"
         case .Subtract:
             return "-"
+        case .Divide:
+            return "/"
         }
     }
 }
@@ -86,6 +89,28 @@ struct Expr: CustomStringConvertible, Hashable, Codable {
                 case Operator.Subtract:
                     degrees = lv.degrees - rv.degrees
                     minutes = lv.minutes - rv.minutes
+                case Operator.Divide:
+                    /*
+                    WOOF this needs to
+                    take degrees x 60 + minutes
+                    do the rounding div
+                    */
+                    
+                    let roundingBehavior = NSDecimalNumberHandler(
+                        roundingMode: NSDecimalNumber.RoundingMode.plain,
+                        scale: 1, // One decimal place
+                        raiseOnExactness: false,
+                        raiseOnOverflow: false,
+                        raiseOnUnderflow: false,
+                        raiseOnDivideByZero: false
+                    )
+
+                    let full_minutes = Decimal(lv.degrees * 60) + lv.minutes
+                    let unrounded = NSDecimalNumber(decimal: full_minutes / Decimal(rv.degrees))
+                    let rounded = unrounded.rounding(accordingToBehavior: roundingBehavior)
+                    
+                    degrees = rounded.intValue / 60
+                    minutes = rounded.decimalValue - Decimal(degrees * 60)
                 }
                 
                 // This could be done via % 60 and % 360 and checking
@@ -101,9 +126,12 @@ struct Expr: CustomStringConvertible, Hashable, Codable {
                     minutes += 60.0
                     degrees -= 1
                 }
+                /*
+                NOTE: disable auto overflow subtractions as we add -360 button instead
                 while degrees >= 360 {
                     degrees -= 360
                 }
+                */
                 while degrees < 0 {
                     degrees += 360
                 }
