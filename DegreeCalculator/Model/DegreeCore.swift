@@ -217,7 +217,7 @@ struct Expr: CustomStringConvertible, Hashable, Codable {
                 result.append(")")
             }
         }
-        return result.joined(separator: " ")
+        return result.joined(separator: "")
     }
     
     public func inOrder(visit: (Expr) -> Void) {
