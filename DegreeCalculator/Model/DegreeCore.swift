@@ -8,8 +8,9 @@
 import Foundation
 
 struct Value: Codable, Hashable, CustomStringConvertible {
-    var degrees: Int
-    var minutes: Decimal
+    var degrees: Int?
+    var minutes: Decimal?
+    var integer: Int?
     
     init() {
         degrees = 0
@@ -20,7 +21,11 @@ struct Value: Codable, Hashable, CustomStringConvertible {
         self.degrees = degrees
         self.minutes = minutes
     }
-    
+
+    init(integer: Int) {
+        self.integer = integer
+    }
+
     // Format to <degrees>°<mm>'<s> format.
     public var description: String {
         let formatter = NumberFormatter()
@@ -30,11 +35,17 @@ struct Value: Codable, Hashable, CustomStringConvertible {
         formatter.decimalSeparator = "'"
         formatter.maximumFractionDigits = 1
         formatter.minimumFractionDigits = 1
-        let number = NSDecimalNumber(decimal: minutes)
-        if let s = formatter.string(from: number) {
-            return String(format: "%d°%@", degrees, s)
+        if let d = degrees, let m = minutes {
+            let number = NSDecimalNumber(decimal: m)
+            if let s = formatter.string(from: number) {
+                return String(format: "%d°%@", d, s)
+            } else {
+                return String(format: "%d°", d)
+            }
+        } else if let i = integer {
+            return String(format: "%d", i)
         } else {
-            return String(format: "%d°", degrees)
+            return String("nan")
         }
     }
 }
@@ -84,18 +95,20 @@ struct Expr: CustomStringConvertible, Hashable, Codable {
                 
                 switch op! {
                 case Operator.Add:
-                    degrees = lv.degrees + rv.degrees
-                    minutes = lv.minutes + rv.minutes
+                    if let lvd = lv.degrees, let rvd = rv.degrees  {
+                        degrees = lvd + rvd
+                    }
+                    if let lvm = lv.minutes, let rvm = rv.minutes {
+                        minutes = lvm + rvm
+                    }
                 case Operator.Subtract:
-                    degrees = lv.degrees - rv.degrees
-                    minutes = lv.minutes - rv.minutes
+                    if let lvd = lv.degrees, let rvd = rv.degrees  {
+                        degrees = lvd - rvd
+                    }
+                    if let lvm = lv.minutes, let rvm = rv.minutes {
+                        minutes = lvm - rvm
+                    }
                 case Operator.Divide:
-                    /*
-                    WOOF this needs to
-                    take degrees x 60 + minutes
-                    do the rounding div
-                    */
-                    
                     let roundingBehavior = NSDecimalNumberHandler(
                         roundingMode: NSDecimalNumber.RoundingMode.plain,
                         scale: 1, // One decimal place
@@ -104,13 +117,15 @@ struct Expr: CustomStringConvertible, Hashable, Codable {
                         raiseOnUnderflow: false,
                         raiseOnDivideByZero: false
                     )
-
-                    let full_minutes = Decimal(lv.degrees * 60) + lv.minutes
-                    let unrounded = NSDecimalNumber(decimal: full_minutes / Decimal(rv.degrees))
-                    let rounded = unrounded.rounding(accordingToBehavior: roundingBehavior)
                     
-                    degrees = rounded.intValue / 60
-                    minutes = rounded.decimalValue - Decimal(degrees * 60)
+                    if let lvd = lv.degrees, let lvm = lv.minutes, let denom = rv.integer {
+                        let full_minutes = Decimal(lvd * 60) + lvm
+                        let unrounded = NSDecimalNumber(decimal: full_minutes / Decimal(denom))
+                        let rounded = unrounded.rounding(accordingToBehavior: roundingBehavior)
+                        
+                        degrees = rounded.intValue / 60
+                        minutes = rounded.decimalValue - Decimal(degrees * 60)
+                    }
                 }
                 
                 // This could be done via % 60 and % 360 and checking

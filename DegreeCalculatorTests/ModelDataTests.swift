@@ -202,27 +202,40 @@ final class ModelDataTests: XCTestCase {
     
     func testPrepExpr() {
         md.entered = ""
-        XCTAssertEqual(md.prepExpr(), Expr(Value(degrees: 0, minutes: 0.0)))
+        XCTAssertEqual(md.prepExpr(toDMS: true), Expr(Value(degrees: 0, minutes: 0.0)))
         XCTAssertEqual(md.entered, "0°0'0")
         
         md.entered = "0"
-        XCTAssertEqual(md.prepExpr(), Expr(Value(degrees: 0, minutes: 0.0)))
+        XCTAssertEqual(md.prepExpr(toDMS: true), Expr(Value(degrees: 0, minutes: 0.0)))
         XCTAssertEqual(md.entered, "0°0'0")
 
+        md.entered = "0"
+        XCTAssertEqual(md.prepExpr(toDMS: false), Expr(Value(integer: 0)))
+        XCTAssertEqual(md.entered, "0")
+
         md.entered = "1°"
-        XCTAssertEqual(md.prepExpr(), Expr(Value(degrees: 1, minutes: 0.0)))
+        XCTAssertEqual(md.prepExpr(toDMS: true), Expr(Value(degrees: 1, minutes: 0.0)))
         XCTAssertEqual(md.entered, "1°0'0")
 
+        // Parseing 1d as not-DMS yields 0
+        md.entered = "1°"
+        XCTAssertEqual(md.prepExpr(toDMS: false), Expr(Value(integer: 0)))
+        XCTAssertEqual(md.entered, "1°")
+
+        md.entered = "1"
+        XCTAssertEqual(md.prepExpr(toDMS: false), Expr(Value(integer: 1)))
+        XCTAssertEqual(md.entered, "1")
+
         md.entered = "1°2"
-        XCTAssertEqual(md.prepExpr(), Expr(Value(degrees: 1, minutes: 2.0)))
+        XCTAssertEqual(md.prepExpr(toDMS: true), Expr(Value(degrees: 1, minutes: 2.0)))
         XCTAssertEqual(md.entered, "1°2'0")
 
         md.entered = "1°2'"
-        XCTAssertEqual(md.prepExpr(), Expr(Value(degrees: 1, minutes: 2.0)))
+        XCTAssertEqual(md.prepExpr(toDMS: true), Expr(Value(degrees: 1, minutes: 2.0)))
         XCTAssertEqual(md.entered, "1°2'0")
         
         md.entered = "1°2'3"
-        XCTAssertEqual(md.prepExpr(), Expr(Value(degrees: 1, minutes: 2.3)))
+        XCTAssertEqual(md.prepExpr(toDMS: true), Expr(Value(degrees: 1, minutes: 2.3)))
         XCTAssertEqual(md.entered, "1°2'3")
     }
     
@@ -260,6 +273,60 @@ final class ModelDataTests: XCTestCase {
                                              left: Expr(Value(degrees: 361, minutes: 2.3)),
                                              right: Expr(Value(degrees: 360, minutes: 0.0))),
                                     Expr()])
+        XCTAssertEqual(md.entered, "")
+    }
+    
+    func testDivide_add_add_add_left_sided_tree() {
+        md.entered = "1"
+        md.callFunction(CalculatorFunction.ADD, label: "")
+        md.entered = "2"
+        md.callFunction(CalculatorFunction.ADD, label: "")
+        md.entered = "3"
+        md.callFunction(CalculatorFunction.ADD, label: "")
+        XCTAssertEqual(md.entries, [Expr(op: Operator.Add,
+                                         left: Expr(op: Operator.Add,
+                                                    left: Expr(op: Operator.Add,
+                                                               left: Expr(Value(degrees: 1, minutes: 0.0)),
+                                                               right: Expr(Value(degrees: 2, minutes: 0.0))
+                                                              ),
+                                                    right: Expr(Value(degrees: 3, minutes: 0.0))))])
+        XCTAssertEqual(md.entered, "")
+    }
+    
+    func testDivide_wrong_add_add_divide_left_sided_tree() {
+        md.entered = "1"
+        md.callFunction(CalculatorFunction.ADD, label: "")
+        md.entered = "2"
+        md.callFunction(CalculatorFunction.ADD, label: "")
+        md.entered = "3"
+        md.callFunction(CalculatorFunction.DIV, label: "")
+        XCTAssertEqual(md.entries, [Expr(op: Operator.Divide,
+                                         left: Expr(op: Operator.Add,
+                                                    left: Expr(op: Operator.Add,
+                                                               left: Expr(Value(degrees: 1, minutes: 0.0)),
+                                                               right: Expr(Value(degrees: 2, minutes: 0.0))
+                                                              ),
+                                                    right: Expr(Value(degrees: 3, minutes: 0))))
+        ])
+        XCTAssertEqual(md.entered, "")
+    }
+    
+    func testDivide_right_add_add_divide() {
+        md.entered = "9"
+        md.callFunction(CalculatorFunction.ADD, label: "")
+        md.entered = "9"
+        md.callFunction(CalculatorFunction.ADD, label: "")
+        md.entered = "9"
+        md.callFunction(CalculatorFunction.DIV, label: "")
+        XCTAssertEqual(md.entries, [Expr(op: Operator.Add,
+                                         left: Expr(op: Operator.Add,
+                                                    left: Expr(Value(degrees: 1, minutes: 0.0)),
+                                                    right: Expr(Value(degrees: 2, minutes: 0.0))
+                                                   ),
+                                         right: Expr(op: Operator.Divide,
+                                                     left: Expr(Value(degrees: 3, minutes: 0.0))
+                                                    ))
+        ])
         XCTAssertEqual(md.entered, "")
     }
 }

@@ -84,24 +84,15 @@ final class DegreeCoreTests: XCTestCase {
     
     func testDivideValues_base_case() throws {
         let lhs = Expr(Value(degrees: 1023, minutes: 6.3))
-        let rhs = Expr(Value(degrees: 3, minutes:0.0))
+        let rhs = Expr(Value(integer: 3))
         let expected = Value(degrees: 341, minutes: 2.1)
         let expr = Expr(op: Operator.Divide, left: lhs, right: rhs)
         XCTAssertEqual(expr.value, expected)
     }
-
-    func testDivideValues_ignores_minutes() throws {
-        let lhs = Expr(Value(degrees: 1023, minutes: 6.3))
-        let rhs = Expr(Value(degrees: 3, minutes:99.9))
-        let expected = Value(degrees: 341, minutes: 2.1)
-        let expr = Expr(op: Operator.Divide, left: lhs, right: rhs)
-        XCTAssertEqual(expr.value, expected)
-    }
-
     
     func testDivideValues_degrees_divvy_into_minutes() throws {
         let lhs = Expr(Value(degrees: 9, minutes: 0.0))
-        let rhs = Expr(Value(degrees: 2, minutes: 0.0))
+        let rhs = Expr(Value(integer: 2))
         let expected = Value(degrees: 4, minutes: 30.0)
         let expr = Expr(op: Operator.Divide, left: lhs, right: rhs)
         XCTAssertEqual(expr.value, expected)

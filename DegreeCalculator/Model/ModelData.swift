@@ -103,6 +103,8 @@ final class ModelData: ObservableObject {
         }
     }
     
+    // _ is a Swift syntax to indicate the argument doesn't need to be named when
+    // called, ie. addEntry("str") instead of addEntry(string: "str")
     func addEntry(_ string: String) {
         if string == "°" {
             setDegree()
@@ -181,12 +183,15 @@ final class ModelData: ObservableObject {
     
     func parseValue(_ s: String) -> Value {
         // Simple parse by just splitting on ° and '. This works since
-        // prepExpr inserts ° and ' and trailing 0.
+        // prepExpr(toDMS=true) inserts ° and ' and trailing 0, and when toDMS=false,
+        // we get an integer value instead.
         var degrees = 0
         var minutes: Decimal = 0.0
         
         let trimmed = s.trimmingCharacters(in: .whitespaces)
         let dgm = trimmed.split(separator: "°")
+        // If there's a degree symbol in the string, parse and return
+        // as DMS.
         if dgm.count > 0 {
             degrees = Int(dgm[0]) ?? 0
             if dgm.count == 2 {
@@ -198,21 +203,25 @@ final class ModelData: ObservableObject {
                 }
             }
         }
-        
         return Value(degrees: degrees, minutes: minutes)
     }
     
-    func prepExpr() -> Expr {
-        // If the string is emptish, this will create a 0d0'0
-        // First add a d symbol, which will add a leading 0
-        setDegree()
-        // Then add ' symbol, which will add 0 after degree is there's no numbers
-        setMinutes()
-        // Then add a 0 after the last '
-        addEntry("0")
+    func prepExpr(toDMS: Bool) -> Expr {
+        if (toDMS) {
+            // If the string is emptish, this will create a 0d0'0
+            // First add a d symbol, which will add a leading 0
+            setDegree()
+            // Then add ' symbol, which will add 0 after degree is there's no numbers
+            setMinutes()
+            // Then add a 0 after the last '
+            addEntry("0")
+            
+            let value = parseValue(entered)
+            return Expr(value)
+        }
         
-        let value = parseValue(entered)
-        return Expr(value)
+        let trimmed = entered.trimmingCharacters(in: .whitespaces)
+        return Expr(Value(integer: Int(trimmed) ?? 0))
     }
     
     private func debugLog(_ name: String) {
@@ -235,9 +244,10 @@ final class ModelData: ObservableObject {
             // No previous answer
             return
         }
-        let node = prepExpr()
         
         if var root = entries.last {
+            let node = prepExpr(toDMS: true)
+
             if root.op == nil  {
                 // Fresh root
                 root.op = op
@@ -297,10 +307,15 @@ final class ModelData: ObservableObject {
                 return
             }
         }
-        let node = prepExpr()
         
         if var root = entries.last {
             if root.op != nil && root.nodes.count == 1 {
+                let node: Expr
+                if root.op == Operator.Divide {
+                    node = prepExpr(toDMS: false)
+                } else {
+                    node = prepExpr(toDMS: true)
+                }
                 // Root has a left side & operator, add right side value and new operator
                 root.nodes.append(node)
                 entries.removeLast()
