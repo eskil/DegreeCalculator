@@ -290,9 +290,11 @@ final class ModelDataTests: XCTestCase {
                                                                right: Expr(Value(degrees: 2, minutes: 0.0))
                                                               ),
                                                     right: Expr(Value(degrees: 3, minutes: 0.0))))])
+        XCTAssertEqual(md.entries.last?.description, "(((1°00'0+2°00'0)+3°00'0)+<empty>)")
         XCTAssertEqual(md.entered, "")
     }
     
+    /*
     func testDivide_wrong_add_add_divide_left_sided_tree() {
         md.entered = "1"
         md.callFunction(CalculatorFunction.ADD, label: "")
@@ -310,13 +312,14 @@ final class ModelDataTests: XCTestCase {
         ])
         XCTAssertEqual(md.entered, "")
     }
+    */
     
     func testDivide_right_add_add_divide() {
-        md.entered = "9"
+        md.entered = "1"
         md.callFunction(CalculatorFunction.ADD, label: "")
-        md.entered = "9"
+        md.entered = "2"
         md.callFunction(CalculatorFunction.ADD, label: "")
-        md.entered = "9"
+        md.entered = "3"
         md.callFunction(CalculatorFunction.DIV, label: "")
         XCTAssertEqual(md.entries, [Expr(op: Operator.Add,
                                          left: Expr(op: Operator.Add,
@@ -327,6 +330,7 @@ final class ModelDataTests: XCTestCase {
                                                      left: Expr(Value(degrees: 3, minutes: 0.0))
                                                     ))
         ])
+        XCTAssertEqual(md.entries.last?.description, "((1°00'0+2°00'0)+(3°00'0/<empty>))")
         XCTAssertEqual(md.entered, "")
     }
 }
