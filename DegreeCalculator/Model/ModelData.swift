@@ -255,11 +255,22 @@ final class ModelData: ObservableObject {
                 entries.removeLast()
                 entries.append(root)
             } else if root.op != nil && root.nodes.count == 1 {
-                // Root has a left side & operator, add right side value and new operator
-                root.nodes.append(node)
-                let newRoot = Expr(op: op, left: root, right: nil)
-                entries.removeLast()
-                entries.append(newRoot)
+                Fail compile here
+                TODO I bet this won't work with things like "3 + 3 + 3 / 3 / 3" being entered
+                // Root has a left side and an operator.
+                // Determine operator precedence to determine which side to add it
+                if op == Operator.Divide && (root.op == Operator.Add || root.op == Operator.Subtract) {
+                    let newRoot = Expr(op: op, left: node, right: nil)
+                    root.nodes.append(newRoot)
+                    entries.removeLast()
+                    entries.append(root)
+                } else {
+                    // Add right side value and new operator
+                    root.nodes.append(node)
+                    let newRoot = Expr(op: op, left: root, right: nil)
+                    entries.removeLast()
+                    entries.append(newRoot)
+                }
             }
         } else {
             NSLog("entries has no root?")
@@ -309,6 +320,11 @@ final class ModelData: ObservableObject {
         }
         
         if var root = entries.last {
+            Fail compile here
+            TODO: root.nodes.count == 1 assumes a right balanced tree
+            instead of assuming that and inserting the current Expression
+            there, we have to support a tree like (+ 1 2) + (/ 3 <empty>)
+            that means walk the tree and find where to insert the node
             if root.op != nil && root.nodes.count == 1 {
                 let node: Expr
                 if root.op == Operator.Divide {

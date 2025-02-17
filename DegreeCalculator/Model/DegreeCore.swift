@@ -89,6 +89,10 @@ struct Expr: CustomStringConvertible, Hashable, Codable {
                 return nil
             }
 
+            // This recursively evaluates the expression by
+            // accessing nodes[0] and [1] (left and right).
+            // If any expression returns nil, the expression can't
+            // be evaluated, eg. missing left/right
             if let lv = nodes[0].value, let rv = nodes[1].value {
                 var degrees: Int = 0
                 var minutes: Decimal = 0.0
@@ -125,6 +129,9 @@ struct Expr: CustomStringConvertible, Hashable, Codable {
                         
                         degrees = rounded.intValue / 60
                         minutes = rounded.decimalValue - Decimal(degrees * 60)
+                    } else {
+                        // left of right node is nil,
+                        return nil
                     }
                 }
                 
@@ -152,7 +159,8 @@ struct Expr: CustomStringConvertible, Hashable, Codable {
                 }
                 return Value(degrees: degrees, minutes: minutes)
             } else {
-                return nodes[0].value
+                // Neither left not right value means nil
+                return nil 
             }
         }
     }
