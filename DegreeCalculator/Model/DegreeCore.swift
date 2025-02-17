@@ -7,6 +7,11 @@
 
 import Foundation
 
+/**
+ Value is the part of an expression that models the numeric value.
+ 
+ It only supports degrees (int) and minutes (decimal).
+ */
 struct Value: Codable, Hashable, CustomStringConvertible {
     var degrees: Int?
     var minutes: Decimal?
@@ -26,7 +31,9 @@ struct Value: Codable, Hashable, CustomStringConvertible {
         self.integer = integer
     }
 
-    // Format to <degrees>°<mm>'<s> format.
+    /**
+     Format to  displayable `<degrees>°<mm>'<s>` format used inside the calculator view.
+     */
     public var description: String {
         let formatter = NumberFormatter()
         formatter.numberStyle = .decimal
@@ -50,11 +57,17 @@ struct Value: Codable, Hashable, CustomStringConvertible {
     }
 }
 
+/**
+ The Operator is the part of the expression that models the operator.
+ */
 enum Operator: String, CustomStringConvertible, Hashable, Codable {
     case Add
     case Subtract
     case Divide
     
+    /**
+     Format to  displayable `string used inside the calculator view.
+     */
     public var description: String {
         switch self {
         case .Add:
@@ -67,6 +80,17 @@ enum Operator: String, CustomStringConvertible, Hashable, Codable {
     }
 }
 
+/**
+ Expr captures the binary tree structure of an expression.
+ It has an Operator and array of Exprs the operator applies to.
+ The operator is optional and it can be a value instead.
+ 
+ This is binary tree, so the array of Exprs is at max two, representing
+ left and right.
+ 
+ So eg. a basic 2+3 is an Expr with op = PLUS and two Exprs,
+ each that have no op but have a value.
+ */
 struct Expr: CustomStringConvertible, Hashable, Codable {
     static func == (lhs: Expr, rhs: Expr) -> Bool {
         return lhs.value == rhs.value
@@ -75,7 +99,95 @@ struct Expr: CustomStringConvertible, Hashable, Codable {
     var nodes: [Expr]
     var op: Operator?
     var v: Value?
+
+    // Expr can be empty, no children and no op
+    init() {
+        self.op = nil
+        self.nodes = []
+        self.v = nil
+    }
     
+    // Expr can be a Value (leaf), no childre and no op
+    init(_ value: Value) {
+        self.op = nil
+        self.nodes = []
+        self.v = value
+    }
+    
+    // Expressions are built left side first.
+    init(op: Operator?, left: Expr?) {
+        self.op = op
+        self.nodes = []
+        if let l = left {
+            self.nodes.append(l)
+        }
+    }
+    
+    // Expressions are built left side first.
+    init(op: Operator?, left: Expr, right: Expr?) {
+        self.op = op
+        self.nodes = []
+        self.nodes.append(left)
+        if let r = right {
+            self.nodes.append(r)
+        }
+    }
+    
+    /**
+     Format to  displayable `string used inside the calculator view.
+     */
+    public var description: String {
+        var result: [String] = []
+        if let v = v {
+            result.append("\(v.description)")
+        } else {
+            if nodes.count > 0 {
+                result.append("(")
+            }
+            if nodes.count > 0 {
+                result.append("\(nodes[0].description)")
+            } else {
+                result.append("<empty>")
+            }
+            if let b = op {
+                result.append("\(b)")
+            } else {
+                result.append("<noop>")
+            }
+            if nodes.count > 1 {
+                result.append("\(nodes[1].description)")
+            } else {
+                result.append("<empty>")
+            }
+            if nodes.count > 0 {
+                result.append(")")
+            }
+        }
+        return result.joined(separator: "")
+    }
+    
+    /**
+     Inorder visit the tree, apply visit function to each node.
+     */
+    public func inOrder(visit: (Expr) -> Void) {
+        if nodes.count > 0 {
+            nodes[0].inOrder(visit: visit)
+        }
+        visit(self)
+        if nodes.count > 1 {
+            nodes[1].inOrder(visit: visit)
+        }
+    }
+    
+    /**
+     value recursively computes the expression value.
+     If the expression is fully formed (has operator, left and right), this function
+     computes the value by applying the operator to the result of calling
+     value on the left and right nodes.
+     
+     There's no caching of the value (for simplicity's sake), but the operations
+     are so simple that this should not pose a problem.
+     */
     var value: Value? {
         get {
             if v != nil {
@@ -160,81 +272,8 @@ struct Expr: CustomStringConvertible, Hashable, Codable {
                 return Value(degrees: degrees, minutes: minutes)
             } else {
                 // Neither left not right value means nil
-                return nil 
+                return nil
             }
-        }
-    }
-
-    // Expr can be empty, no children and no op
-    init() {
-        self.op = nil
-        self.nodes = []
-        self.v = nil
-    }
-    
-    // Expr can be a Value (leaf), no childre and no op
-    init(_ value: Value) {
-        self.op = nil
-        self.nodes = []
-        self.v = value
-    }
-    
-    // Expressions are built left side first.
-    init(op: Operator?, left: Expr?) {
-        self.op = op
-        self.nodes = []
-        if let l = left {
-            self.nodes.append(l)
-        }
-    }
-    
-    // Expressions are built left side first.
-    init(op: Operator?, left: Expr, right: Expr?) {
-        self.op = op
-        self.nodes = []
-        self.nodes.append(left)
-        if let r = right {
-            self.nodes.append(r)
-        }
-    }
-
-    public var description: String {
-        var result: [String] = []
-        if let v = v {
-            result.append("\(v.description)")
-        } else {
-            if nodes.count > 0 {
-                result.append("(")
-            }
-            if nodes.count > 0 {
-                result.append("\(nodes[0].description)")
-            } else {
-                result.append("<empty>")
-            }
-            if let b = op {
-                result.append("\(b)")
-            } else {
-                result.append("<noop>")
-            }
-            if nodes.count > 1 {
-                result.append("\(nodes[1].description)")
-            } else {
-                result.append("<empty>")
-            }
-            if nodes.count > 0 {
-                result.append(")")
-            }
-        }
-        return result.joined(separator: "")
-    }
-    
-    public func inOrder(visit: (Expr) -> Void) {
-        if nodes.count > 0 {
-            nodes[0].inOrder(visit: visit)
-        }
-        visit(self)
-        if nodes.count > 1 {
-            nodes[1].inOrder(visit: visit)
         }
     }
 }
