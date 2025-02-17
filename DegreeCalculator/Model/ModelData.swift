@@ -47,10 +47,12 @@ enum CalculatorFunction: Int {
  responsible for storing the expressions and values and converting to a displayable string,
  ModeData controls the operations.
  
- MVC style, It'd be more fair to say
+ MVC style, It'd be a better naming to have
  - ModelData is the Controller
- - DegreeCode (Expr & Value) is the Model
+ - DegreeCode (Expr & Value) are the Models.
  - The UI is the View that uses the descriptions() from the Expr/Value
+ 
+ The naming stems from the SwiftUI tutorials.
 */
 final class ModelData: ObservableObject {
     /**
