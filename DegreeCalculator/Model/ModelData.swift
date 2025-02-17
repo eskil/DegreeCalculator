@@ -14,19 +14,54 @@ import Foundation
  https://www.hackingwithswift.com/example-code/strings/how-to-load-a-string-from-a-file-in-your-bundle
  */
 
+/**
+ This enum represents the possible functions
+ */
 enum CalculatorFunction: Int {
+    // Insert last answer as entry
     case ANS
+    // Clear everyhing
     case ALL_CLEAR
+    // Clear current input
     case CLEAR
+    // Delete last ENTRY
     case DELETE
+    // Start + operation
     case ADD
+    // Start - operation
     case SUBTRACT
+    // Compute current math operationr
     case EQUAL
+    // Entry is a single number entered
     case ENTRY
     
 }
 
+
+/**
+ ModelData is the observable entity that the UI interacts with.
+ 
+ The primary access is callFunction, called by button widgets to operate on the model.
+ 
+ Internally it maintains a list of Expr objects (from DegreeCore). Where Expr is only
+ responsible for storing the expressions and values and converting to a displayable string,
+ ModeData controls the operations.
+ 
+ MVC style, It'd be a better naming to have
+ - ModelData is the Controller
+ - DegreeCode (Expr & Value) are the Models.
+ - The UI is the View that uses the descriptions() from the Expr/Value
+ 
+ The naming stems from the SwiftUI tutorials.
+*/
 final class ModelData: ObservableObject {
+    /**
+     Entries is the list of expressions.
+     
+     Each time EQUAL is executed, the current expression is computed (via value)
+     and a new expression is started.
+     So in short, this stores all expressions computer until a allClear is issued.
+     */
     @Published var entries: [Expr] = [
         // These comments are various test cases I used regularly.
         /*
@@ -67,11 +102,25 @@ final class ModelData: ObservableObject {
         Expr(),
     ]
     
-    // This is the string that is currently being edited. By keeping it as a simple string, we can delete
-    // (edit) it by simply removing chars.
+    /**
+     This is the string that is currently being edited. By keeping it as a simple string, we can delete
+     (edit) it by simply removing chars.
+     */
     @Published var entered: String = ""
 
-    // Main access point for the model data
+    /**
+     Main access point for the model data
+     It takes a CalculatorFunction (enum) and in the case of ENTRY, the label, a string that
+     contains the text being entered.
+     
+     Eg. a simple addition of 10 + 5
+     ```
+     callFunction(ENTRY, "1")
+     callFunction(ENTRY, "0")
+     callFunction(ADD, "")
+     callFunction(ENTRY, "5")
+     callFunction(EQUAL, "")
+     */
     func callFunction(_ f: CalculatorFunction, label: String) {
         switch f {
         case .ANS:
@@ -113,6 +162,9 @@ final class ModelData: ObservableObject {
         }
     }
     
+    /**
+     Reset the entire state.
+     */
     func allClear() {
         entries = [Expr()]
         entered = ""
