@@ -82,6 +82,14 @@ struct Expr: CustomStringConvertible, Hashable, Codable {
         return lhs.value == rhs.value
     }
     
+    /** Instead of optional left/rights, we use an erros. This is because
+     swift doesn't support recursive structures.
+    Another alternative wouldn't been enums;
+     enum BinaryTree<T> {
+         case empty
+         case node(value: T, left: BinaryTree, right: BinaryTree)
+     }
+    */
     var nodes: [Expr]
     var op: Operator?
     var v: Value?
