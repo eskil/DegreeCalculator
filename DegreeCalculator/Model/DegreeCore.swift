@@ -180,6 +180,19 @@ struct Expr: CustomStringConvertible, Hashable, Codable {
     }
     
     /**
+     Find rightmost open node.
+     */
+    public func rightMost(): Expr
+        if nodes.count > 0 {
+            nodes[0].inOrder(visit: visit)
+        }
+        visit(self)
+        if nodes.count > 1 {
+            nodes[1].inOrder(visit: visit)
+        }
+    }
+    
+    /**
      value recursively computes the expression value.
      If the expression is fully formed (has operator, left and right), this function
      computes the value by applying the operator to the result of calling

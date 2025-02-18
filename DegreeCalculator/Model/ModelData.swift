@@ -306,11 +306,10 @@ final class ModelData: ObservableObject {
                 entries.removeLast()
                 entries.append(root)
             } else if root.op != nil && root.nodes.count == 1 {
-                Fail compile here
-                TODO I bet this won't work with things like "3 + 3 + 3 / 3 / 3" being entered
                 // Root has a left side and an operator.
                 // Determine operator precedence to determine which side to add it
                 if op == Operator.Divide && (root.op == Operator.Add || root.op == Operator.Subtract) {
+                    // Inserting a higher precedence, so move current node to the left.
                     let newRoot = Expr(op: op, left: node, right: nil)
                     root.nodes.append(newRoot)
                     entries.removeLast()
@@ -371,11 +370,11 @@ final class ModelData: ObservableObject {
         }
         
         if var root = entries.last {
-            Fail compile here
             TODO: root.nodes.count == 1 assumes a right balanced tree
             instead of assuming that and inserting the current Expression
             there, we have to support a tree like (+ 1 2) + (/ 3 <empty>)
-            that means walk the tree and find where to insert the node
+            that means walk the tree and find the rightmost open node.
+            
             if root.op != nil && root.nodes.count == 1 {
                 let node: Expr
                 if root.op == Operator.Divide {
