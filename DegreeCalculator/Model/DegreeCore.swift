@@ -24,6 +24,10 @@ struct Value: Codable, Hashable, CustomStringConvertible {
     init(degrees: Int, minutes: Decimal) {
         self.degrees = degrees
         self.minutes = minutes
+        while self.minutes >= 60.0 {
+            self.degrees += 1
+            self.minutes -= 60.0
+        }
     }
     
     /**
