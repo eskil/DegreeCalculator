@@ -109,6 +109,21 @@ final class ModelDataTests: XCTestCase {
         XCTAssertEqual(md.entered, "0°0'1")
     }
     
+    // Test shortcut building by ' with a > 60 value
+    func testEntryShortcutMinutesWhenOver60() throws {
+        md.entered = ""
+        md.callFunction(CalculatorFunction.ENTRY, label: "1")
+        md.callFunction(CalculatorFunction.ENTRY, label: "8")
+        md.callFunction(CalculatorFunction.ENTRY, label: "5")
+        md.callFunction(CalculatorFunction.ENTRY, label: "'")
+        XCTAssertEqual(md.entries, [Expr()])
+        XCTAssertEqual(md.entered, "0°185'")
+        
+        md.callFunction(CalculatorFunction.ENTRY, label: "1")
+        XCTAssertEqual(md.entries, [Expr()])
+        XCTAssertEqual(md.entered, "0°185'1")
+    }
+
     // Test adding second d and ' at various times is a noop
     func testDoubleDegreeMinuteEntryNoop() throws {
         md.entered = ""

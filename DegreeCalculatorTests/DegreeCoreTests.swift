@@ -74,6 +74,12 @@ final class DegreeCoreTests: XCTestCase {
         XCTAssertEqual(expr.value, expected)
     }
 
+    func test_minutes_overflow() throws {
+        let expr = Expr(Value(degrees: 0, minutes: 185.0))
+        let expected = Value(degrees: 3, minutes: 5.0)
+        XCTAssertEqual(expr.value, expected)
+    }
+
     func testSubtractTwoValues() throws {
         let lhs = Expr(Value(degrees: 4, minutes: 5.6))
         let rhs = Expr(Value(degrees: 1, minutes: 2.3))
