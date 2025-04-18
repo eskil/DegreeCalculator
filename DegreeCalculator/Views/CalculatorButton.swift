@@ -11,7 +11,8 @@ struct CalculatorButton: View {
     @EnvironmentObject var modelData: ModelData
     var label: String
     var function: CalculatorFunction = CalculatorFunction.ENTRY
-
+    var tripleTapFunction: CalculatorFunction?
+    
     var fg: Color {
         switch function {
         case .ADD, .SUBTRACT:
@@ -30,7 +31,7 @@ struct CalculatorButton: View {
             return Color.brown
         case .EQUAL:
             return Color.green
-        case .ADD, .SUBTRACT:
+        case .ADD, .SUBTRACT, .M360:
             return Color.yellow
         default:
             return Color.gray
@@ -44,6 +45,11 @@ struct CalculatorButton: View {
                 .font(.system(.largeTitle, design: .monospaced))
         }
         .buttonStyle(CalculatorButtonStyle(foregroundColor: fg, backgroundColor: bg))
+        .onTapGesture(count: 3) {
+             if let fn = tripleTapFunction {
+                 modelData.callFunction(fn, label: label)
+             }
+         }
     }
 }
 

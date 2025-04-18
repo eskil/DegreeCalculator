@@ -74,7 +74,7 @@ struct Calculator: View {
             .padding(.bottom, 0)
     }
     
-    var body: some View {
+    private func hmsBody() -> some View {
         VStack {
             GeometryReader { geo in
                 ScrollView {
@@ -127,25 +127,135 @@ struct Calculator: View {
                 .padding(20.0)
             }
             // Divider()
-
+            
             Grid(alignment: .topLeading, horizontalSpacing: 1, verticalSpacing: 1) {
                 GridRow {
                     CalculatorButton(label: "AC", function: CalculatorFunction.ALL_CLEAR)
                     CalculatorButton(label: "C", function: CalculatorFunction.CLEAR)
                     CalculatorButton(label: "DEL", function: CalculatorFunction.DELETE)
                     CalculatorButton(label: "ANS", function: CalculatorFunction.ANS)
-               }
+                }
                 GridRow {
                     CalculatorButton(label: "7", function: CalculatorFunction.ENTRY)
                     CalculatorButton(label: "8", function: CalculatorFunction.ENTRY)
                     CalculatorButton(label: "9", function: CalculatorFunction.ENTRY)
                     CalculatorButton(label: "+", function: CalculatorFunction.ADD)
-               }
+                }
                 GridRow {
                     CalculatorButton(label: "4", function: CalculatorFunction.ENTRY)
                     CalculatorButton(label: "5", function: CalculatorFunction.ENTRY)
                     CalculatorButton(label: "6", function: CalculatorFunction.ENTRY)
-                    CalculatorButton(label: "-", function: CalculatorFunction.SUBTRACT)
+                    CalculatorButton(label: "-",
+                                     function: CalculatorFunction.SUBTRACT,
+                                     tripleTapFunction: CalculatorFunction.M360)
+                }
+                GridRow {
+                    CalculatorButton(label: "1", function: CalculatorFunction.ENTRY)
+                    CalculatorButton(label: "2", function: CalculatorFunction.ENTRY)
+                    CalculatorButton(label: "3", function: CalculatorFunction.ENTRY)
+                }
+                GridRow {
+                    CalculatorButton(label: "0", function: CalculatorFunction.ENTRY)
+                    CalculatorButton(label: "h", function: CalculatorFunction.ENTRY)
+                    CalculatorButton(label: "m", function: CalculatorFunction.ENTRY)
+                    CalculatorButton(label: "=", function: CalculatorFunction.EQUAL)
+                        .background(
+                            GeometryReader { geo in
+                                /* See https://stackoverflow.com/a/68291983/21866895
+                                 for how the Geometry reader here is done.
+                                 It reads the Button's height and then padds by that (negative) to move up.
+                                 The extra -1.0 seems to be needed.
+                                 */
+                                Color.clear.onAppear {
+                                    if padTop == .zero {
+                                        padTop = -geo.size.height-1.0
+                                    }
+                                }
+                            }
+                        )
+                        .padding(.top, padTop)
+                }
+            }
+            .padding([.bottom], 20)
+            .background(Color.black)
+        }
+        .background(.black) //Color(UIColor.lightGray))
+    }
+  
+    private func dmsBody() -> some View {
+        VStack {
+            GeometryReader { geo in
+                ScrollView {
+                    ScrollViewReader { scroll_reader in
+                        ForEach(lines, id: \.id) { line in
+                            // https://sarunw.com/posts/how-to-make-swiftui-view-fill-container-width-and-height/
+                            VStack {
+                                if let op = line.op {
+                                    if op == "=" {
+                                        // FIXME: this view could be generalised
+                                        Text(line.value + " " + op)
+                                            .frame(maxWidth: .infinity, alignment: .leading)
+                                            .foregroundColor(.white)
+                                        Underscore
+                                    } else if op == "==" {
+                                        Text(line.value + " ")
+                                            .frame(maxWidth: .infinity, alignment: .leading)
+                                            .foregroundColor(.white)
+                                        Underscore
+                                        Underscore
+                                    } else {
+                                        Text(line.value + " " + op)
+                                            .frame(maxWidth: .infinity, alignment: .leading)
+                                            .foregroundColor(.white)
+                                        
+                                    }
+                                } else {
+                                    Text(line.value)
+                                        .frame(maxWidth: .infinity, alignment: .leading)
+                                        .foregroundColor(.yellow)
+                                }
+                            }
+                            .id(line.id)
+                        }
+                        
+                        // https://stackoverflow.com/questions/58376681/swiftui-automatically-scroll-to-bottom-in-scrollview-bottom-first
+                        // FIXME: this causes "lines" to be calculated multiple times which is a waste. And doing a single "let lines = lines" earlier doesn't work, since .onChange likely has some wrapper to cache values and thus accesses it... blabla. In short, doing the onChange on lines is needed for some corner case where ANS needs to scoll (ie. entered is unchanges) and all in all, we compute lines 3-4 times on each keypress :-/
+                        // I could add a generation counter to the ModelData and +1 on each change, then monitor that... But this "is fine".
+                        .onChange(of: lines) { _ in
+                            NSLog("change on entered lines count is \(lines.count)")
+                            // The -1 is to scroll to id:5 when list has 6 elements - starts at 0.
+                            // Alternatively, assign id:1, 2...
+                            scroll_reader.scrollTo(lines.count-1, anchor: .bottom)
+                        }
+                    }
+                }
+                //.frame(width: geo.size.width, height: geo.size.height/2)
+                .font(.system(.largeTitle, design: .monospaced))
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .padding(20.0)
+            }
+            // Divider()
+            
+            Grid(alignment: .topLeading, horizontalSpacing: 1, verticalSpacing: 1) {
+                GridRow {
+                    CalculatorButton(label: "AC", function: CalculatorFunction.ALL_CLEAR)
+                    CalculatorButton(label: "C", function: CalculatorFunction.CLEAR)
+                    CalculatorButton(label: "DEL", function: CalculatorFunction.DELETE)
+                    CalculatorButton(label: "ANS", function: CalculatorFunction.ANS)
+                }
+                GridRow {
+                    CalculatorButton(label: "7", function: CalculatorFunction.ENTRY)
+                    CalculatorButton(label: "8", function: CalculatorFunction.ENTRY)
+                    CalculatorButton(label: "9", function: CalculatorFunction.ENTRY)
+                    CalculatorButton(label: "+", function: CalculatorFunction.ADD)
+                }
+                GridRow {
+                    CalculatorButton(label: "4", function: CalculatorFunction.ENTRY)
+                    CalculatorButton(label: "5", function: CalculatorFunction.ENTRY)
+                    CalculatorButton(label: "6", function: CalculatorFunction.ENTRY)
+                    CalculatorButton(label: "-",
+                                     function: CalculatorFunction.SUBTRACT,
+                                     tripleTapFunction: CalculatorFunction.M360)
                 }
                 GridRow {
                     CalculatorButton(label: "1", function: CalculatorFunction.ENTRY)
@@ -179,18 +289,30 @@ struct Calculator: View {
             .background(Color.black)
         }
         .background(.black) //Color(UIColor.lightGray))
-
+    }
+    
+    var body: some View {
+        switch mode {
+        case .DMS:
+            return AnyView(dmsBody())
+        case .HMS:
+            return AnyView(hmsBody())
+        }
     }
 }
 
 struct Calculator_Previews: PreviewProvider {
     static var previews: some View {
-        Group {
-            ForEach(["iPhone 11 Pro", "iPhone 13 Pro", "iPhone 14 Pro", "iPhone SE (3rd generation)", "iPad (10th generation)"], id: \.self) { deviceName in
+        ForEach(["iPhone 16 Pro", "iPhone 11 Pro", "iPhone 13 Pro", "iPhone 14 Pro", "iPhone SE (3rd generation)", "iPad (10th generation)"], id: \.self) { deviceName in
+            Group {
                 Calculator(mode: .DMS)
                     .environmentObject(ModelData())
                     .previewDevice(PreviewDevice(rawValue: deviceName))
                     .previewDisplayName(deviceName + " - DMS")
+                Calculator(mode: .HMS)
+                    .environmentObject(ModelData())
+                    .previewDevice(PreviewDevice(rawValue: deviceName))
+                    .previewDisplayName(deviceName + " - HMS")
             }
         }
     }
