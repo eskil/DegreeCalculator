@@ -34,7 +34,8 @@ enum CalculatorFunction: Int {
     case EQUAL
     // Entry is a single number entered
     case ENTRY
-    
+    // M360 is a triple tap on - to subtract 360
+    case M360
 }
 
 
@@ -139,6 +140,8 @@ final class ModelData: ObservableObject {
             return equal()
         case .ENTRY:
             return addEntry(label)
+        case .M360:
+            return minus_360()
         }
     }
     
@@ -331,6 +334,21 @@ final class ModelData: ObservableObject {
         debugLog("=")
 
         entered = ""
+    }
+    
+    func minus_360() {
+        // If there's an op, del() so eg. "+" gets removed.
+        if let root = entries.last {
+            if root.op != nil && root.nodes.count == 1 {
+                delete()
+            }
+        }
+        // Start a subtractions
+        startExpr(op: Operator.Subtract)
+        // and erase whatever was entered and insert 360 degrees
+        entered = "360"
+        setDegree()
+        return equal()
     }
     
     func setDegree() {
