@@ -23,15 +23,20 @@ struct ContentView: View {
             VStack {
                 Calculator(mode: mode).environmentObject(modelData)
             }
-            .navigationTitle("Calculator")
             .toolbar {
+                ToolbarItemGroup(placement: .navigationBarLeading) {
+                    Text(mode == .DMS ? "DMS" : "HMS")
+                        .font(.headline)
+                        .foregroundColor(.white)
+                }
+
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button(action: {
                         mode = (mode == .DMS) ? .HMS : .DMS
                     }) {
                         Image(systemName: "arrow.2.squarepath")
-                            .accessibilityLabel("Toggle Mode")
                     }
+                    .accessibilityLabel("Toggle Mode")
                 }
             }
         }
