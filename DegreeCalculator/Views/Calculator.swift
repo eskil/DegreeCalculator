@@ -144,7 +144,9 @@ struct Calculator: View {
                     CalculatorButton(label: "4", function: CalculatorFunction.ENTRY)
                     CalculatorButton(label: "5", function: CalculatorFunction.ENTRY)
                     CalculatorButton(label: "6", function: CalculatorFunction.ENTRY)
-                    CalculatorButton(label: "-", function: CalculatorFunction.SUBTRACT)
+                    CalculatorButton(label: "-",
+                                     function: CalculatorFunction.SUBTRACT,
+                                     tripleTapFunction: CalculatorFunction.M360)
                 }
                 GridRow {
                     CalculatorButton(label: "1", function: CalculatorFunction.ENTRY)
@@ -181,7 +183,7 @@ struct Calculator: View {
 
 struct Calculator_Previews: PreviewProvider {
     static var previews: some View {
-        ForEach(["iPhone 11 Pro", "iPhone 13 Pro", "iPhone 14 Pro", "iPhone SE (3rd generation)", "iPad (10th generation)"], id: \.self) { deviceName in
+        ForEach(["iPhone 16 Pro", "iPhone 11 Pro", "iPhone 13 Pro", "iPhone 14 Pro", "iPhone SE (3rd generation)", "iPad (10th generation)"], id: \.self) { deviceName in
             Calculator()
                 .environmentObject(ModelData())
                 .previewDevice(PreviewDevice(rawValue: deviceName))

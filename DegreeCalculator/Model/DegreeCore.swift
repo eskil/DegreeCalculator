@@ -184,9 +184,12 @@ struct Expr: CustomStringConvertible, Hashable, Codable {
                     minutes += 60.0
                     degrees -= 1
                 }
+                /*
+                NOTE: disable auto overflow subtractions as we add -360 button
                 while degrees >= 360 {
                     degrees -= 360
                 }
+                */
                 while degrees < 0 {
                     degrees += 360
                 }

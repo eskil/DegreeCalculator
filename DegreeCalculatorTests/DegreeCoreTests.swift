@@ -91,7 +91,11 @@ final class DegreeCoreTests: XCTestCase {
     func testDegreesAndMinutesOverflow() throws {
         let lhs = Expr(Value(degrees: 354, minutes: 54.5))
         let rhs = Expr(Value(degrees: 6, minutes: 6.6))
+        /*
+        Search for NOTE: disable auto overflow subtractions as we add -360 button instead
         let expected = Value(degrees: 1, minutes: 1.1)
+        */
+        let expected = Value(degrees: 361, minutes: 1.1)
         let expr = Expr(op: Operator.Add, left: lhs, right: rhs)
         XCTAssertEqual(expr.value, expected)
     }
