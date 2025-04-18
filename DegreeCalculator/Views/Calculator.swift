@@ -21,7 +21,8 @@ extension String {
 struct Calculator: View {
     @EnvironmentObject var modelData: ModelData
     @State var padTop = 0.0
-    
+    let mode: CalculatorMode
+
     struct Line: Hashable {
         var id = 0
         var value: String
@@ -150,12 +151,14 @@ struct Calculator: View {
                     CalculatorButton(label: "1", function: CalculatorFunction.ENTRY)
                     CalculatorButton(label: "2", function: CalculatorFunction.ENTRY)
                     CalculatorButton(label: "3", function: CalculatorFunction.ENTRY)
+                    CalculatorButton(label: "AVG", function: CalculatorFunction.ENTRY)
                 }
                 GridRow {
                     CalculatorButton(label: "0", function: CalculatorFunction.ENTRY)
                     CalculatorButton(label: "°", function: CalculatorFunction.ENTRY)
                     CalculatorButton(label: "'", function: CalculatorFunction.ENTRY)
                     CalculatorButton(label: "=", function: CalculatorFunction.EQUAL)
+#if false
                         .background(
                             GeometryReader { geo in
                                 /* See https://stackoverflow.com/a/68291983/21866895
@@ -169,6 +172,7 @@ struct Calculator: View {
                             }
                         )
                         .padding(.top, padTop)
+#endif
                 }
             }
             .padding([.bottom], 20)
@@ -181,11 +185,13 @@ struct Calculator: View {
 
 struct Calculator_Previews: PreviewProvider {
     static var previews: some View {
-        ForEach(["iPhone 11 Pro", "iPhone 13 Pro", "iPhone 14 Pro", "iPhone SE (3rd generation)", "iPad (10th generation)"], id: \.self) { deviceName in
-            Calculator()
-                .environmentObject(ModelData())
-                .previewDevice(PreviewDevice(rawValue: deviceName))
-                .previewDisplayName(deviceName)
+        Group {
+            ForEach(["iPhone 11 Pro", "iPhone 13 Pro", "iPhone 14 Pro", "iPhone SE (3rd generation)", "iPad (10th generation)"], id: \.self) { deviceName in
+                Calculator(mode: .DMS)
+                    .environmentObject(ModelData())
+                    .previewDevice(PreviewDevice(rawValue: deviceName))
+                    .previewDisplayName(deviceName + " - DMS")
+            }
         }
     }
 }

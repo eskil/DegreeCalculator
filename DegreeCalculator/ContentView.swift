@@ -7,11 +7,34 @@
 
 import SwiftUI
 
+/* Controls whether we're doing degrees-minutes-seconds math or hours-minutes-seconds
+ */
+enum CalculatorMode {
+    case DMS
+    case HMS
+}
+
 struct ContentView: View {
     @State var modelData = ModelData()
+    @State private var mode: CalculatorMode = .DMS
 
     var body: some View {
-        Calculator().environmentObject(modelData)
+        NavigationView {
+            VStack {
+                Calculator(mode: mode).environmentObject(modelData)
+            }
+            .navigationTitle("Calculator")
+            .toolbar {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button(action: {
+                        mode = (mode == .DMS) ? .HMS : .DMS
+                    }) {
+                        Image(systemName: "arrow.2.squarepath")
+                            .accessibilityLabel("Toggle Mode")
+                    }
+                }
+            }
+        }
     }
 }
 
