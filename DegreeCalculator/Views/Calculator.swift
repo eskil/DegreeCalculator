@@ -261,7 +261,7 @@ struct Calculator: View {
                     CalculatorButton(label: "1", function: CalculatorFunction.ENTRY)
                     CalculatorButton(label: "2", function: CalculatorFunction.ENTRY)
                     CalculatorButton(label: "3", function: CalculatorFunction.ENTRY)
-                    CalculatorButton(label: "AVG", function: CalculatorFunction.ENTRY)
+                    CalculatorButton(label: "/", function: CalculatorFunction.DIVIDE)
                 }
                 GridRow {
                     CalculatorButton(label: "0", function: CalculatorFunction.ENTRY)

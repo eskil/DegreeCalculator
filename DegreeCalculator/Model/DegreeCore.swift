@@ -56,6 +56,7 @@ struct Value: Codable, Hashable, CustomStringConvertible {
 enum Operator: String, CustomStringConvertible, Hashable, Codable {
     case Add
     case Subtract
+    case Divide
     
     /**
      Format to  displayable `string used inside the calculator view.
@@ -66,6 +67,8 @@ enum Operator: String, CustomStringConvertible, Hashable, Codable {
             return "+"
         case .Subtract:
             return "-"
+        case .Divide:
+            return "/"
         }
     }
 }

@@ -31,7 +31,7 @@ struct CalculatorButton: View {
             return Color.brown
         case .EQUAL:
             return Color.green
-        case .ADD, .SUBTRACT, .M360:
+        case .ADD, .SUBTRACT, .M360, .DIV:
             return Color.yellow
         default:
             return Color.gray

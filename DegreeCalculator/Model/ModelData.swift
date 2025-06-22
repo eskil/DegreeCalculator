@@ -30,6 +30,8 @@ enum CalculatorFunction: Int {
     case ADD
     // Start - operation
     case SUBTRACT
+    // Start / operation, only accept "normal" numeric input
+    case DIV
     // Compute current math operationr
     case EQUAL
     // Entry is a single number entered
@@ -136,6 +138,8 @@ final class ModelData: ObservableObject {
             return add()
         case .SUBTRACT:
             return subtract()
+        case .DIV:
+            return divide()
         case .EQUAL:
             return equal()
         case .ENTRY:
@@ -309,6 +313,15 @@ final class ModelData: ObservableObject {
 
     func subtract() {
         startExpr(op: Operator.Subtract)
+    }
+    
+    func divide() {
+        /* This is a bit unconventional. But to avoid buildings "a full
+        calculator" and have to make it clear how precedence comes into play, divide
+         first issues an "equal" to reduce to 1 number.
+         */
+        equal()
+        startExpr(op: Operator.Divide)
     }
     
     func equal() {
