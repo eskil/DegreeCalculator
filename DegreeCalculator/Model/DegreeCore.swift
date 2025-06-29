@@ -27,14 +27,15 @@ struct Value: Codable, Hashable, CustomStringConvertible {
     }
     
     init(degrees: Int, minutes: Decimal) {
+        // Copy to local vars and apply minute overflow
+        var degrees = degrees
+        var minutes = minutes
+        while minutes >= 60.0 {
+            degrees += 1
+            minutes -= 60.0
+        }
         self.degrees = degrees
         self.minutes = minutes
-        /*
-        while self.minutes >= 60.0 {
-            self.degrees += 1
-            self.minutes -= 60.0
-        }
-        */
     }
     
     /**
@@ -258,7 +259,7 @@ struct Expr: CustomStringConvertible, Hashable, Codable {
             result.append("\(v.description)")
         } else {
             if nodes.count > 0 {
-                result.append("(")
+                result.append("( ")
             }
             if nodes.count > 0 {
                 result.append("\(nodes[0].description)")
@@ -266,9 +267,9 @@ struct Expr: CustomStringConvertible, Hashable, Codable {
                 result.append("<empty>")
             }
             if let b = op {
-                result.append("\(b)")
+                result.append(" \(b) ")
             } else {
-                result.append("<noop>")
+                result.append(" <noop> ")
             }
             if nodes.count > 1 {
                 result.append("\(nodes[1].description)")
@@ -276,7 +277,7 @@ struct Expr: CustomStringConvertible, Hashable, Codable {
                 result.append("<empty>")
             }
             if nodes.count > 0 {
-                result.append(")")
+                result.append(" )")
             }
         }
         return result.joined(separator: "")

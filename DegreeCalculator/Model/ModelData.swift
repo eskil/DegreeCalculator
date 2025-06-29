@@ -235,7 +235,7 @@ final class ModelData: ObservableObject {
         }
     }
     
-    func parseValue(_ s: String) -> Value {
+    func parseDMSValue(_ s: String) -> Value {
         // Simple parse by just splitting on ° and '. This works since
         // prepExpr(toDMS=true) inserts ° and ' and trailing 0, and when toDMS=false,
         // we get an integer value instead.
@@ -259,6 +259,20 @@ final class ModelData: ObservableObject {
         }
         
         return Value(degrees: degrees, minutes: minutes)
+    }
+    
+    func parseHMSValue(_ s: String) -> Value {
+        return Value()
+    }
+    
+    func parseValue(_ s: String) -> Value {
+        if s.contains("°") || s.contains("'") {
+            return parseDMSValue(s)
+        }
+        if s.contains("h") || s.contains("m") {
+            return parseHMSValue(s)
+        }
+        return Value()
     }
     
     func prepExpr(toDMS: Bool) -> Expr {
