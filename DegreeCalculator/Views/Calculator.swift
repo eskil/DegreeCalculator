@@ -21,6 +21,7 @@ extension String {
 struct Calculator: View {
     @EnvironmentObject var modelData: ModelData
     @State var padTop = 0.0
+    @State var padRight = 0.0
     let mode: CalculatorMode
 
     struct Line: Hashable {
@@ -134,6 +135,7 @@ struct Calculator: View {
                     CalculatorButton(label: "C", function: CalculatorFunction.CLEAR)
                     CalculatorButton(label: "DEL", function: CalculatorFunction.DELETE)
                     CalculatorButton(label: "ANS", function: CalculatorFunction.ANS)
+                        .disabled(modelData.disableDegreesAndMinutes)
                 }
                 GridRow {
                     CalculatorButton(label: "7", function: CalculatorFunction.ENTRY)
@@ -157,7 +159,9 @@ struct Calculator: View {
                 GridRow {
                     CalculatorButton(label: "0", function: CalculatorFunction.ENTRY)
                     CalculatorButton(label: "h", function: CalculatorFunction.ENTRY)
+                        .disabled(modelData.disableDegreesAndMinutes)
                     CalculatorButton(label: "m", function: CalculatorFunction.ENTRY)
+                        .disabled(modelData.disableDegreesAndMinutes)
                     CalculatorButton(label: "=", function: CalculatorFunction.EQUAL)
                         .background(
                             GeometryReader { geo in
@@ -242,6 +246,7 @@ struct Calculator: View {
                     CalculatorButton(label: "C", function: CalculatorFunction.CLEAR)
                     CalculatorButton(label: "DEL", function: CalculatorFunction.DELETE)
                     CalculatorButton(label: "ANS", function: CalculatorFunction.ANS)
+                        .disabled(modelData.disableDegreesAndMinutes)
                 }
                 GridRow {
                     CalculatorButton(label: "7", function: CalculatorFunction.ENTRY)
@@ -261,12 +266,14 @@ struct Calculator: View {
                     CalculatorButton(label: "1", function: CalculatorFunction.ENTRY)
                     CalculatorButton(label: "2", function: CalculatorFunction.ENTRY)
                     CalculatorButton(label: "3", function: CalculatorFunction.ENTRY)
-                    CalculatorButton(label: "/", function: CalculatorFunction.DIVIDE)
+                    CalculatorButton(label: "/", function: CalculatorFunction.DIV)
                 }
                 GridRow {
                     CalculatorButton(label: "0", function: CalculatorFunction.ENTRY)
                     CalculatorButton(label: "°", function: CalculatorFunction.ENTRY)
+                        .disabled(modelData.disableDegreesAndMinutes)
                     CalculatorButton(label: "'", function: CalculatorFunction.ENTRY)
+                        .disabled(modelData.disableDegreesAndMinutes)
                     CalculatorButton(label: "=", function: CalculatorFunction.EQUAL)
 #if false
                         .background(

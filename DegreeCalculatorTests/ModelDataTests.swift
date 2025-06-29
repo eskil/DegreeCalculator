@@ -217,27 +217,36 @@ final class ModelDataTests: XCTestCase {
     
     func testPrepExpr() {
         md.entered = ""
-        XCTAssertEqual(md.prepExpr(), Expr(Value(degrees: 0, minutes: 0.0)))
+        XCTAssertEqual(md.prepExpr(toDMS: true), Expr(Value(degrees: 0, minutes: 0.0)))
         XCTAssertEqual(md.entered, "0°0'0")
         
         md.entered = "0"
-        XCTAssertEqual(md.prepExpr(), Expr(Value(degrees: 0, minutes: 0.0)))
+        XCTAssertEqual(md.prepExpr(toDMS: true), Expr(Value(degrees: 0, minutes: 0.0)))
         XCTAssertEqual(md.entered, "0°0'0")
 
         md.entered = "1°"
-        XCTAssertEqual(md.prepExpr(), Expr(Value(degrees: 1, minutes: 0.0)))
+        XCTAssertEqual(md.prepExpr(toDMS: true), Expr(Value(degrees: 1, minutes: 0.0)))
         XCTAssertEqual(md.entered, "1°0'0")
 
+        // Parseing 1d as not-DMS yields 0
+        md.entered = "1°"
+        XCTAssertEqual(md.prepExpr(toDMS: false), Expr(Value(integer: 0)))
+        XCTAssertEqual(md.entered, "1°")
+
+        md.entered = "1"
+        XCTAssertEqual(md.prepExpr(toDMS: false), Expr(Value(integer: 1)))
+        XCTAssertEqual(md.entered, "1")
+        
         md.entered = "1°2"
-        XCTAssertEqual(md.prepExpr(), Expr(Value(degrees: 1, minutes: 2.0)))
+        XCTAssertEqual(md.prepExpr(toDMS: true), Expr(Value(degrees: 1, minutes: 2.0)))
         XCTAssertEqual(md.entered, "1°2'0")
 
         md.entered = "1°2'"
-        XCTAssertEqual(md.prepExpr(), Expr(Value(degrees: 1, minutes: 2.0)))
+        XCTAssertEqual(md.prepExpr(toDMS: true), Expr(Value(degrees: 1, minutes: 2.0)))
         XCTAssertEqual(md.entered, "1°2'0")
         
         md.entered = "1°2'3"
-        XCTAssertEqual(md.prepExpr(), Expr(Value(degrees: 1, minutes: 2.3)))
+        XCTAssertEqual(md.prepExpr(toDMS: true), Expr(Value(degrees: 1, minutes: 2.3)))
         XCTAssertEqual(md.entered, "1°2'3")
     }
     
@@ -250,6 +259,7 @@ final class ModelDataTests: XCTestCase {
                            left: Expr(Value(degrees: 1, minutes: 2.3)),
                            right: Expr(Value(degrees: 4, minutes: 5.6))),
                       Expr()]
+        md.callFunction(CalculatorFunction.EQUAL, label: "")
         md.callFunction(CalculatorFunction.ANS, label: "")
         XCTAssertEqual(md.entered, "5°07'9")
     }

@@ -13,21 +13,28 @@ import Foundation
  It only supports degrees (int) and minutes (decimal).
  */
 struct Value: Codable, Hashable, CustomStringConvertible {
-    var degrees: Int
-    var minutes: Decimal
+    var degrees: Int?
+    var minutes: Decimal?
+    var integer: Int?
     
     init() {
         degrees = 0
         minutes = 0.0
     }
 
+    init(integer: Int) {
+        self.integer = integer
+    }
+    
     init(degrees: Int, minutes: Decimal) {
         self.degrees = degrees
         self.minutes = minutes
+        /*
         while self.minutes >= 60.0 {
             self.degrees += 1
             self.minutes -= 60.0
         }
+        */
     }
     
     /**
@@ -41,11 +48,17 @@ struct Value: Codable, Hashable, CustomStringConvertible {
         formatter.decimalSeparator = "'"
         formatter.maximumFractionDigits = 1
         formatter.minimumFractionDigits = 1
-        let number = NSDecimalNumber(decimal: minutes)
-        if let s = formatter.string(from: number) {
-            return String(format: "%d°%@", degrees, s)
+        if let d = degrees, let m = minutes {
+            let number = NSDecimalNumber(decimal: m)
+            if let s = formatter.string(from: number) {
+                return String(format: "%d°%@", d, s)
+            } else {
+                return String(format: "%d°", d)
+            }
+        } else if let i = integer {
+            return String(format: "%d", i)
         } else {
-            return String(format: "%d°", degrees)
+            return String("nan")
         }
     }
 }
@@ -133,6 +146,7 @@ struct Expr: CustomStringConvertible, Hashable, Codable {
             self.nodes.append(r)
         }
     }
+    
     /**
      value recursively computes the expression value.
      If the expression is fully formed (has operator, left and right), this function
@@ -164,21 +178,46 @@ struct Expr: CustomStringConvertible, Hashable, Codable {
                 // Apply the operation first...
                 switch op! {
                 case Operator.Add:
-                    degrees = lv.degrees + rv.degrees
-                    minutes = lv.minutes + rv.minutes
+                    if let lvd = lv.degrees, let rvd = rv.degrees  {
+                        degrees = lvd + rvd
+                    }
+                    if let lvm = lv.minutes, let rvm = rv.minutes {
+                        minutes = lvm + rvm
+                    }
                 case Operator.Subtract:
-                    degrees = lv.degrees - rv.degrees
-                    minutes = lv.minutes - rv.minutes
+                    if let lvd = lv.degrees, let rvd = rv.degrees  {
+                        degrees = lvd - rvd
+                    }
+                    if let lvm = lv.minutes, let rvm = rv.minutes {
+                        minutes = lvm - rvm
+                    }
+                case Operator.Divide:
+                    let roundingBehavior = NSDecimalNumberHandler(
+                        roundingMode: NSDecimalNumber.RoundingMode.plain,
+                        scale: 1, // One decimal place
+                        raiseOnExactness: false,
+                        raiseOnOverflow: false,
+                        raiseOnUnderflow: false,
+                        raiseOnDivideByZero: false
+                    )
+
+                    if let lvd = lv.degrees, let lvm = lv.minutes, let denom = rv.integer {
+                        let full_minutes = Decimal(lvd * 60) + lvm
+                        let unrounded = NSDecimalNumber(decimal: full_minutes / Decimal(denom))
+                        let rounded = unrounded.rounding(accordingToBehavior: roundingBehavior)
+
+                        degrees = rounded.intValue / 60
+                        minutes = rounded.decimalValue - Decimal(degrees * 60)
+                    } else {
+                        // left of right node is nil,
+                        return nil
+                    }
                 }
                 
-                // Then normalise to keep inside [0..360],
-                // so eg. -10 = 360-10 and 370 = 370 - 360
-                
+                // Normalise minutes to keep within [0..60] and degreess
+                // as positive.
                 // This could be done via % 60 and % 360 and checking
-                // for negative. But this is not runtime sensitive and
-                // this extremely literal version is an easy to
-                // understand/read reflection of how a person does
-                // this math.
+                // for negative. But this is not runtime sensitive.
                 while minutes >= 60.0 {
                     degrees += 1
                     minutes -= 60.0
@@ -189,6 +228,10 @@ struct Expr: CustomStringConvertible, Hashable, Codable {
                 }
                 /*
                 NOTE: disable auto overflow subtractions as we add -360 button
+                instead. This allows adding eg. 250° + 251°= 501° to divide
+                by 2 to get 250°30'0. If we still did this, 501 would become
+                141° and /2 would yield 70°30'0.
+                 
                 while degrees >= 360 {
                     degrees -= 360
                 }
@@ -197,8 +240,11 @@ struct Expr: CustomStringConvertible, Hashable, Codable {
                     degrees += 360
                 }
                 return Value(degrees: degrees, minutes: minutes)
-            } else {
+            } else if nodes[0].value != nil {
                 return nodes[0].value
+            } else {
+                // Neither left not right value means nil
+                return nil
             }
         }
     }
@@ -233,7 +279,7 @@ struct Expr: CustomStringConvertible, Hashable, Codable {
                 result.append(")")
             }
         }
-        return result.joined(separator: " ")
+        return result.joined(separator: "")
     }
     
     /**

@@ -66,7 +66,8 @@ final class ModelData: ObservableObject {
      So in short, this stores all expressions computer until a allClear is issued.
      */
     @Published var entries: [Expr] = [
-        // These comments are various test cases I used regularly.
+        // These comments are various test cases I used regularly. Uncomment
+        // and the calculator will startup with this as the input.
         /*
         // Basic, add two values
         Expr(op: Operator.Add,
@@ -111,6 +112,9 @@ final class ModelData: ObservableObject {
      */
     @Published var entered: String = ""
 
+    // When last operator is divide, disable degrees/minutes input
+    @Published var disableDegreesAndMinutes: Bool = false
+    
     /**
      Main access point for the model data
      It takes a CalculatorFunction (enum) and in the case of ENTRY, the label, a string that
@@ -140,15 +144,17 @@ final class ModelData: ObservableObject {
             return subtract()
         case .DIV:
             return divide()
+        case .M360:
+            return minus_360()
         case .EQUAL:
             return equal()
         case .ENTRY:
             return addEntry(label)
-        case .M360:
-            return minus_360()
         }
     }
     
+    // NOTE: _ is a Swift syntax to indicate the argument doesn't need to be named when
+    // called, ie. addEntry("str") instead of addEntry(string: "str")
     func addEntry(_ string: String) {
         if string == "°" {
             setDegree()
@@ -174,6 +180,7 @@ final class ModelData: ObservableObject {
      */
     func allClear() {
         entries = [Expr()]
+        disableDegreesAndMinutes = false
         entered = ""
     }
     
@@ -204,6 +211,8 @@ final class ModelData: ObservableObject {
                 if left.op == nil {
                     // If left has no op, it's a value, so we're at the first entry of the expression - reset tree.
                     newRoot = Expr()
+                    // Reenable this in case it was disabled while inputting a number for division
+                    disableDegreesAndMinutes = false
                 } else {
                     // Otherwise, left side forms new root, but we go back to the "pre-operator" state
                     newRoot = Expr(op: left.op, left: left.nodes[0], right: nil)
@@ -228,12 +237,15 @@ final class ModelData: ObservableObject {
     
     func parseValue(_ s: String) -> Value {
         // Simple parse by just splitting on ° and '. This works since
-        // prepExpr inserts ° and ' and trailing 0.
+        // prepExpr(toDMS=true) inserts ° and ' and trailing 0, and when toDMS=false,
+        // we get an integer value instead.
         var degrees = 0
         var minutes: Decimal = 0.0
         
         let trimmed = s.trimmingCharacters(in: .whitespaces)
         let dgm = trimmed.split(separator: "°")
+        // If there's a degree symbol in the string, parse and return
+        // as DMS.
         if dgm.count > 0 {
             degrees = Int(dgm[0]) ?? 0
             if dgm.count == 2 {
@@ -249,17 +261,22 @@ final class ModelData: ObservableObject {
         return Value(degrees: degrees, minutes: minutes)
     }
     
-    func prepExpr() -> Expr {
-        // If the string is emptish, this will create a 0d0'0
-        // First add a d symbol, which will add a leading 0
-        setDegree()
-        // Then add ' symbol, which will add 0 after degree is there's no numbers
-        setMinutes()
-        // Then add a 0 after the last '
-        addEntry("0")
-        
-        let value = parseValue(entered)
-        return Expr(value)
+    func prepExpr(toDMS: Bool) -> Expr {
+        if (toDMS) {
+            // If the string is emptish, this will create a 0d0'0
+            // First add a d symbol, which will add a leading 0
+            setDegree()
+            // Then add ' symbol, which will add 0 after degree is there's no numbers
+            setMinutes()
+            // Then add a 0 after the last '
+            addEntry("0")
+
+            let value = parseValue(entered)
+            return Expr(value)
+        }
+
+        let trimmed = entered.trimmingCharacters(in: .whitespaces)
+        return Expr(Value(integer: Int(trimmed) ?? 0))
     }
     
     private func debugLog(_ name: String) {
@@ -282,7 +299,7 @@ final class ModelData: ObservableObject {
             // No previous answer
             return
         }
-        let node = prepExpr()
+        let node = prepExpr(toDMS: true)
         
         if var root = entries.last {
             if root.op == nil  {
@@ -292,7 +309,9 @@ final class ModelData: ObservableObject {
                 entries.removeLast()
                 entries.append(root)
             } else if root.op != nil && root.nodes.count == 1 {
-                // Root has a left side & operator, add right side value and new operator
+                // Root has a left side & operator, add right side value and new operator.
+                // Note: the hack of issuing an "equal" command when starting divide
+                // means we don't have to consider precedence. This is gross.
                 root.nodes.append(node)
                 let newRoot = Expr(op: op, left: root, right: nil)
                 entries.removeLast()
@@ -316,37 +335,15 @@ final class ModelData: ObservableObject {
     }
     
     func divide() {
-        /* This is a bit unconventional. But to avoid buildings "a full
-        calculator" and have to make it clear how precedence comes into play, divide
+        /*
+         This is a bit unconventional. But to avoid buildings "a full
+         calculator" and have to make it clear how precedence comes into play, divide
          first issues an "equal" to reduce to 1 number.
+         This is grosds.
          */
         equal()
+        disableDegreesAndMinutes = true
         startExpr(op: Operator.Divide)
-    }
-    
-    func equal() {
-        if let root = entries.last {
-            if root.nodes.count == 0 {
-                return
-            }
-        }
-        let node = prepExpr()
-        
-        if var root = entries.last {
-            if root.op != nil && root.nodes.count == 1 {
-                // Root has a left side & operator, add right side value and new operator
-                root.nodes.append(node)
-                entries.removeLast()
-                entries.append(root)
-                entries.append(Expr())
-            }
-        } else {
-            NSLog("entries has no root?")
-        }
-        
-        debugLog("=")
-
-        entered = ""
     }
     
     func minus_360() {
@@ -362,6 +359,38 @@ final class ModelData: ObservableObject {
         entered = "360"
         setDegree()
         return equal()
+    }
+    
+    func equal() {
+        // Reenable this in case it was disabled while inputting a number for division
+        disableDegreesAndMinutes = false
+        if let root = entries.last {
+            if root.nodes.count == 0 {
+                return
+            }
+        }
+        
+        if var root = entries.last {
+            if root.op != nil && root.nodes.count == 1 {
+                let node: Expr
+                if root.op == Operator.Divide {
+                    node = prepExpr(toDMS: false)
+                } else {
+                    node = prepExpr(toDMS: true)
+                }
+                // Root has a left side & operator, add right side value and new operator
+                root.nodes.append(node)
+                entries.removeLast()
+                entries.append(root)
+                entries.append(Expr())
+            }
+        } else {
+            NSLog("entries has no root?")
+        }
+        
+        debugLog("=")
+
+        entered = ""
     }
     
     func setDegree() {
