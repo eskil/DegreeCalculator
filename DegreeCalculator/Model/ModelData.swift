@@ -242,6 +242,8 @@ final class ModelData: ObservableObject {
         var degrees = 0
         var minutes: Decimal = 0.0
         
+        NSLog("parseDMSValue(\(s)), exprMode=\(exprMode)")
+        
         let trimmed = s.trimmingCharacters(in: .whitespaces)
         let dgm = trimmed.split(separator: "°")
         // If there's a degree symbol in the string, parse and return
@@ -266,6 +268,7 @@ final class ModelData: ObservableObject {
     }
     
     func parseValue(_ s: String) -> Value {
+        NSLog("parseValue(\(s)), exprMode=\(exprMode)")
         if s.contains("°") || s.contains("'") {
             return parseDMSValue(s)
         }
@@ -275,20 +278,20 @@ final class ModelData: ObservableObject {
         return Value()
     }
     
-    func prepExpr(toDMS: Bool) -> Expr {
-        if (toDMS) {
-            // If the string is emptish, this will create a 0d0'0
-            // First add a d symbol, which will add a leading 0
-            setDegree()
-            // Then add ' symbol, which will add 0 after degree is there's no numbers
-            setMinutes()
-            // Then add a 0 after the last '
-            addEntry("0")
+    func prepDMSExpr() -> Expr {
+        // If the string is emptish, this will create a 0d0'0
+        // First add a d symbol, which will add a leading 0
+        setDegree()
+        // Then add ' symbol, which will add 0 after degree is there's no numbers
+        setMinutes()
+        // Then add a 0 after the last '
+        addEntry("0")
 
-            let value = parseValue(entered)
-            return Expr(value)
-        }
-
+        let value = parseValue(entered)
+        return Expr(value)
+    }
+    
+    func prepIntExpr() -> Expr {
         let trimmed = entered.trimmingCharacters(in: .whitespaces)
         return Expr(Value(integer: Int(trimmed) ?? 0))
     }
@@ -313,7 +316,7 @@ final class ModelData: ObservableObject {
             // No previous answer
             return
         }
-        let node = prepExpr(toDMS: true)
+        let node = prepDMSExpr()
         
         if var root = entries.last {
             if root.op == nil  {
@@ -388,9 +391,9 @@ final class ModelData: ObservableObject {
             if root.op != nil && root.nodes.count == 1 {
                 let node: Expr
                 if root.op == Operator.Divide {
-                    node = prepExpr(toDMS: false)
+                    node = prepIntExpr()
                 } else {
-                    node = prepExpr(toDMS: true)
+                    node = prepDMSExpr()
                 }
                 // Root has a left side & operator, add right side value and new operator
                 root.nodes.append(node)
