@@ -22,7 +22,6 @@ struct Calculator: View {
     @EnvironmentObject var modelData: ModelData
     @State var padTop = 0.0
     @State var padRight = 0.0
-    let mode: CalculatorMode
 
     struct Line: Hashable {
         var id = 0
@@ -156,6 +155,7 @@ struct Calculator: View {
                     CalculatorButton(label: "1", function: CalculatorFunction.ENTRY)
                     CalculatorButton(label: "2", function: CalculatorFunction.ENTRY)
                     CalculatorButton(label: "3", function: CalculatorFunction.ENTRY)
+                    CalculatorButton(label: "/", function: CalculatorFunction.DIV)
                 }
                 GridRow {
                     CalculatorButton(label: "0", function: CalculatorFunction.ENTRY)
@@ -164,6 +164,7 @@ struct Calculator: View {
                     CalculatorButton(label: "m", function: CalculatorFunction.ENTRY)
                         .disabled(modelData.disableDegreesAndMinutes)
                     CalculatorButton(label: "=", function: CalculatorFunction.EQUAL)
+#if false // double up size of button
                         .background(
                             GeometryReader { geo in
                                 /* See https://stackoverflow.com/a/68291983/21866895
@@ -179,6 +180,7 @@ struct Calculator: View {
                             }
                         )
                         .padding(.top, padTop)
+#endif
                 }
             }
             .padding([.bottom], 20)
@@ -276,7 +278,7 @@ struct Calculator: View {
                     CalculatorButton(label: "'", function: CalculatorFunction.ENTRY)
                         .disabled(modelData.disableDegreesAndMinutes)
                     CalculatorButton(label: "=", function: CalculatorFunction.EQUAL)
-#if false
+#if false // double up size of button
                         .background(
                             GeometryReader { geo in
                                 /* See https://stackoverflow.com/a/68291983/21866895
@@ -300,7 +302,7 @@ struct Calculator: View {
     }
     
     var body: some View {
-        switch mode {
+        switch modelData.exprMode {
         case .DMS:
             return AnyView(dmsBody())
         case .HMS:
@@ -310,17 +312,24 @@ struct Calculator: View {
 }
 
 struct Calculator_Previews: PreviewProvider {
+    static func previewFor(deviceName: String, mode: ModelData.ExprMode) -> some View {
+        let model = ModelData()
+        model.exprMode = mode
+        
+        let hmsModel = ModelData()
+        hmsModel.exprMode = .HMS
+        
+        return Calculator()
+            .environmentObject(model)
+            .previewDevice(PreviewDevice(rawValue: deviceName))
+            .previewDisplayName(deviceName + " - \(mode)")
+    }
+    
     static var previews: some View {
-        ForEach(["iPhone 16 Pro", "iPhone 11 Pro", "iPhone 13 Pro", "iPhone 14 Pro", "iPhone SE (3rd generation)", "iPad (10th generation)"], id: \.self) { deviceName in
-            Group {
-                Calculator(mode: .DMS)
-                    .environmentObject(ModelData())
-                    .previewDevice(PreviewDevice(rawValue: deviceName))
-                    .previewDisplayName(deviceName + " - DMS")
-                Calculator(mode: .HMS)
-                    .environmentObject(ModelData())
-                    .previewDevice(PreviewDevice(rawValue: deviceName))
-                    .previewDisplayName(deviceName + " - HMS")
+        Group {
+            ForEach(["iPhone 16 Pro", "iPhone 11 Pro", "iPhone 13 Pro", "iPhone 14 Pro", "iPhone SE (3rd generation)", "iPad (10th generation)"], id: \.self) { deviceName in
+                previewFor(deviceName: deviceName, mode: .DMS)
+                previewFor(deviceName: deviceName, mode: .HMS)
             }
         }
     }

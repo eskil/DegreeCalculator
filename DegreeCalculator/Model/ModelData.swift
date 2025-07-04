@@ -58,6 +58,13 @@ enum CalculatorFunction: Int {
  The naming stems from the SwiftUI tutorials.
 */
 final class ModelData: ObservableObject {
+    /* Controls whether we're doing degrees-minutes-seconds math or hours-minutes-seconds
+     */
+    enum ExprMode {
+        case DMS
+        case HMS
+    }
+
     /**
      Entries is the list of expressions.
      
@@ -114,7 +121,10 @@ final class ModelData: ObservableObject {
 
     // When last operator is divide, disable degrees/minutes input
     @Published var disableDegreesAndMinutes: Bool = false
-    
+
+    // Entering DMS or HMS
+    @Published var exprMode: ExprMode = .DMS
+        
     /**
      Main access point for the model data
      It takes a CalculatorFunction (enum) and in the case of ENTRY, the label, a string that

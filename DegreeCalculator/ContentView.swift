@@ -7,33 +7,34 @@
 
 import SwiftUI
 
-/* Controls whether we're doing degrees-minutes-seconds math or hours-minutes-seconds
- */
-enum CalculatorMode {
-    case DMS
-    case HMS
-}
-
 struct ContentView: View {
     @State var modelData = ModelData()
-    @State private var mode: CalculatorMode = .DMS
-
+    // This is used as a copy of modelData.exprMode. That seems wrong.
+    // I suspect a onChange could be used.
+    @State private var exprMode: ModelData.ExprMode = .DMS
+    
+    private func switchMode() {
+        modelData.exprMode = (modelData.exprMode == .DMS) ? .HMS : .DMS
+        exprMode = modelData.exprMode
+    }
+    
     var body: some View {
         NavigationView {
             VStack {
-                Calculator(mode: mode).environmentObject(modelData)
+                Calculator().environmentObject(modelData)
             }
             .toolbar {
                 ToolbarItemGroup(placement: .navigationBarLeading) {
-                    Text(mode == .DMS ? "DMS" : "HMS")
-                        .font(.headline)
-                        .foregroundColor(.white)
                 }
 
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button(action: {
-                        mode = (mode == .DMS) ? .HMS : .DMS
+                        modelData.exprMode = (modelData.exprMode == .DMS) ? .HMS : .DMS
+                        exprMode = modelData.exprMode
                     }) {
+                        Text(exprMode == .DMS ? "DMS" : "HMS")
+                            .font(.headline)
+                            .foregroundColor(.blue)
                         Image(systemName: "arrow.2.squarepath")
                     }
                     .accessibilityLabel("Toggle Mode")
