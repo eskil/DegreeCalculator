@@ -31,6 +31,7 @@ struct Calculator: View {
     }
     
     var lines: [Line] {
+        NSLog("Computing lines")
         var result: [Line] = []
         modelData.entries.forEach { entry in
             var line: Line = Line(value: "")
@@ -61,7 +62,7 @@ struct Calculator: View {
         for index in result.indices {
             result[index].id = index
         }
-        NSLog("computed lines")
+        NSLog("computed lines \(result)")
         return result
     }
     
