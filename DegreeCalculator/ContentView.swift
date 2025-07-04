@@ -8,16 +8,8 @@
 import SwiftUI
 
 struct ContentView: View {
-    @State var modelData = ModelData()
-    // This is used as a copy of modelData.exprMode. That seems wrong.
-    // I suspect a onChange could be used.
-    @State private var exprMode: ModelData.ExprMode = .DMS
-    
-    private func switchMode() {
-        modelData.exprMode = (modelData.exprMode == .DMS) ? .HMS : .DMS
-        exprMode = modelData.exprMode
-    }
-    
+    @StateObject private var modelData = ModelData()
+
     var body: some View {
         NavigationView {
             VStack {
@@ -25,17 +17,19 @@ struct ContentView: View {
             }
             .toolbar {
                 ToolbarItemGroup(placement: .navigationBarLeading) {
+                    // Intentionally empty for now.
                 }
 
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button(action: {
                         modelData.exprMode = (modelData.exprMode == .DMS) ? .HMS : .DMS
-                        exprMode = modelData.exprMode
                     }) {
-                        Text(exprMode == .DMS ? "DMS" : "HMS")
-                            .font(.headline)
-                            .foregroundColor(.blue)
-                        Image(systemName: "arrow.2.squarepath")
+                        HStack(spacing: 4) {
+                            Text(modelData.exprMode == .DMS ? "DMS" : "HMS")
+                                .font(.headline)
+                            Image(systemName: "arrow.2.squarepath")
+                        }
+                        .foregroundColor(.blue)
                     }
                     .accessibilityLabel("Toggle Mode")
                 }
