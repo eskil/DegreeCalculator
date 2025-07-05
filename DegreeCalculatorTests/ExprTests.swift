@@ -1,0 +1,139 @@
+//
+//  ExprTests.swift
+//  DegreeCalculatorTests
+//
+//  Created by Eskil Olsen on 6/12/23.
+//
+
+import XCTest
+
+@testable import DegreeCalculator
+
+final class ExprTests: XCTestCase {
+
+    override func setUpWithError() throws {
+        // Put setup code here. This method is called before the invocation of each test method in the class.
+    }
+    
+    override func tearDownWithError() throws {
+        // Put teardown code here. This method is called after the invocation of each test method in the class.
+    }
+    
+    func testOperator() throws {
+        XCTAssertEqual(Operator.add.description, "+")
+        XCTAssertEqual(Operator.subtract.description, "-")
+        XCTAssertEqual(Operator.divide.description, "/")
+    }
+    
+    
+    func testEmptyExpr_NoValue() throws {
+        let expr = Expr()
+        XCTAssertEqual(expr.value, nil)
+    }
+    
+    func testEmptyRight_NoValue() throws {
+        let lhs = Expr.value(Value(degrees: 1, minutes: 2.3))
+        let expr = Expr.binary(op: Operator.add, lhs: lhs, rhs: Expr())
+        XCTAssertEqual(expr.value, nil)
+        XCTAssertEqual(expr.description, "( 1°02'3 + <empty> )")
+        
+    }
+
+    func testAddTwoValues_1() throws {
+        let lhs = Expr.value(Value(degrees: 1, minutes: 2.3))
+        let rhs = Expr.value(Value(degrees: 4, minutes: 5.6))
+        let expected = Value(degrees: 5, minutes: 7.9)
+        let expr = Expr.binary(op: Operator.add, lhs: lhs, rhs: rhs)
+        XCTAssertEqual(expr.value, expected)
+    }
+
+    func testAddTwoValues_minutes_overflow() throws {
+        let lhs = Expr.value(Value(degrees: 4, minutes: 30.0))
+        let rhs = Expr.value(Value(degrees: 4, minutes: 30.0))
+        let expected = Value(degrees: 9, minutes: 0.0)
+        let expr = Expr.binary(op: Operator.add, lhs: lhs, rhs: rhs)
+        XCTAssertEqual(expr.value, expected)
+    }
+
+    func test_minutes_overflow() throws {
+        let expr = Expr.value(Value(degrees: 0, minutes: 185.0))
+        let expected = Value(degrees: 3, minutes: 5.0)
+        XCTAssertEqual(expr.value, expected)
+    }
+
+    func testSubtractTwoValues() throws {
+        let lhs = Expr.value(Value(degrees: 4, minutes: 5.6))
+        let rhs = Expr.value(Value(degrees: 1, minutes: 2.3))
+        let expected = Value(degrees: 3, minutes: 3.3)
+        let expr = Expr.binary(op: Operator.subtract, lhs: lhs, rhs: rhs)
+        XCTAssertEqual(expr.value, expected)
+    }
+    
+    func testDivideValues_base_case() throws {
+        let lhs = Expr.value(Value(degrees: 1023, minutes: 6.3))
+        let rhs = Expr.value(Value(integer: 3))
+        let expected = Value(degrees: 341, minutes: 2.1)
+        let expr = Expr.binary(op: Operator.divide, lhs: lhs, rhs: rhs)
+        XCTAssertEqual(expr.value, expected)
+    }
+
+    func testDivideValues_degrees_divvy_into_minutes() throws {
+        let lhs = Expr.value(Value(degrees: 9, minutes: 0.0))
+        let rhs = Expr.value(Value(integer: 2))
+        let expected = Value(degrees: 4, minutes: 30.0)
+        let expr = Expr.binary(op: Operator.divide, lhs: lhs, rhs: rhs)
+        XCTAssertEqual(expr.value, expected)
+    }
+    
+    func testDegreesAndMinutesOverflow() throws {
+        let lhs = Expr.value(Value(degrees: 354, minutes: 54.5))
+        let rhs = Expr.value(Value(degrees: 6, minutes: 6.6))
+        /*
+        Search for NOTE: disable auto overflow subtractions as we add -360 button instead
+        let expected = Value(degrees: 1, minutes: 1.1)
+        */
+        let expected = Value(degrees: 361, minutes: 1.1)
+        let expr = Expr.binary(op: Operator.add, lhs: lhs, rhs: rhs)
+        XCTAssertEqual(expr.value, expected)
+    }
+    
+    func testDegreesAndMinutesUnderflow() throws {
+        let lhs = Expr.value(Value(degrees: 1, minutes: 1.1))
+        let rhs = Expr.value(Value(degrees: 6, minutes: 6.6))
+        let expected = Value(degrees: 354, minutes: 54.5)
+        let expr = Expr.binary(op: Operator.subtract, lhs: lhs, rhs: rhs)
+        XCTAssertEqual(expr.value, expected)
+    }
+    
+    func testParenthesis() throws {
+        let val123 = Expr.value(Value(degrees: 1, minutes: 2.3))
+        let val456 = Expr.value(Value(degrees: 4, minutes: 5.6))
+        let val789 = Expr.value(Value(degrees: 7, minutes: 8.9))
+        let rightSide = Expr.binary(op: Operator.add, lhs: val123, rhs: Expr.binary(op: Operator.subtract, lhs: val456, rhs: val789))
+        XCTAssertEqual(rightSide.value, Value(degrees: 357, minutes: 59.0))
+        let leftSide = Expr.binary(op: Operator.subtract, lhs: Expr.binary(op: Operator.add, lhs: val123, rhs: val456), rhs: val789)
+        XCTAssertEqual(leftSide.value, Value(degrees: 357, minutes: 59.0))
+
+    }
+    
+    func testExprDescription() throws {
+        let val123 = Expr.value(Value(degrees: 1, minutes: 2.3))
+        let val456 = Expr.value(Value(degrees: 4, minutes: 5.6))
+        let val789 = Expr.value(Value(degrees: 7, minutes: 8.9))
+        let emptyExpr = Expr()
+        XCTAssertEqual(emptyExpr.description, "<empty> <noop> <empty>")
+        
+        let missingRhsExpr2 = Expr.binary(op: Operator.add, lhs: val123, rhs: Expr())
+        XCTAssertEqual(missingRhsExpr2.description, "( 1°02'3 + <empty> )")
+
+        let addExpr = Expr.binary(op: Operator.add, lhs: val123, rhs: val456)
+        XCTAssertEqual(addExpr.description, "( 1°02'3 + 4°05'6 )")
+        let subExpr = Expr.binary(op: Operator.subtract, lhs: val123, rhs: val456)
+        XCTAssertEqual(subExpr.description, "( 1°02'3 - 4°05'6 )")
+        
+        let rightSide = Expr.binary(op: Operator.add, lhs: val123, rhs: Expr.binary(op: Operator.subtract, lhs: val456, rhs: val789))
+        XCTAssertEqual(rightSide.description, "( 1°02'3 + ( 4°05'6 - 7°08'9 ) )")
+        let leftSide = Expr.binary(op: Operator.subtract, lhs: Expr.binary(op: Operator.add, lhs: val123, rhs: val456), rhs: val789)
+        XCTAssertEqual(leftSide.description, "( ( 1°02'3 + 4°05'6 ) - 7°08'9 )")
+    }
+}

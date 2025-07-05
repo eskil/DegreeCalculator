@@ -39,10 +39,10 @@ struct Calculator: View {
             // In order traverse the tree and add the left side value to "line", then the op
             // and emit that line.
             entry.inOrder { expr in
-                if let v = expr.v {
+                switch expr {
+                case .value(let v):
                     line.value = v.description.leftPadding(toLength: 11, withPad: " ")
-                }
-                if let op = expr.op {
+                case .binary(let op, _, _):
                     line.op = op.description
                     tmp.append(Line(value: line.value, op: line.op))
                     line = Line(value: "")
@@ -57,7 +57,7 @@ struct Calculator: View {
 
             result = result + tmp
         }
-        result = result + [Line(value: modelData.entered, op: nil)]
+        result = result + [Line(value: modelData.inputStack, op: nil)]
         for index in result.indices {
             result[index].id = index
         }

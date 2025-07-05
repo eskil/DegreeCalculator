@@ -117,8 +117,8 @@ final class ModelData: ObservableObject {
      This is the string that is currently being edited. By keeping it as a simple string, we can delete
      (edit) it by simply removing chars.
      */
-    @Published var entered: String = ""
-
+    @Published var inputStack: String = ""
+    
     // When last operator is divide, disable degrees/minutes input
     @Published var disableDegreesAndMinutes: Bool = false
 
@@ -166,21 +166,23 @@ final class ModelData: ObservableObject {
     // NOTE: _ is a Swift syntax to indicate the argument doesn't need to be named when
     // called, ie. addEntry("str") instead of addEntry(string: "str")
     func addEntry(_ string: String) {
-        if string == "°" {
-            setDegree()
-        } else if string == "'" {
-            setMinutes()
+        if string == "°" || string == "h" {
+            inputStack = setDegreeHour(inputStack)
+        } else if string == "'" || string == "m" {
+            inputStack = setMinutes(inputStack)
+        } else if string == "s" {
+            inputStack = setSeconds(inputStack)
         } else {
             // If we have a ' and it's the last, we can add a number. But if not, we've already
             // maxed our string
-            if entered.contains("'") {
-                if let c = entered.last {
+            if inputStack.contains("'") {
+                if let c = inputStack.last {
                     if c == "'" {
-                        entered += string
+                        inputStack += string
                     }
                 }
             } else {
-                entered += string
+                inputStack += string
             }
         }
     }
@@ -191,48 +193,16 @@ final class ModelData: ObservableObject {
     func allClear() {
         entries = [Expr()]
         disableDegreesAndMinutes = false
-        entered = ""
+        inputStack = ""
     }
     
     func clear() {
-        // FIXME: if entered is empty it should delete the current expression.
+        // FIXME: if inputStack is empty it should delete the current expression.
         // Eg. "enter 1d2'3+", pressing clear should remove that.
-        entered = ""
+        inputStack = ""
     }
     
     func delete() {
-        if entered.isEmpty {
-            if let root = entries.last {
-                if root.nodes.isEmpty && root.op == nil {
-                    return
-                }
-                let left = root.nodes[0]
-                
-                // Reset the entered string to right.v, left.v or .v in that order of preference.
-                if left.nodes.count == 2, let rightv = left.nodes[1].v {
-                    entered = rightv.description
-                } else if left.nodes.count == 1, let leftv = left.nodes[0].v {
-                    entered = leftv.description
-                } else if let v = left.v {
-                    entered = v.description
-                }
-                
-                var newRoot: Expr
-                if left.op == nil {
-                    // If left has no op, it's a value, so we're at the first entry of the expression - reset tree.
-                    newRoot = Expr()
-                    // Reenable this in case it was disabled while inputting a number for division
-                    disableDegreesAndMinutes = false
-                } else {
-                    // Otherwise, left side forms new root, but we go back to the "pre-operator" state
-                    newRoot = Expr(op: left.op, left: left.nodes[0], right: nil)
-                }
-                entries.removeLast()
-                entries.append(newRoot)
-            }
-        } else {
-            entered.removeLast()
-        }
         debugLog("DEL")
     }
     
@@ -240,7 +210,7 @@ final class ModelData: ObservableObject {
         if entries.count > 1 {
             let last = entries[entries.count-2]
             if let val = last.value {
-                entered = val.description
+                inputStack = val.description
             }
         }
     }
@@ -276,14 +246,26 @@ final class ModelData: ObservableObject {
     func parseHMSValue(_ s: String) -> Value {
         return Value()
     }
+
+    func parseIntValue(_ s: String) -> Value {
+        return Value()
+    }
     
     func parseValue(_ s: String) -> Value {
         NSLog("parseValue(\(s)), exprMode=\(exprMode)")
-        if s.contains("°") || s.contains("'") {
-            return parseDMSValue(s)
+        if exprMode == ExprMode.DMS {
+            if s.contains("°") || s.contains("'") {
+                return parseDMSValue(s)
+            } else {
+                return parseIntValue(s)
+            }
         }
-        if s.contains("h") || s.contains("m") {
-            return parseHMSValue(s)
+        if exprMode == ExprMode.HMS {
+            if s.contains("h") || s.contains("m") {
+                return parseHMSValue(s)
+            } else {
+                return parseIntValue(s)
+            }
         }
         return Value()
     }
@@ -291,19 +273,19 @@ final class ModelData: ObservableObject {
     func prepDMSExpr() -> Expr {
         // If the string is emptish, this will create a 0d0'0
         // First add a d symbol, which will add a leading 0
-        setDegree()
+        inputStack = setDegreeHour(inputStack)
         // Then add ' symbol, which will add 0 after degree is there's no numbers
-        setMinutes()
+        inputStack = setMinutes(inputStack)
         // Then add a 0 after the last '
         addEntry("0")
 
-        let value = parseValue(entered)
-        return Expr(value)
+        let value = parseValue(inputStack)
+        return Expr.value(value)
     }
     
     func prepIntExpr() -> Expr {
-        let trimmed = entered.trimmingCharacters(in: .whitespaces)
-        return Expr(Value(integer: Int(trimmed) ?? 0))
+        let trimmed = inputStack.trimmingCharacters(in: .whitespaces)
+        return Expr.value(Value(integer: Int(trimmed) ?? 0))
     }
     
     private func debugLog(_ name: String) {
@@ -319,46 +301,41 @@ final class ModelData: ObservableObject {
     }
     
     func startExpr(op: Operator) {
-        if entered.isEmpty {
+        if inputStack.isEmpty {
             ans()
         }
-        if entered.isEmpty {
+        if inputStack.isEmpty {
             // No previous answer
             return
         }
-        let node = prepDMSExpr()
+        var node: Expr
+        switch exprMode {
+        case .DMS:
+            node = prepDMSExpr()
+        case .HMS:
+            // node = prepHMSExpr()
+            node = Expr()
+        }
         
         if var root = entries.last {
-            if root.op == nil  {
-                // Fresh root
-                root.op = op
-                root.nodes.append(node)
-                entries.removeLast()
-                entries.append(root)
-            } else if root.op != nil && root.nodes.count == 1 {
-                // Root has a left side & operator, add right side value and new operator.
-                // Note: the hack of issuing an "equal" command when starting divide
-                // means we don't have to consider precedence. This is gross.
-                root.nodes.append(node)
-                let newRoot = Expr(op: op, left: root, right: nil)
-                entries.removeLast()
-                entries.append(newRoot)
-            }
+            var newRoot = Expr.binary(op: op, lhs: node, rhs: Expr())
+            entries.removeLast()
+            entries.append(newRoot)
         } else {
             NSLog("entries has no root?")
         }
         
         debugLog("op \(op.description)")
         
-        entered = ""
+        inputStack = ""
     }
     
     func add() {
-        startExpr(op: Operator.Add)
+        startExpr(op: Operator.add)
     }
 
     func subtract() {
-        startExpr(op: Operator.Subtract)
+        startExpr(op: Operator.subtract)
     }
     
     func divide() {
@@ -370,87 +347,133 @@ final class ModelData: ObservableObject {
          */
         equal()
         disableDegreesAndMinutes = true
-        startExpr(op: Operator.Divide)
+        startExpr(op: Operator.divide)
     }
     
     func minus_360() {
-        // If there's an op, del() so eg. "+" gets removed.
-        if let root = entries.last {
-            if root.op != nil && root.nodes.count == 1 {
-                delete()
-            }
-        }
         // Start a subtractions
-        startExpr(op: Operator.Subtract)
+        startExpr(op: Operator.subtract)
         // and erase whatever was entered and insert 360 degrees
-        entered = "360"
-        setDegree()
+        inputStack = "360"
+        inputStack = setDegreeHour(inputStack)
         return equal()
     }
     
     func equal() {
         // Reenable this in case it was disabled while inputting a number for division
         disableDegreesAndMinutes = false
-        if let root = entries.last {
-            if root.nodes.count == 0 {
-                return
-            }
-        }
-        
-        if var root = entries.last {
-            if root.op != nil && root.nodes.count == 1 {
-                let node: Expr
-                if root.op == Operator.Divide {
-                    node = prepIntExpr()
-                } else {
-                    node = prepDMSExpr()
-                }
-                // Root has a left side & operator, add right side value and new operator
-                root.nodes.append(node)
-                entries.removeLast()
-                entries.append(root)
-                entries.append(Expr())
-            }
-        } else {
-            NSLog("entries has no root?")
-        }
         
         debugLog("=")
 
-        entered = ""
+        inputStack = ""
     }
     
-    func setDegree() {
-        if entered.contains("'") {
-            return
-        }
-        if entered.contains("°") {
-            return
-        }
-        if entered.isEmpty {
-            entered = "0°" + entered
-        } else {
-            entered += "°"
-        }
-    }
-    
-    func setMinutes() {
-        // We already set minutes
-        if entered.contains("'") {
-            return
-        }
-        // If there's no degrees, insert 0 degrees up front
-        if entered.contains("°") == false {
-            entered = "0°" + entered
-        }
-        // If the last char isn't a number, we're entering "'", so put a 0 up front
-        if let c = entered.last {
-            if c.isNumber == false {
-                entered += "0"
+    func setDegreeHour(_ entered :String) -> String {
+        var entered = entered
+        switch exprMode {
+        case .DMS:
+            if entered.contains("'") {
+                break
+            }
+            if entered.contains("°") {
+                break
+            }
+            if inputStack.isEmpty {
+                entered = "0°" + inputStack
+            } else {
+                entered += "°"
+            }
+        case .HMS:
+            if entered.contains("s") {
+                break
+            }
+            if entered.contains("m") {
+                break
+            }
+            if entered.contains("h") {
+                break
+            }
+            if entered.isEmpty {
+                entered = "0h" + entered
+            } else {
+                entered += "h"
             }
         }
-        entered += "'"
+        return entered
     }
+    
+    func setMinutes(_ entered: String) -> String {
+        var entered = entered
+        switch exprMode {
+        case .DMS:
+            // We already set minutes
+            if entered.contains("'") {
+                break
+            }
+            // If there's no degrees, insert 0 degrees up front
+            if entered.contains("°") == false {
+                entered = "0°" + entered
+            }
+            // If the last char isn't a number, we're entering "'", so put a 0 up front
+            if let c = entered.last {
+                if c.isNumber == false {
+                    entered += "0"
+                }
+            }
+            entered += "'"
+        case .HMS:
+            // We already set seconds
+            if entered.contains("s") {
+                break
+            }
+            // We already set minutes
+            if entered.contains("m") {
+                break
+            }
+            // If there's no degrees, insert 0 degrees up front
+            if entered.contains("h") == false {
+                entered = "0h" + entered
+            }
+            // If the last char isn't a number, we're entering "'", so put a 0 up front
+            if let c = entered.last {
+                if c.isNumber == false {
+                    entered += "0"
+                }
+            }
+            entered += "m"
+        }
+        return entered
+    }
+    
+    func setSeconds(_ entered: String) -> String {
+        var entered = entered
+        switch exprMode {
+        case .DMS:
+            break;
+        case .HMS:
+            // We already set seconds
+            if entered.contains("s") {
+                break
+            }
+            // If there's no degrees, insert 0 degrees up front
+            if entered.contains("m") == false {
+                entered = "0m" + entered
+            }
+            // If there's no degrees, insert 0 degrees up front
+            if entered.contains("h") == false {
+                entered = "0h" + entered
+            }
+            // If the last char isn't a number, we're entering "'", so put a 0 up front
+            if let c = entered.last {
+                if c.isNumber == false {
+                    entered += "0"
+                }
+            }
+            entered += "s"
+        }
+        return entered
+    }
+
 }
 
 
