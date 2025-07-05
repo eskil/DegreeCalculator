@@ -10,6 +10,7 @@ import XCTest
 @testable import DegreeCalculator
 
 final class ValueBaseAndIntTests: XCTestCase {
+    
     func testEmptyValue() throws {
         let v = Value()
         XCTAssert(v.type == .empty)
@@ -56,6 +57,7 @@ final class ValueBaseAndIntTests: XCTestCase {
 }
 
 final class ValueDMSTests: XCTestCase {
+    
     func testValue() throws {
         let v = Value(degrees: 1, minutes: 2.3)
         switch v.type {
@@ -111,6 +113,7 @@ final class ValueDMSTests: XCTestCase {
 }
 
 final class ValueHMSTests: XCTestCase {
+    
     func testValue() throws {
         let v = Value(hours: 1, minutes: 2, seconds: 3)
         switch v.type {

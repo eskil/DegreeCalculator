@@ -10,14 +10,6 @@ import XCTest
 @testable import DegreeCalculator
 
 final class ExprTests: XCTestCase {
-
-    override func setUpWithError() throws {
-        // Put setup code here. This method is called before the invocation of each test method in the class.
-    }
-    
-    override func tearDownWithError() throws {
-        // Put teardown code here. This method is called after the invocation of each test method in the class.
-    }
     
     func testOperator() throws {
         XCTAssertEqual(Operator.add.description, "+")
@@ -25,10 +17,9 @@ final class ExprTests: XCTestCase {
         XCTAssertEqual(Operator.divide.description, "/")
     }
     
-    
     func testEmptyExpr_NoValue() throws {
         let expr = Expr()
-        XCTAssertEqual(expr.value, nil)
+        XCTAssertEqual(expr.value, Value())
     }
     
     func testEmptyRight_NoValue() throws {

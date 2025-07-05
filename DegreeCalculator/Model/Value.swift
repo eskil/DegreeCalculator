@@ -36,7 +36,7 @@ struct Value: Codable, Hashable, CustomStringConvertible {
     public var description: String {
         switch type {
         case .empty:
-            return "n/a"
+            return "<empty>"
             
         case .integer(let value):
             return String(value)
