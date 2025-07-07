@@ -72,8 +72,8 @@ final class ValueDMSTests: XCTestCase {
     }
     
     func testNormalise() throws {
-        XCTAssertEqual(Value(degrees: 0, minutes: 61).normalise(), Value(degrees: 1, minutes: 1))
-        XCTAssertEqual(Value(degrees: 1, minutes: -1).normalise(), Value(degrees: 0, minutes: 59))
+        XCTAssertEqual(Value(degrees: 0, minutes: 61).normalised(), Value(degrees: 1, minutes: 1))
+        XCTAssertEqual(Value(degrees: 1, minutes: -1).normalised(), Value(degrees: 0, minutes: 59))
     }
     
     func testAdding() throws {
@@ -129,8 +129,8 @@ final class ValueHMSTests: XCTestCase {
     }
     
     func testNormalise() throws {
-        XCTAssertEqual(Value(hours: 0, minutes: 60, seconds: 61).normalise(), Value(hours: 1, minutes: 1, seconds: 1))
-        XCTAssertEqual(Value(hours: 1, minutes: -1, seconds: -1).normalise(), Value(hours: 0, minutes: 58, seconds: 59))
+        XCTAssertEqual(Value(hours: 0, minutes: 60, seconds: 61).normalised(), Value(hours: 1, minutes: 1, seconds: 1))
+        XCTAssertEqual(Value(hours: 1, minutes: -1, seconds: -1).normalised(), Value(hours: 0, minutes: 58, seconds: 59))
     }
     
     func testAdding() throws {

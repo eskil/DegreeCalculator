@@ -17,20 +17,25 @@ struct Value: Codable, Hashable, CustomStringConvertible {
     
     var type: ValueType = .empty
     
+    private init(type: ValueType) {
+        self.type = type
+    }
+
+    
     init() {
-        self.type = .empty
+        self = Value(type: .empty)
     }
     
     init(integer: Int) {
-        self.type = .integer(integer)
+        self = Value(type: .integer(integer))
     }
     
     init(degrees: Int, minutes: Decimal) {
-        self.type = .dms(degrees: degrees, minutes: minutes)
+        self = Value(type: .dms(degrees: degrees, minutes: minutes)).normalised()
     }
     
     init(hours: Int, minutes: Int, seconds: Int) {
-        self.type = .hms(hours: hours, minutes: minutes, seconds: seconds)
+        self = Value(type: .hms(hours: hours, minutes: minutes, seconds: seconds)).normalised()
     }
     
     public var description: String {
@@ -69,7 +74,7 @@ struct Value: Codable, Hashable, CustomStringConvertible {
         }
     }
     
-    func normalise() -> Value {
+    mutating func normalise() -> Self {
         switch type {
         case .dms(let d, let m):
             var degrees = d
@@ -96,7 +101,7 @@ struct Value: Codable, Hashable, CustomStringConvertible {
              degrees -= 360
              }
              */
-            return Value(degrees: degrees, minutes: minutes)
+            type =  .dms(degrees: degrees, minutes: minutes)
             
         case .hms(let h, let m, let s):
             var hours = h
@@ -119,23 +124,31 @@ struct Value: Codable, Hashable, CustomStringConvertible {
                 hours -= 1
                 minutes += 60
             }
-            return Value(hours: hours, minutes: minutes, seconds: seconds)
+            type = .hms(hours: hours, minutes: minutes, seconds: seconds)
             
         default:
-            return self
+            break
         }
+        return self
     }
 
+    func normalised() -> Value {
+        var copy = self
+        _ = copy.normalise()
+        return copy
+    }
+
+    
     func adding(_ other: Value) -> Value? {
         switch (self.type, other.type) {
         case (.integer(let a), .integer(let b)):
             return Value(integer: a + b)
             
         case (.dms(let ldeg, let lmin), .dms(let rdeg, let rmin)):
-            return Value(degrees: ldeg + rdeg, minutes: lmin + rmin).normalise()
+            return Value(degrees: ldeg + rdeg, minutes: lmin + rmin).normalised()
             
         case (.hms(let lh, let lm, let ls), .hms(let rh, let rm, let rs)):
-            return Value(hours: lh + rh, minutes: lm + rm, seconds: ls + rs).normalise()
+            return Value(hours: lh + rh, minutes: lm + rm, seconds: ls + rs).normalised()
 
         default:
             return nil
@@ -148,10 +161,10 @@ struct Value: Codable, Hashable, CustomStringConvertible {
             return Value(integer: a - b)
             
         case (.dms(let ldeg, let lmin), .dms(let rdeg, let rmin)):
-            return Value(degrees: ldeg - rdeg, minutes: lmin-rmin).normalise()
+            return Value(degrees: ldeg - rdeg, minutes: lmin-rmin).normalised()
             
         case (.hms(let lh, let lm, let ls), .hms(let rh, let rm, let rs)):
-            return Value(hours: lh-rh, minutes: lm-rm, seconds: ls-rs).normalise()
+            return Value(hours: lh-rh, minutes: lm-rm, seconds: ls-rs).normalised()
 
         default:
             return nil

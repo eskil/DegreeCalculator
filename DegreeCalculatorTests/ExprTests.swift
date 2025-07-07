@@ -26,7 +26,7 @@ final class ExprTests: XCTestCase {
         let lhs = Expr.value(Value(degrees: 1, minutes: 2.3))
         let expr = Expr.binary(op: Operator.add, lhs: lhs, rhs: Expr())
         XCTAssertEqual(expr.value, nil)
-        XCTAssertEqual(expr.description, "( 1°02'3 + <empty> )")
+        XCTAssertEqual(expr.description, "(1°02'3 + <empty>)")
         
     }
 
@@ -112,19 +112,19 @@ final class ExprTests: XCTestCase {
         let val456 = Expr.value(Value(degrees: 4, minutes: 5.6))
         let val789 = Expr.value(Value(degrees: 7, minutes: 8.9))
         let emptyExpr = Expr()
-        XCTAssertEqual(emptyExpr.description, "<empty> <noop> <empty>")
+        XCTAssertEqual(emptyExpr.description, "<empty>")
         
         let missingRhsExpr2 = Expr.binary(op: Operator.add, lhs: val123, rhs: Expr())
-        XCTAssertEqual(missingRhsExpr2.description, "( 1°02'3 + <empty> )")
+        XCTAssertEqual(missingRhsExpr2.description, "(1°02'3 + <empty>)")
 
         let addExpr = Expr.binary(op: Operator.add, lhs: val123, rhs: val456)
-        XCTAssertEqual(addExpr.description, "( 1°02'3 + 4°05'6 )")
+        XCTAssertEqual(addExpr.description, "(1°02'3 + 4°05'6)")
         let subExpr = Expr.binary(op: Operator.subtract, lhs: val123, rhs: val456)
-        XCTAssertEqual(subExpr.description, "( 1°02'3 - 4°05'6 )")
+        XCTAssertEqual(subExpr.description, "(1°02'3 - 4°05'6)")
         
         let rightSide = Expr.binary(op: Operator.add, lhs: val123, rhs: Expr.binary(op: Operator.subtract, lhs: val456, rhs: val789))
-        XCTAssertEqual(rightSide.description, "( 1°02'3 + ( 4°05'6 - 7°08'9 ) )")
+        XCTAssertEqual(rightSide.description, "(1°02'3 + (4°05'6 - 7°08'9))")
         let leftSide = Expr.binary(op: Operator.subtract, lhs: Expr.binary(op: Operator.add, lhs: val123, rhs: val456), rhs: val789)
-        XCTAssertEqual(leftSide.description, "( ( 1°02'3 + 4°05'6 ) - 7°08'9 )")
+        XCTAssertEqual(leftSide.description, "((1°02'3 + 4°05'6) - 7°08'9)")
     }
 }
