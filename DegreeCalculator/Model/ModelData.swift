@@ -70,7 +70,7 @@ final class ModelData: ObservableObject {
     init(mode: ExprMode) {
         self.mode = mode
     }
-
+    
     /**
      expressions is the list of expressions.
      
@@ -82,55 +82,119 @@ final class ModelData: ObservableObject {
         // These comments are various test cases I used regularly. Uncomment
         // and the calculator will startup with this as the input.
         /*
-        // Basic, add two values
-        Expr(op: Operator.Add,
-              left: Expr(Value(degrees: 39, minutes: 15.2)),
-              right: Expr(Value(degrees: 1, minutes: 21.9))),
-        */
-        /*
-        // Unsupported right-leaning tree
-        Expr(op: Operator.Add,
-                       left: Expr(Value(degrees: 39, minutes: 15.2)),
-                       right: Expr(op: Operator.Subtract,
-                                    left: Expr(Value(degrees: 1, minutes: 21.9)),
-                                    right: Expr(op: Operator.Add,
-                                                 left: Expr(Value(degrees: 49, minutes: 37.1)),
-                                                 right: Expr(Value(degrees: 350, minutes: 51.9))))),
+         // Basic, add two values
+         Expr(op: Operator.Add,
+         left: Expr(Value(degrees: 39, minutes: 15.2)),
+         right: Expr(Value(degrees: 1, minutes: 21.9))),
          */
         /*
-        // Supported left-leaning tree
-        Expr(op: Operator.Add,
-                       left: Expr(op: Operator.Subtract,
-                                   left: Expr(op: Operator.Add,
-                                               left: Expr(Value(degrees: 39, minutes: 15.2)),
-                                               right: Expr(Value(degrees: 1, minutes: 21.9))),
-                                   right: Expr(Value(degrees: 49, minutes: 37.1))),
-                       right: Expr(Value(degrees: 350, minutes: 51.9))),
+         // Unsupported right-leaning tree
+         Expr(op: Operator.Add,
+         left: Expr(Value(degrees: 39, minutes: 15.2)),
+         right: Expr(op: Operator.Subtract,
+         left: Expr(Value(degrees: 1, minutes: 21.9)),
+         right: Expr(op: Operator.Add,
+         left: Expr(Value(degrees: 49, minutes: 37.1)),
+         right: Expr(Value(degrees: 350, minutes: 51.9))))),
          */
         /*
-        // Unclosed tree
-        Expr(op: Operator.Subtract,
-             left: Expr(op: Operator.Add,
-                        left: Expr(Value(degrees: 1, minutes: 2.3)),
-                        right: Expr(Value(degrees: 4, minutes: 5.6))),
-             right: nil),
+         // Supported left-leaning tree
+         Expr(op: Operator.Add,
+         left: Expr(op: Operator.Subtract,
+         left: Expr(op: Operator.Add,
+         left: Expr(Value(degrees: 39, minutes: 15.2)),
+         right: Expr(Value(degrees: 1, minutes: 21.9))),
+         right: Expr(Value(degrees: 49, minutes: 37.1))),
+         right: Expr(Value(degrees: 350, minutes: 51.9))),
+         */
+        /*
+         // Unclosed tree
+         Expr(op: Operator.Subtract,
+         left: Expr(op: Operator.Add,
+         left: Expr(Value(degrees: 1, minutes: 2.3)),
+         right: Expr(Value(degrees: 4, minutes: 5.6))),
+         right: nil),
          */
         // The initial value is a empty expression that we're inserting into.
         Expr(),
     ]
     
     /**
-     This is the string that is currently being edited. By keeping it as a simple string, we can delete
-     (edit) it by simply removing chars.
+     The inputStack is the raw unprocessed sequence of characters input by the user.
+     
+     This allows for editing the input, eg. the most basic operation is backspace - pop
+     the last input - and the current inputStack can be reprocessed to a new expression.
      */
-    @Published var inputStack: String = ""
+    var inputStack: [Character] = []
     
-    // When last operator is divide, disable degrees/minutes input
+    /**
+     currentNumber is the current numeric value being input, as a string.
+     
+     As long as the input character is part of a number, it's appended to this.
+     
+     At any time this value should be convertible to a numeric value. This is relied on
+     when the imput is an operator (and non-number charactor). Then currentNumber is
+     used to construct a Expr.num.
+     
+     Eg. if input is 7 and 2, this will be "72". If we support degree or decimals,
+     the code appending to this should be extended to support characters like
+     °" and .
+     */
+    var currentNumber: String = ""
+    
+    /**
+     expressionStack is the stack of evaluated subexpressions.
+     
+     As operators are entered (see operatorStack), we can process the input into
+     expressions. These are kept in this stack.
+     
+     Eg. when entering "10/2+", when + is entered, before it's pushed onto the operatorStack
+     (which already has /) we eval the expression.
+     
+     The expressionStack has two Expr.num values (10 and 2), that can popped along with the
+     operatorStack, those three components are used to make a Expr.operation that's put
+     on the expressionStack.
+     
+     After "+", the operatorStack has "+" and the expressionStack has "10/2".
+     */
+    var expressionStack: [Expr] = []
+    
+    /**
+     OperatorStack contains the operators input but _not yet_ evaluated.
+     
+     This is key to handling precedence. As numbers and operators are entered, we keep a stack of
+     operators entered. Eg. entering "2 + 4 -" will have + on the stack until -
+     is entered. Since it's same-or-lower precedence, we can pop + from the stack and
+     process "2 + 4" into a new expression and put into expressionStack.
+     
+     If we entered "2 / 4 + ", we'd have / on the stack until + is entered.
+     Since + is same-or-lower precedence then /, we can pop / from the stack and process "2 / 4".
+     This leaves - on the operator stack.
+     
+     But if we enter "2 + 4 /", we'd have - on the stack until / is entered.
+     Since / higher precedence then +, we can't evaluate "2 + 4" yet, so the stack is now "+ /".
+     */
+    var operatorStack: [Operator] = []
+    
+    /**
+     DisplayStack is purely for displaying the input in presentable way.
+     
+     On each operator being entered, the currentNumber is processed put on this stack
+     suffixed with the operator.
+     
+     This allows for "printing" the inmput as lines, but the precedence is still
+     left to the reader. Additionally the processing of the number means a "6" becomes
+     "6.0", and if supported °'" and decimals, that would also show up on the display output.
+     */
+    var displayStack: [String] = []
+    
+    /** When last operator is divide, disable degrees/minutes input */
     @Published var disableDegreesAndMinutes: Bool = false
-
-    // Entering DMS or HMS
+    
+    /** The entry mode for this model. */
+    // This could be encapsulated in the class hierarchy and I might do that some day.
     @Published var exprMode: ExprMode = .DMS
-        
+    
     /**
      Main access point for the model data
      It takes a CalculatorFunction (enum) and in the case of ENTRY, the label, a string that
@@ -172,55 +236,107 @@ final class ModelData: ObservableObject {
     // NOTE: _ is a Swift syntax to indicate the argument doesn't need to be named when
     // called, ie. addEntry("str") instead of addEntry(string: "str")
     func addEntry(_ string: String) {
-        if string == "°" || string == "h" {
-            inputStack = setDegreeHour(inputStack)
-        } else if string == "'" || string == "m" {
-            inputStack = setMinutes(inputStack)
-        } else if string == "s" {
-            inputStack = setSeconds(inputStack)
-        } else {
-            // If we have a ' and it's the last, we can add a number. But if not, we've already
-            // maxed our string
-            if inputStack.contains("'") {
-                if let c = inputStack.last {
-                    if c == "'" {
-                        inputStack += string
-                    }
-                }
-            } else {
-                inputStack += string
-            }
+        NSLog("addEntry (\(string))")
+        
+        /**
+         If it's a number, append to currentNumber, otherwise it's an
+         operator and we start an expression on expressionStack.
+         */
+        if string.count == 1,
+           let char = string.first,
+           char.isNumber
+        {
+            currentNumber.append(string)
         }
+        else if string.count == 1,
+                let char = string.first,
+                let inputOp = Operator(rawValue: char)
+        {
+            /**
+             We're entering an operator, so convert the currentNumber
+             input into an Expr.number and push onto the expressionStack.
+             This makes it availble for composing into a new expression
+             depending on the precedence of the operator.
+             */
+            if let num = Int(currentNumber) {
+                displayStack.append("\(num) \(inputOp.rawValue)")
+                expressionStack.append(.value(Value(integer: num)))
+                currentNumber = ""
+            }
+            /**
+             As long as the top of the operator stack has higher or equal
+             precedence than the operator entered, we pop the operator, which will
+             replace the last two entries on expressionStack with a "left op right"
+             expression. This handles precedence.
+             */
+            while let lastOp = operatorStack.last, lastOp.precedence >= inputOp.precedence {
+                popOperator()
+            }
+            /* Add the newly input operator */
+            operatorStack.append(inputOp)
+        }
+        
+        // TODO handle all the dms/hms entry here.
+        
+        /*
+         if string == "°" || string == "h" {
+         inputStack = setDegreeHour(inputStack)
+         } else if string == "'" || string == "m" {
+         inputStack = setMinutes(inputStack)
+         } else if string == "s" {
+         inputStack = setSeconds(inputStack)
+         } else {
+         // If we have a ' and it's the last, we can add a number. But if not, we've already
+         // maxed our string
+         if inputStack.contains("'") {
+         if let c = inputStack.last {
+         if c == "'" {
+         inputStack += string
+         }
+         }
+         } else {
+         inputStack += string
+         }
+         }
+         */
     }
     
     /**
      Reset the entire state.
      */
     func allClear() {
-        expressions = [Expr()]
         disableDegreesAndMinutes = false
-        inputStack = ""
+        expressions.removeAll()
+        inputStack.removeAll()
+        displayStack.removeAll()
+        expressionStack.removeAll()
+        operatorStack.removeAll()
     }
     
     func clear() {
         // FIXME: if inputStack is empty it should delete the current expression.
         // Eg. "enter 1d2'3+", pressing clear should remove that.
-        inputStack = ""
+        inputStack.removeAll()
     }
     
     func delete() {
-        debugLog("DEL")
+        NSLog("DEL")
+        guard !inputStack.isEmpty else { return }
+        let removedChar = inputStack.removeLast()
+        NSLog("\tdeleted \(removedChar)")
+        rebuildExpr()
     }
     
     func ans() {
         if expressions.count > 1 {
             let last = expressions[expressions.count-2]
             if let val = last.value {
-                inputStack = val.description
+                inputStack = Array(val.description)
             }
         }
     }
     
+    // TODO: move to Value?
     func parseDMSValue(_ s: String) -> Value {
         // Simple parse by just splitting on ° and '. This works since
         // prepExpr(toDMS=true) inserts ° and ' and trailing 0, and when toDMS=false,
@@ -249,10 +365,12 @@ final class ModelData: ObservableObject {
         return Value(degrees: degrees, minutes: minutes)
     }
     
+    // TODO: move to Value?
     func parseHMSValue(_ s: String) -> Value {
         return Value()
     }
-
+    
+    // TODO: move to Value?
     func parseIntValue(_ s: String) -> Value {
         return Value()
     }
@@ -279,19 +397,19 @@ final class ModelData: ObservableObject {
     func prepDMSExpr() -> Expr {
         // If the string is emptish, this will create a 0d0'0
         // First add a d symbol, which will add a leading 0
-        inputStack = setDegreeHour(inputStack)
+        setDegreeHour()
         // Then add ' symbol, which will add 0 after degree is there's no numbers
-        inputStack = setMinutes(inputStack)
+        setMinutes()
         // Then add a 0 after the last '
         addEntry("0")
-
-        let value = parseValue(inputStack)
+        
+        let value = Value(from: String(inputStack))
         return Expr.value(value)
     }
     
     func prepIntExpr() -> Expr {
-        let trimmed = inputStack.trimmingCharacters(in: .whitespaces)
-        return Expr.value(Value(integer: Int(trimmed) ?? 0))
+        let trimmed = inputStack.filter { !$0.isWhitespace }
+        return Expr.value(Value(integer: Int(String(trimmed)) ?? 0))
     }
     
     private func debugLog(_ name: String) {
@@ -333,13 +451,13 @@ final class ModelData: ObservableObject {
         
         debugLog("op \(op.description)")
         
-        inputStack = ""
+        inputStack = []
     }
     
     func add() {
         startExpr(op: Operator.add)
     }
-
+    
     func subtract() {
         startExpr(op: Operator.subtract)
     }
@@ -360,95 +478,89 @@ final class ModelData: ObservableObject {
         // Start a subtractions
         startExpr(op: Operator.subtract)
         // and erase whatever was entered and insert 360 degrees
-        inputStack = "360"
-        inputStack = setDegreeHour(inputStack)
+        inputStack = ["3", "6", "0"]
+        setDegreeHour()
         return equal()
     }
     
     func equal() {
         // Reenable this in case it was disabled while inputting a number for division
         disableDegreesAndMinutes = false
-        
         debugLog("=")
-
-        inputStack = ""
+        inputStack = []
     }
     
-    func setDegreeHour(_ entered :String) -> String {
-        var entered = entered
+    func setDegreeHour() {
         switch exprMode {
         case .DMS:
-            if entered.contains("'") {
+            if inputStack.contains("'") {
                 break
             }
-            if entered.contains("°") {
+            if inputStack.contains("°") {
                 break
             }
             if inputStack.isEmpty {
-                entered = "0°" + inputStack
+                inputStack = ["0", "°"] + inputStack
             } else {
-                entered += "°"
+                inputStack += "°"
             }
         case .HMS:
-            if entered.contains("s") {
+            if inputStack.contains("s") {
                 break
             }
-            if entered.contains("m") {
+            if inputStack.contains("m") {
                 break
             }
-            if entered.contains("h") {
+            if inputStack.contains("h") {
                 break
             }
-            if entered.isEmpty {
-                entered = "0h" + entered
+            if inputStack.isEmpty {
+                inputStack = ["0", "h"] + inputStack
             } else {
-                entered += "h"
+                inputStack += "h"
             }
         }
-        return entered
     }
     
-    func setMinutes(_ entered: String) -> String {
-        var entered = entered
+    func setMinutes() {
         switch exprMode {
         case .DMS:
             // We already set minutes
-            if entered.contains("'") {
+            if inputStack.contains("'") {
                 break
             }
             // If there's no degrees, insert 0 degrees up front
-            if entered.contains("°") == false {
-                entered = "0°" + entered
+            if inputStack.contains("°") == false {
+                inputStack = ["0", "°"] + inputStack
             }
             // If the last char isn't a number, we're entering "'", so put a 0 up front
-            if let c = entered.last {
+            if let c = inputStack.last {
                 if c.isNumber == false {
-                    entered += "0"
+                    inputStack += "0"
                 }
             }
-            entered += "'"
+            inputStack += "'"
         case .HMS:
             // We already set seconds
-            if entered.contains("s") {
+            if inputStack.contains("s") {
                 break
             }
             // We already set minutes
-            if entered.contains("m") {
+            if inputStack.contains("m") {
                 break
             }
             // If there's no degrees, insert 0 degrees up front
-            if entered.contains("h") == false {
-                entered = "0h" + entered
+            if inputStack.contains("h") == false {
+                inputStack = ["0", "h"] + inputStack
             }
             // If the last char isn't a number, we're entering "'", so put a 0 up front
-            if let c = entered.last {
+            if let c = inputStack.last {
                 if c.isNumber == false {
-                    entered += "0"
+                    inputStack += "0"
                 }
             }
-            entered += "m"
+            inputStack += "m"
         }
-        return entered
     }
     
     func setSeconds(_ entered: String) -> String {
@@ -478,6 +590,121 @@ final class ModelData: ObservableObject {
             entered += "s"
         }
         return entered
+    }
+    
+    /**
+    Build an expression from the current expressionStack and operatorStack.
+    
+    */
+    func buildExpr() -> Expr? {
+        NSLog("BUILD")
+        /* Why this rebuild? Because of the expression has become partly formed
+        after a delete, but buildExpr was called, we may have manipulated the stack.
+
+        Calling rebuild is a simple/safe way to hard reset the whole thing.
+
+        It's possible this function could be fixed to not need this, but it's not
+        worth saving a few cpu cycles for this.
+        */
+        rebuildExpr()
+
+        NSLog("\tPRE")
+        NSLog("\t\tbuild expressionStack")
+        for expr in expressionStack {
+            print("\t\t\t- \(expr)")
+        }
+        NSLog("\t\tbuild operatorStack \(operatorStack)")
+        NSLog("\t\tbuild inputStack \(inputStack)")
+        NSLog("\t\tbuild currentNumber \(currentNumber)")
+
+        /*
+        If a number is being entered, ensure it's processed and on the expressionStack.
+        This manipulates the stacks and why we call rebuildExpr early
+        */
+        if let num = Int(currentNumber) {
+            displayStack.append("\(num)")
+            expressionStack.append(Expr.value(Value(integer: num)))
+            currentNumber = ""
+        }
+        /* Now clear the operator stack. */
+        while !operatorStack.isEmpty {
+            popOperator()
+        }
+
+        NSLog("\tPOST")
+        NSLog("\t\tbuild expressionStack after pop")
+        for expr in expressionStack {
+            NSLog("\t\t\t- \(expr)")
+        }
+        NSLog("\t\tbuild operatorStack \(operatorStack)")
+        NSLog("\t\tbuild inputStack \(inputStack)")
+        NSLog("\t\tbuild currentNumber \(currentNumber)")
+
+        /*
+        The operatorStack can be non-empty if eg. buildExpr is called,
+        but there's no number entered after an operator (for example, "2+2/").
+
+        In that case we return nil as there's no value to compute.
+
+        As a sanity check, ensure the expressionStack is 1.
+        */
+        if operatorStack.isEmpty, expressionStack.count == 1 {
+            /* "pretty" print the input from the user */
+            print("----------------")
+            for line in displayStack {
+                print("\t\(line)")
+            }
+            print("----------------")
+            print("\t\(expressionStack.last?.evaluate() ?? Value())")
+            print("================")
+            return expressionStack.last
+        }
+        return nil
+    }
+
+    
+    /**
+     Pop a single operator from the operatorStack and build an expression.
+     See comment for operatorStack for details.
+     */
+    private func popOperator() {
+        NSLog("\t\tpop expressionStack")
+        for expr in expressionStack {
+            print("\t\t\t- \(expr)")
+        }
+        NSLog("\t\tpop operatorStack \(operatorStack)")
+        guard operatorStack.count > 0, expressionStack.count > 0 else { return }
+        guard let op = operatorStack.popLast(),
+              let right = expressionStack.popLast(),
+              let left = expressionStack.popLast()
+        else {
+            NSLog("\t\tpop missing element")
+            return
+        }
+        expressionStack.append(Expr.binary(op: op, lhs: left, rhs: right))
+    }
+    
+    /**
+    Rebuild the expression from scratch.
+    
+    This clears all the stacks and replays (from a copy)
+    all the characters input.
+    
+    This simplifies a lot of stack management, eg. during "backspace",
+    since we don't have to try and manage the tree.
+    */
+    func rebuildExpr() {
+        print("REBUILD")
+        // copy the array
+        let backup = inputStack
+        inputStack.removeAll()
+        displayStack.removeAll()
+        expressionStack.removeAll()
+        operatorStack.removeAll()
+        currentNumber = ""
+        for char in backup {
+            addEntry(String(char))
+        }
     }
 
 }

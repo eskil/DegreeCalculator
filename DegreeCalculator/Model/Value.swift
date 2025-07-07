@@ -38,6 +38,60 @@ struct Value: Codable, Hashable, CustomStringConvertible {
         self = Value(type: .hms(hours: hours, minutes: minutes, seconds: seconds)).normalised()
     }
     
+    init(from string: String) {
+        let trimmed = string.trimmingCharacters(in: .whitespacesAndNewlines)
+
+        // Assume unparsable and empty
+        self.type = .empty
+        
+        // Try integer
+        if let intVal = Int(trimmed) {
+            self = Value(integer: intVal)
+            return
+        }
+
+        // Try DMS format: 45°30.0'
+        let dmsPattern = #"^(\d+)°(\d{1,2})'(\d)$"#
+        if let _ = trimmed.range(of: dmsPattern, options: .regularExpression) {
+            let regex = try! NSRegularExpression(pattern: dmsPattern)
+            if let result = regex.firstMatch(in: trimmed, range: NSRange(trimmed.startIndex..., in: trimmed)) {
+                if let degRange = Range(result.range(at: 1), in: trimmed),
+                   let minRange = Range(result.range(at: 2), in: trimmed),
+                   let secRange = Range(result.range(at: 3), in: trimmed),
+                   let degrees = Int(trimmed[degRange]),
+                   let minutes = Decimal(string: String(trimmed[minRange])),
+                   let seconds = Decimal(string: String(trimmed[secRange])) {
+
+                    // If your Value type supports HMS-style storage
+                    self = Value(degrees: degrees, minutes: minutes+seconds/10)
+                    return
+                }
+            }
+        }
+
+        // Try HMS format: 12h34m56s
+        let hmsPattern = #"^(\d{2})h(\d{2})m(\d{2})s$"#
+        if let _ = trimmed.range(of: hmsPattern, options: .regularExpression) {
+            let regex = try! NSRegularExpression(pattern: hmsPattern)
+            if let result = regex.firstMatch(in: trimmed, range: NSRange(trimmed.startIndex..., in: trimmed)) {
+                if let hRange = Range(result.range(at: 1), in: trimmed),
+                   let mRange = Range(result.range(at: 2), in: trimmed),
+                   let sRange = Range(result.range(at: 3), in: trimmed),
+                   let h = Int(trimmed[hRange]),
+                   let m = Int(trimmed[mRange]),
+                   let s = Int(trimmed[sRange])
+                {
+                    self = Value(hours: h, minutes: m, seconds: s)
+                    return
+                }
+            }
+        }
+
+        // If all parsing fails
+        return
+    }
+
+    
     public var description: String {
         switch type {
         case .empty:

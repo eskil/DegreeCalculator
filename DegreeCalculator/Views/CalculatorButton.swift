@@ -108,7 +108,7 @@ struct CalculatorButton_Previews: PreviewProvider {
     static var previews: some View {
         ForEach(["iPhone 11 Pro", "iPhone 13 Pro", "iPhone 14 Pro", "iPhone SE (3rd generation)", "iPad (10th generation)"], id: \.self) { deviceName in
             CalculatorButton(label: "Y")
-                .environmentObject(ModelData())
+                .environmentObject(ModelData(mode: .DMS))
                 .previewDevice(PreviewDevice(rawValue: deviceName))
                 .previewDisplayName(deviceName)
         }

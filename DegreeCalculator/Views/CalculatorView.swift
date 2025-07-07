@@ -23,6 +23,7 @@ struct CalculatorView: View {
     @State var padTop = 0.0
     @State var padRight = 0.0
 
+    // Note, this should probably be replaced with the displayStack
     struct Line: Hashable {
         var id = 0
         var value: String
@@ -57,7 +58,7 @@ struct CalculatorView: View {
 
             result = result + tmp
         }
-        result = result + [Line(value: modelData.inputStack, op: nil)]
+        result = result + [Line(value: String(modelData.inputStack), op: nil)]
         for index in result.indices {
             result[index].id = index
         }
