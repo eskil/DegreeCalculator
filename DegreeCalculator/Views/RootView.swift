@@ -8,14 +8,14 @@
 import SwiftUI
 
 struct RootView: View {
-    @StateObject var state = AppState()
+    @StateObject var appState = AppState()
 
     var body: some View {
         NavigationView {
             VStack {
                 CalculatorView()
-                    .environmentObject(state.dmsData)
-                    .environmentObject(state.hmsData)
+                    .environmentObject(appState.dmsData)
+                    .environmentObject(appState.hmsData)
             }
             .toolbar {
                 ToolbarItemGroup(placement: .navigationBarLeading) {
@@ -24,10 +24,10 @@ struct RootView: View {
 
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button(action: {
-                        state.mode = (state.mode == .DMS) ? .HMS : .DMS
+                        appState.displayMode = (appState.displayMode == .DMS) ? .HMS : .DMS
                     }) {
                         HStack(spacing: 4) {
-                            Text(state.mode == .DMS ? "DMS" : "HMS")
+                            Text(appState.displayMode == .DMS ? "DMS" : "HMS")
                                 .font(.headline)
                             Image(systemName: "arrow.2.squarepath")
                         }
