@@ -18,7 +18,7 @@ extension String {
     }
 }
 
-struct Calculator: View {
+struct CalculatorView: View {
     @EnvironmentObject var modelData: ModelData
     @State var padTop = 0.0
     @State var padRight = 0.0
@@ -311,15 +311,11 @@ struct Calculator: View {
     }
 }
 
-struct Calculator_Previews: PreviewProvider {
+struct CalculatorView_Previews: PreviewProvider {
     static func previewFor(deviceName: String, mode: ModelData.ExprMode) -> some View {
-        let model = ModelData()
-        model.exprMode = mode
-        
-        let hmsModel = ModelData()
-        hmsModel.exprMode = .HMS
-        
-        return Calculator()
+        let model = ModelData(mode: mode)
+                
+        return CalculatorView()
             .environmentObject(model)
             .previewDevice(PreviewDevice(rawValue: deviceName))
             .previewDisplayName(deviceName + " - \(mode)")

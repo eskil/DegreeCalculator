@@ -1,5 +1,5 @@
 //
-//  ContentView.swift
+//  RootView.swift
 //  DegreeCalculator
 //
 //  Created by Eskil Olsen on 5/19/23.
@@ -7,13 +7,15 @@
 
 import SwiftUI
 
-struct ContentView: View {
-    @StateObject private var modelData = ModelData()
+struct RootView: View {
+    @StateObject var state = AppState()
 
     var body: some View {
         NavigationView {
             VStack {
-                Calculator().environmentObject(modelData)
+                CalculatorView()
+                    .environmentObject(state.dmsData)
+                    .environmentObject(state.hmsData)
             }
             .toolbar {
                 ToolbarItemGroup(placement: .navigationBarLeading) {
@@ -22,10 +24,10 @@ struct ContentView: View {
 
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button(action: {
-                        modelData.exprMode = (modelData.exprMode == .DMS) ? .HMS : .DMS
+                        state.mode = (state.mode == .DMS) ? .HMS : .DMS
                     }) {
                         HStack(spacing: 4) {
-                            Text(modelData.exprMode == .DMS ? "DMS" : "HMS")
+                            Text(state.mode == .DMS ? "DMS" : "HMS")
                                 .font(.headline)
                             Image(systemName: "arrow.2.squarepath")
                         }
@@ -38,8 +40,8 @@ struct ContentView: View {
     }
 }
 
-struct ContentView_Previews: PreviewProvider {
+struct RootView_Previews: PreviewProvider {
     static var previews: some View {
-        ContentView()
+        RootView()
     }
 }

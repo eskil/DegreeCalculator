@@ -8,7 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		DA61AEED2A1840F900048DAB /* DegreeCalculatorApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA61AEEC2A1840F900048DAB /* DegreeCalculatorApp.swift */; };
-		DA61AEEF2A1840F900048DAB /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA61AEEE2A1840F900048DAB /* ContentView.swift */; };
+		DA61AEEF2A1840F900048DAB /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA61AEEE2A1840F900048DAB /* RootView.swift */; };
 		DA61AEF12A1840FB00048DAB /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = DA61AEF02A1840FB00048DAB /* Assets.xcassets */; };
 		DA61AEF42A1840FB00048DAB /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = DA61AEF32A1840FB00048DAB /* Preview Assets.xcassets */; };
 		DA61AEFE2A1840FB00048DAB /* DegreeCalculatorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA61AEFD2A1840FB00048DAB /* DegreeCalculatorTests.swift */; };
@@ -20,8 +20,9 @@
 		DACF74592A18675D00826755 /* CalculatorButtonStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = DACF74582A18675D00826755 /* CalculatorButtonStyle.swift */; };
 		DACF745C2A1A834200826755 /* ModelData.swift in Sources */ = {isa = PBXBuildFile; fileRef = DACF745B2A1A834200826755 /* ModelData.swift */; };
 		DACF745E2A266EC000826755 /* Expr.swift in Sources */ = {isa = PBXBuildFile; fileRef = DACF745D2A266EC000826755 /* Expr.swift */; };
-		DACF74602A2958D300826755 /* Calculator.swift in Sources */ = {isa = PBXBuildFile; fileRef = DACF745F2A2958D300826755 /* Calculator.swift */; };
+		DACF74602A2958D300826755 /* CalculatorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DACF745F2A2958D300826755 /* CalculatorView.swift */; };
 		DACF74662A2A923300826755 /* CalculatorButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = DACF74652A2A923300826755 /* CalculatorButton.swift */; };
+		DADF90C22E1B57060024AE19 /* AppState.swift in Sources */ = {isa = PBXBuildFile; fileRef = DADF90C12E1B57020024AE19 /* AppState.swift */; };
 		DAE002602A38EF1800502C2E /* ModelDataTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAE0025F2A38EF1800502C2E /* ModelDataTests.swift */; };
 /* End PBXBuildFile section */
 
@@ -45,7 +46,7 @@
 /* Begin PBXFileReference section */
 		DA61AEE92A1840F900048DAB /* DegreeCalculator.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = DegreeCalculator.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		DA61AEEC2A1840F900048DAB /* DegreeCalculatorApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DegreeCalculatorApp.swift; sourceTree = "<group>"; };
-		DA61AEEE2A1840F900048DAB /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		DA61AEEE2A1840F900048DAB /* RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootView.swift; sourceTree = "<group>"; };
 		DA61AEF02A1840FB00048DAB /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		DA61AEF32A1840FB00048DAB /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		DA61AEF92A1840FB00048DAB /* DegreeCalculatorTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = DegreeCalculatorTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -62,8 +63,9 @@
 		DACF74582A18675D00826755 /* CalculatorButtonStyle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalculatorButtonStyle.swift; sourceTree = "<group>"; };
 		DACF745B2A1A834200826755 /* ModelData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModelData.swift; sourceTree = "<group>"; };
 		DACF745D2A266EC000826755 /* Expr.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Expr.swift; sourceTree = "<group>"; };
-		DACF745F2A2958D300826755 /* Calculator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Calculator.swift; sourceTree = "<group>"; };
+		DACF745F2A2958D300826755 /* CalculatorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalculatorView.swift; sourceTree = "<group>"; };
 		DACF74652A2A923300826755 /* CalculatorButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalculatorButton.swift; sourceTree = "<group>"; };
+		DADF90C12E1B57020024AE19 /* AppState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppState.swift; sourceTree = "<group>"; };
 		DAE0025F2A38EF1800502C2E /* ModelDataTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModelDataTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -117,10 +119,10 @@
 		DA61AEEB2A1840F900048DAB /* DegreeCalculator */ = {
 			isa = PBXGroup;
 			children = (
+				DADF90C12E1B57020024AE19 /* AppState.swift */,
 				DACF745A2A1A833600826755 /* Model */,
 				DACF74552A185F3C00826755 /* Views */,
 				DA61AEEC2A1840F900048DAB /* DegreeCalculatorApp.swift */,
-				DA61AEEE2A1840F900048DAB /* ContentView.swift */,
 				DA61AEF02A1840FB00048DAB /* Assets.xcassets */,
 				DA61AEF22A1840FB00048DAB /* Preview Content */,
 			);
@@ -159,8 +161,9 @@
 			isa = PBXGroup;
 			children = (
 				DACF74582A18675D00826755 /* CalculatorButtonStyle.swift */,
-				DACF745F2A2958D300826755 /* Calculator.swift */,
+				DACF745F2A2958D300826755 /* CalculatorView.swift */,
 				DACF74652A2A923300826755 /* CalculatorButton.swift */,
+				DA61AEEE2A1840F900048DAB /* RootView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -314,12 +317,13 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				DA61AEEF2A1840F900048DAB /* ContentView.swift in Sources */,
+				DA61AEEF2A1840F900048DAB /* RootView.swift in Sources */,
 				DACF74662A2A923300826755 /* CalculatorButton.swift in Sources */,
 				DACF745C2A1A834200826755 /* ModelData.swift in Sources */,
+				DADF90C22E1B57060024AE19 /* AppState.swift in Sources */,
 				DAB074952E1892E600866A30 /* Value.swift in Sources */,
 				DACF745E2A266EC000826755 /* Expr.swift in Sources */,
-				DACF74602A2958D300826755 /* Calculator.swift in Sources */,
+				DACF74602A2958D300826755 /* CalculatorView.swift in Sources */,
 				DACF74592A18675D00826755 /* CalculatorButtonStyle.swift in Sources */,
 				DA61AEED2A1840F900048DAB /* DegreeCalculatorApp.swift in Sources */,
 			);

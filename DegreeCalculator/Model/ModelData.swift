@@ -64,6 +64,12 @@ final class ModelData: ObservableObject {
         case DMS
         case HMS
     }
+    
+    var mode: ExprMode
+    
+    init(mode: ExprMode) {
+        self.mode = mode
+    }
 
     /**
      expressions is the list of expressions.
