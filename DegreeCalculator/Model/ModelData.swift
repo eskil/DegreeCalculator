@@ -66,13 +66,13 @@ final class ModelData: ObservableObject {
     }
 
     /**
-     Entries is the list of expressions.
+     expressions is the list of expressions.
      
      Each time EQUAL is executed, the current expression is computed (via value)
      and a new expression is started.
      So in short, this stores all expressions computer until a allClear is issued.
      */
-    @Published var entries: [Expr] = [
+    @Published var expressions: [Expr] = [
         // These comments are various test cases I used regularly. Uncomment
         // and the calculator will startup with this as the input.
         /*
@@ -191,7 +191,7 @@ final class ModelData: ObservableObject {
      Reset the entire state.
      */
     func allClear() {
-        entries = [Expr()]
+        expressions = [Expr()]
         disableDegreesAndMinutes = false
         inputStack = ""
     }
@@ -207,8 +207,8 @@ final class ModelData: ObservableObject {
     }
     
     func ans() {
-        if entries.count > 1 {
-            let last = entries[entries.count-2]
+        if expressions.count > 1 {
+            let last = expressions[expressions.count-2]
             if let val = last.value {
                 inputStack = val.description
             }
@@ -292,7 +292,7 @@ final class ModelData: ObservableObject {
         do {
             let encoder = JSONEncoder()
             encoder.outputFormatting = .prettyPrinted
-            let data = try encoder.encode(entries)
+            let data = try encoder.encode(expressions)
             NSLog("JSON for \(name)")
             NSLog(String(data: data, encoding: .utf8)!)
         } catch {
@@ -317,12 +317,12 @@ final class ModelData: ObservableObject {
             node = Expr()
         }
         
-        if var root = entries.last {
+        if var root = expressions.last {
             var newRoot = Expr.binary(op: op, lhs: node, rhs: Expr())
-            entries.removeLast()
-            entries.append(newRoot)
+            expressions.removeLast()
+            expressions.append(newRoot)
         } else {
-            NSLog("entries has no root?")
+            NSLog("expressions has no root?")
         }
         
         debugLog("op \(op.description)")
