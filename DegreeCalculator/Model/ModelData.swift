@@ -226,7 +226,6 @@ final class ModelData: ObservableObject {
         else if exprMode == .HMS && char == "m" {
             if addMinutes() {
                 inputStack.append(char)
-                currentNumber.append(char)
             }
         }
         /*
@@ -410,7 +409,7 @@ final class ModelData: ObservableObject {
             if currentNumber.contains("h") == false {
                 currentNumber = "0h" + currentNumber
             }
-            // If the last char isn't a number, we're entering "'", so put a 0 up front
+            // If the last char isn't a number, we're entering "m", so put a 0 up front
             if let c = currentNumber.last {
                 if c.isNumber == false {
                     currentNumber += "0"
