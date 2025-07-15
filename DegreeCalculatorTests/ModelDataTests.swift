@@ -265,7 +265,7 @@ final class ModelDataTests: XCTestCase {
 
         md.callFunction(CalculatorFunction.ENTRY, label: "1")
         XCTAssertEqual(md.inputStack, Array("hm1"))
-        XCTAssertEqual(md.currentNumber, "0m0m1")
+        XCTAssertEqual(md.currentNumber, "0h0m1")
         XCTAssertEqual(md.builtExpressions, [])
         XCTAssertEqual(md.displayStack, [])
     }
