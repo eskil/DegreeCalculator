@@ -33,7 +33,7 @@ struct CalculatorView: View {
     var lines: [Line] {
         NSLog("Expressions changed, recomputing lines")
         var result: [Line] = []
-        modelData.expressions.forEach { entry in
+        modelData.builtExpressions.forEach { entry in
             var line: Line = Line(value: "")
             var tmp: [Line] = []
 

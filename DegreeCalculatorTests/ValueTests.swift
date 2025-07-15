@@ -28,13 +28,16 @@ final class ValueBaseAndIntTests: XCTestCase {
     }
     
     func testValueFromString() throws {
-        let v = Value(from: "23")
-        switch v.type {
-        case .integer(let i):
-            XCTAssertEqual(i, 23)
-            XCTAssertEqual(v.description, "23")
-        default:
-            XCTFail("Expected .integer kind")
+        if let v = Value(from: "23") {
+            switch v.type {
+            case .integer(let i):
+                XCTAssertEqual(i, 23)
+                XCTAssertEqual(v.description, "23")
+            default:
+                XCTFail("Expected .integer kind")
+            }
+        } else {
+            XCTFail("Expected to parse .integer kind")
         }
     }
 
@@ -83,14 +86,17 @@ final class ValueDMSTests: XCTestCase {
     }
     
     func testValueFromString() throws {
-        let v = Value(from: "123°45'6")
-        switch v.type {
-        case .dms(let d, let m):
-            XCTAssertEqual(d, 123)
+        if let v = Value(from: "123°45'6") {
+            switch v.type {
+            case .dms(let d, let m):
+                XCTAssertEqual(d, 123)
             XCTAssertEqual(m, 45.6)
-            XCTAssertEqual(v.description, "123°45'6")
-        default:
-            XCTFail("Expected .dms kind")
+                XCTAssertEqual(v.description, "123°45'6")
+            default:
+                XCTFail("Expected .dms kind")
+            }
+        } else {
+            XCTFail("Expected to parse .dms kind")
         }
     }
     
@@ -152,15 +158,18 @@ final class ValueHMSTests: XCTestCase {
     }
     
     func testValueFromString() throws {
-        let v = Value(from: "12h34m56s")
-        switch v.type {
-        case .hms(let d, let m, let s):
-            XCTAssertEqual(d, 12)
-            XCTAssertEqual(m, 34)
-            XCTAssertEqual(s, 56)
-            XCTAssertEqual(v.description, "12h34m56s")
-        default:
-            XCTFail("Expected .hms kind")
+        if let v = Value(from: "12h34m56s") {
+            switch v.type {
+            case .hms(let d, let m, let s):
+                XCTAssertEqual(d, 12)
+                XCTAssertEqual(m, 34)
+                XCTAssertEqual(s, 56)
+                XCTAssertEqual(v.description, "12h34m56s")
+            default:
+                XCTFail("Expected .hms kind")
+            }
+        } else {
+            XCTFail("Expected to parse .hms kind")
         }
     }
 

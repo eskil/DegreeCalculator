@@ -38,7 +38,7 @@ struct Value: Codable, Hashable, CustomStringConvertible {
         self = Value(type: .hms(hours: hours, minutes: minutes, seconds: seconds)).normalised()
     }
     
-    init(from string: String) {
+    init?(from string: String) {
         let trimmed = string.trimmingCharacters(in: .whitespacesAndNewlines)
 
         // Assume unparsable and empty
@@ -88,7 +88,7 @@ struct Value: Codable, Hashable, CustomStringConvertible {
         }
 
         // If all parsing fails
-        return
+        return nil
     }
 
     
