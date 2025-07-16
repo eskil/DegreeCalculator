@@ -320,7 +320,7 @@ final class ModelDataTests: XCTestCase {
         XCTAssertEqual(md.builtExpressions, [])
         XCTAssertEqual(md.displayStack, [])
 
-        // Immediate repeated degree (°) is noop
+        // Immediate repeated hour (h) is noop
         md.callFunction(CalculatorFunction.ENTRY, label: "h")
         XCTAssertEqual(md.inputStack, Array("1h"))
         XCTAssertEqual(md.currentNumber, "1h")
@@ -328,48 +328,48 @@ final class ModelDataTests: XCTestCase {
         XCTAssertEqual(md.displayStack, [])
 
         md.callFunction(CalculatorFunction.ENTRY, label: "2")
-        XCTAssertEqual(md.inputStack, Array("1°2"))
-        XCTAssertEqual(md.currentNumber, "1°2")
+        XCTAssertEqual(md.inputStack, Array("1h2"))
+        XCTAssertEqual(md.currentNumber, "1h2")
         XCTAssertEqual(md.builtExpressions, [])
         XCTAssertEqual(md.displayStack, [])
 
-        // Later epeated degree (°) is noop
-        md.callFunction(CalculatorFunction.ENTRY, label: "°")
-        XCTAssertEqual(md.inputStack, Array("1°2"))
-        XCTAssertEqual(md.currentNumber, "1°2")
+        // Later epeated hour (h) is noop
+        md.callFunction(CalculatorFunction.ENTRY, label: "h")
+        XCTAssertEqual(md.inputStack, Array("1h2"))
+        XCTAssertEqual(md.currentNumber, "1h2")
         XCTAssertEqual(md.builtExpressions, [])
         XCTAssertEqual(md.displayStack, [])
 
-        md.callFunction(CalculatorFunction.ENTRY, label: "'")
-        XCTAssertEqual(md.inputStack, Array("1°2'"))
-        XCTAssertEqual(md.currentNumber, "1°2'")
+        md.callFunction(CalculatorFunction.ENTRY, label: "m")
+        XCTAssertEqual(md.inputStack, Array("1h2m"))
+        XCTAssertEqual(md.currentNumber, "1h2m")
         XCTAssertEqual(md.builtExpressions, [])
         XCTAssertEqual(md.displayStack, [])
 
         // Immediate repeated minute
-        md.callFunction(CalculatorFunction.ENTRY, label: "'")
-        XCTAssertEqual(md.inputStack, Array("1°2'"))
-        XCTAssertEqual(md.currentNumber, "1°2'")
+        md.callFunction(CalculatorFunction.ENTRY, label: "m")
+        XCTAssertEqual(md.inputStack, Array("1h2m"))
+        XCTAssertEqual(md.currentNumber, "1h2m")
         XCTAssertEqual(md.builtExpressions, [])
         XCTAssertEqual(md.displayStack, [])
 
         md.callFunction(CalculatorFunction.ENTRY, label: "3")
-        XCTAssertEqual(md.inputStack, Array("1°2'3"))
-        XCTAssertEqual(md.currentNumber, "1°2'3")
+        XCTAssertEqual(md.inputStack, Array("1h2m3"))
+        XCTAssertEqual(md.currentNumber, "1h2m3")
         XCTAssertEqual(md.builtExpressions, [])
         XCTAssertEqual(md.displayStack, [])
 
-        // Later repeated minute (') is noop
-        md.callFunction(CalculatorFunction.ENTRY, label: "'")
-        XCTAssertEqual(md.inputStack, Array("1°2'3"))
-        XCTAssertEqual(md.currentNumber, "1°2'3")
+        // Later repeated minute (m) is noop
+        md.callFunction(CalculatorFunction.ENTRY, label: "m")
+        XCTAssertEqual(md.inputStack, Array("1h2m3"))
+        XCTAssertEqual(md.currentNumber, "1h2m3")
         XCTAssertEqual(md.builtExpressions, [])
         XCTAssertEqual(md.displayStack, [])
 
-        // Later repeated degree (°) is noop
-        md.callFunction(CalculatorFunction.ENTRY, label: "°")
-        XCTAssertEqual(md.inputStack, Array("1°2'3"))
-        XCTAssertEqual(md.currentNumber, "1°2'3")
+        // Later repeated hour (h) is noop
+        md.callFunction(CalculatorFunction.ENTRY, label: "h")
+        XCTAssertEqual(md.inputStack, Array("1h2m3"))
+        XCTAssertEqual(md.currentNumber, "1h2m3")
         XCTAssertEqual(md.builtExpressions, [])
         XCTAssertEqual(md.displayStack, [])
     }
