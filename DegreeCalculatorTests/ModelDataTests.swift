@@ -397,7 +397,29 @@ final class ModelDataTests: XCTestCase {
                        ]
         )
     }
-   
+
+    func testAddAndEqualShortStyle() {
+        md = makeModel(with: .DMS)
+
+        inputString("°2 + 4 =")
+        XCTAssertEqual(md.inputStack, Array("°2+4"))
+        XCTAssertEqual(md.displayStack, ["0°02'0 +", "4°00'0 =", "4°02'0"])
+        XCTAssertEqual(md.currentNumber, "")
+        XCTAssertEqual(md.builtExpressions, [])
+
+        md.callFunction(CalculatorFunction.EQUAL, label: "")
+        XCTAssertEqual(md.inputStack, [])
+        XCTAssertEqual(md.displayStack, ["1°02'3 +", "4°05'6 =", "5°07'9"])
+        XCTAssertEqual(md.currentNumber, "")
+        XCTAssertEqual(md.builtExpressions,
+                       [
+                        Expr.binary(op: Operator.add,
+                                    lhs: Expr.value(Value(degrees: 1, minutes: 2.3)),
+                                    rhs: Expr.value(Value(degrees: 4, minutes: 5.6)))
+                       ]
+        )
+    }
+
     // MARK: Test functions like clear/del/ans
 
     func testAddAndEqualAndAns() {
@@ -484,7 +506,7 @@ final class ModelDataTests: XCTestCase {
         XCTAssertEqual(md.builtExpressions, [])
     }
     
-    // NOTE: test entering +/- before any numbers
+    // FIXME: test entering +/- before any numbers
     
     func testDelete() {
         md = makeModel(with: .DMS)

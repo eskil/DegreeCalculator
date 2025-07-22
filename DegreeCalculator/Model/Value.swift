@@ -8,6 +8,7 @@
 import Foundation
 
 struct Value: Codable, Hashable, CustomStringConvertible {
+    /** ValueType is the various types of values supported. Each enum has associated values per type. */
     enum ValueType: Codable, Hashable {
         case empty
         case integer(Int)
@@ -15,6 +16,41 @@ struct Value: Codable, Hashable, CustomStringConvertible {
         case hms(hours: Int, minutes: Int, seconds: Int)
     }
     
+    /** Provide hint to init(parsing:) methods as to how to parse. */
+    enum ValueTypeHint {
+        case empty
+        case integer
+        case dms
+        case hms
+        /** Use detect to infer the value type from the string. */
+        case detect
+    }
+    
+    /** Exception enum for parser errors. */
+    enum ValueParseError: Error, CustomStringConvertible {
+        case emptyInput
+        case invalidInteger(String)
+        case invalidDMS(String)
+        case invalidHMS(String)
+        case unsupportedFormat(String)
+
+        var description: String {
+            switch self {
+            case .emptyInput:
+                return "The input string is empty."
+            case .invalidInteger(let s):
+                return "Could not parse integer from input: '\(s)'"
+            case .invalidDMS(let s):
+                return "Could not parse DMS from input: '\(s)'"
+            case .invalidHMS(let s):
+                return "Could not parse HMS from input: '\(s)'"
+            case .unsupportedFormat(let s):
+                return "Input does not match any known format: '\(s)'"
+            }
+        }
+    }
+    
+    /** The type of the enum, and the default is empty. */
     var type: ValueType = .empty
     
     private init(type: ValueType) {
@@ -38,59 +74,139 @@ struct Value: Codable, Hashable, CustomStringConvertible {
         self = Value(type: .hms(hours: hours, minutes: minutes, seconds: seconds)).normalised()
     }
     
-    init?(from string: String) {
+    /** Attemps to parse the given string, optionall using a hint. */
+    init?(parsing string: String, hint: ValueTypeHint = .detect) {
+        let actualHint = (hint == .detect) ? Value.detectHint(parsing: string) : hint
         let trimmed = string.trimmingCharacters(in: .whitespacesAndNewlines)
 
-        // Assume unparsable and empty
-        self.type = .empty
-        
-        // Try integer
-        if let intVal = Int(trimmed) {
+        switch actualHint {
+        case .empty:
+            guard trimmed.isEmpty else { return nil }
+            self = Value()
+        case .integer:
+            guard let intVal = Int(trimmed) else { return nil }
             self = Value(integer: intVal)
-            return
+        case .dms:
+            guard let val = Self.parseDMS(trimmed) else { return nil }
+            self = val
+        case .hms:
+            guard let val = Self.parseHMS(trimmed) else { return nil }
+            self = val
+        case .detect:
+            return nil  // detect case is unreachable due to replacement above
         }
-
-        // Try DMS format: 45°30.0'
-        let dmsPattern = #"^(\d+)°(\d{1,2})'(\d)$"#
-        if let _ = trimmed.range(of: dmsPattern, options: .regularExpression) {
-            let regex = try! NSRegularExpression(pattern: dmsPattern)
-            if let result = regex.firstMatch(in: trimmed, range: NSRange(trimmed.startIndex..., in: trimmed)) {
-                if let degRange = Range(result.range(at: 1), in: trimmed),
-                   let minRange = Range(result.range(at: 2), in: trimmed),
-                   let secRange = Range(result.range(at: 3), in: trimmed),
-                   let degrees = Int(trimmed[degRange]),
-                   let minutes = Decimal(string: String(trimmed[minRange])),
-                   let seconds = Decimal(string: String(trimmed[secRange])) {
-
-                    // If your Value type supports HMS-style storage
-                    self = Value(degrees: degrees, minutes: minutes+seconds/10)
-                    return
-                }
-            }
-        }
-
-        // Try HMS format: 12h34m56s
-        let hmsPattern = #"^(\d{2})h(\d{2})m(\d{2})s$"#
-        if let _ = trimmed.range(of: hmsPattern, options: .regularExpression) {
-            let regex = try! NSRegularExpression(pattern: hmsPattern)
-            if let result = regex.firstMatch(in: trimmed, range: NSRange(trimmed.startIndex..., in: trimmed)) {
-                if let hRange = Range(result.range(at: 1), in: trimmed),
-                   let mRange = Range(result.range(at: 2), in: trimmed),
-                   let sRange = Range(result.range(at: 3), in: trimmed),
-                   let h = Int(trimmed[hRange]),
-                   let m = Int(trimmed[mRange]),
-                   let s = Int(trimmed[sRange])
-                {
-                    self = Value(hours: h, minutes: m, seconds: s)
-                    return
-                }
-            }
-        }
-
-        // If all parsing fails
-        return nil
     }
 
+    /** Sketch fallback to init?, which falls back to empty values or fails */
+    init(parsing string: String, hint: ValueTypeHint = .detect, fallbackToEmpty: Bool = false) throws {
+        let actualHint = (hint == .detect) ? Self.detectHint(parsing: string) : hint
+        let trimmed = string.trimmingCharacters(in: .whitespacesAndNewlines)
+
+        switch actualHint {
+        case .empty:
+            if trimmed.isEmpty {
+                self = Value()
+            } else if fallbackToEmpty {
+                self = Value()
+            } else {
+                throw ValueParseError.unsupportedFormat(string)
+            }
+
+        case .integer:
+            if let intVal = Int(trimmed) {
+                self = Value(integer: intVal)
+            } else if fallbackToEmpty {
+                self = Value()
+            } else {
+                throw ValueParseError.invalidInteger(string)
+            }
+
+        case .dms:
+            if let val = Self.parseDMS(trimmed) {
+                self = val
+            } else if fallbackToEmpty {
+                self = Value()
+            } else {
+                throw ValueParseError.invalidDMS(string)
+            }
+
+        case .hms:
+            if let val = Self.parseHMS(trimmed) {
+                self = val
+            } else if fallbackToEmpty {
+                self = Value()
+            } else {
+                throw ValueParseError.invalidHMS(string)
+            }
+
+        case .detect:
+            // detect case is unreachable due to replacement above
+            throw ValueParseError.unsupportedFormat(string)
+        }
+    }
+
+    static func parseDMS(_ input: String) -> Value? {
+        let pattern = #"(?:(?<deg>\d*)°)?\s*(?:(?<min>\d+))?'?\s*(?:(?<sec>\d))?"#
+        guard let regex = try? NSRegularExpression(pattern: pattern) else { return nil }
+
+        let nsrange = NSRange(input.startIndex..<input.endIndex, in: input)
+        guard let match = regex.firstMatch(in: input, options: [], range: nsrange) else { return nil }
+
+        func getIntOrZero(_ name: String) -> Int {
+            let range = match.range(withName: name)
+            if let r = Range(range, in: input) {
+                return Int(input[r]) ?? 0
+            }
+            return 0
+        }
+
+        let deg = getIntOrZero("deg")
+        let min = getIntOrZero("min")
+        let sec = getIntOrZero("sec")
+        let totalMinutes = Decimal(min) + Decimal(sec) / 10
+
+        return Value(degrees: deg, minutes: totalMinutes)
+    }
+
+    static func parseHMS(_ input: String) -> Value? {
+        let pattern = #"(?:(?<hr>\d*)h)?\s*(?:(?<min>\d*)m)?\s*(?:(?<sec>\d+))?"#
+        guard let regex = try? NSRegularExpression(pattern: pattern) else { return nil }
+
+        let nsrange = NSRange(input.startIndex..<input.endIndex, in: input)
+        guard let match = regex.firstMatch(in: input, options: [], range: nsrange) else { return nil }
+
+        func getIntOrZero(_ name: String) -> Int {
+            let range = match.range(withName: name)
+            if let r = Range(range, in: input), !input[r].isEmpty {
+                return Int(input[r]) ?? 0
+            }
+            return 0
+        }
+
+        let hr = getIntOrZero("hr")
+        let min = getIntOrZero("min")
+        let sec = getIntOrZero("sec")
+
+        return Value(hours: hr, minutes: min, seconds: sec)
+    }
+    
+    /** Detect how to parse the string. Checks for presence of eg. degree or hour-minute symbols. */
+    static func detectHint(parsing input: String) -> Value.ValueTypeHint {
+        let trimmed = input.trimmingCharacters(in: .whitespacesAndNewlines)
+        if trimmed.isEmpty {
+            return .empty
+        }
+        if trimmed.contains("°") || trimmed.contains("'") {
+            return .dms
+        }
+        if trimmed.contains("h") || trimmed.contains("m") {
+            return .hms
+        }
+        if Int(trimmed) != nil {
+            return .integer
+        }
+        return .empty  // fallback
+    }
     
     public var description: String {
         switch type {

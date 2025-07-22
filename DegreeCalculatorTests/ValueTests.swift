@@ -28,7 +28,7 @@ final class ValueBaseAndIntTests: XCTestCase {
     }
     
     func testValueFromString() throws {
-        if let v = Value(from: "23") {
+        if let v = Value(parsing: "23", hint: .integer) {
             switch v.type {
             case .integer(let i):
                 XCTAssertEqual(i, 23)
@@ -71,8 +71,7 @@ final class ValueBaseAndIntTests: XCTestCase {
 }
 
 final class ValueDMSTests: XCTestCase {
-    
-    func testValue() throws {
+    func testDMSValue() throws {
         let v = Value(degrees: 1, minutes: 2.3)
         switch v.type {
         case .dms(let d, let m):
@@ -85,8 +84,8 @@ final class ValueDMSTests: XCTestCase {
         
     }
     
-    func testValueFromString() throws {
-        if let v = Value(from: "123°45'6") {
+    func testDMSValueFromStringComplete() throws {
+        if let v = Value(parsing: "123°45'6") {
             switch v.type {
             case .dms(let d, let m):
                 XCTAssertEqual(d, 123)
@@ -100,40 +99,92 @@ final class ValueDMSTests: XCTestCase {
         }
     }
     
-    func testNormalise() throws {
+    func testDMSValueFromStringIncomplete() throws {
+        if let v = Value(parsing: "°45'6", hint: .detect) {
+            switch v.type {
+            case .dms(let d, let m):
+                XCTAssertEqual(d, 0)
+                XCTAssertEqual(m, 45.6)
+                XCTAssertEqual(v.description, "0°45'6")
+            default:
+                XCTFail("Expected .dms kind")
+            }
+        } else {
+            XCTFail("Expected to parse .dms kind")
+        }
+        if let v = Value(parsing: "45'6", hint: .detect) {
+            switch v.type {
+            case .dms(let d, let m):
+                XCTAssertEqual(d, 0)
+                XCTAssertEqual(m, 45.6)
+                XCTAssertEqual(v.description, "0°45'6")
+            default:
+                XCTFail("Expected .dms kind")
+            }
+        } else {
+            XCTFail("Expected to parse .dms kind")
+        }
+        if let v = Value(parsing: "'6", hint: .detect) {
+            switch v.type {
+            case .dms(let d, let m):
+                XCTAssertEqual(d, 0)
+                XCTAssertEqual(m, 0.6)
+                XCTAssertEqual(v.description, "0°00'6")
+            default:
+                XCTFail("Expected .dms kind")
+            }
+        } else {
+            XCTFail("Expected to parse .dms kind")
+        }
+        if let v = Value(parsing: "45", hint: .dms) {
+            switch v.type {
+            case .dms(let d, let m):
+                XCTAssertEqual(d, 0)
+            XCTAssertEqual(m, 45.0)
+                XCTAssertEqual(v.description, "0°45'0")
+            default:
+                XCTFail("Expected .dms kind")
+            }
+        } else {
+            XCTFail("Expected to parse .dms kind")
+        }
+    }
+
+    func testDMSNormalise() throws {
         XCTAssertEqual(Value(degrees: 0, minutes: 61).normalised(), Value(degrees: 1, minutes: 1))
+        XCTAssertEqual(Value(degrees: 0, minutes: 60).normalised(), Value(degrees: 1, minutes: 0))
         XCTAssertEqual(Value(degrees: 1, minutes: -1).normalised(), Value(degrees: 0, minutes: 59))
     }
     
-    func testAdding() throws {
+    func testDMSAdding() throws {
         let lhs = Value(degrees: 1, minutes: 2.3)
         let rhs = Value(degrees: 2, minutes: 3.4)
         let expected = Value(degrees: 3, minutes: 5.7)
         XCTAssertEqual(lhs.adding(rhs), expected)
     }
     
-    func testAddingOverflow() throws {
+    func testDMSAddingOverflow() throws {
         let lhs = Value(degrees: 359, minutes: 59.9)
         let rhs = Value(degrees: 1, minutes: 1.2)
         let expected = Value(degrees: 361, minutes: 1.1)
         XCTAssertEqual(lhs.adding(rhs), expected)
     }
     
-    func testSubtracting() throws {
+    func testDMSSubtracting() throws {
         let lhs = Value(degrees: 2, minutes: 3.4)
         let rhs = Value(degrees: 1, minutes: 2.3)
         let expected = Value(degrees: 1, minutes: 1.1)
         XCTAssertEqual(lhs.subtracting(rhs), expected)
     }
     
-    func testSubtractingUnderflow() throws {
+    func testDMSSubtractingUnderflow() throws {
         let lhs = Value(degrees: 1, minutes: 2.3)
         let rhs = Value(degrees: 2, minutes: 3.4)
         let expected = Value(degrees: 358, minutes: 58.9)
         XCTAssertEqual(lhs.subtracting(rhs), expected)
     }
     
-    func testDividing() throws {
+    func testDMSDividing() throws {
         let lhs = Value(degrees: 9, minutes: 30.4)
         let rhs = Value(integer: 2)
         let expected = Value(degrees: 4, minutes: 45.2)
@@ -142,8 +193,7 @@ final class ValueDMSTests: XCTestCase {
 }
 
 final class ValueHMSTests: XCTestCase {
-    
-    func testValue() throws {
+    func testHMSValue() throws {
         let v = Value(hours: 1, minutes: 2, seconds: 3)
         switch v.type {
         case .hms(let h, let m, let s):
@@ -157,8 +207,8 @@ final class ValueHMSTests: XCTestCase {
         
     }
     
-    func testValueFromString() throws {
-        if let v = Value(from: "12h34m56s") {
+    func testHMSValueFromString() throws {
+        if let v = Value(parsing: "12h34m56s") {
             switch v.type {
             case .hms(let d, let m, let s):
                 XCTAssertEqual(d, 12)
@@ -172,42 +222,97 @@ final class ValueHMSTests: XCTestCase {
             XCTFail("Expected to parse .hms kind")
         }
     }
-
     
-    func testNormalise() throws {
+    func testHMSValueFromStringIncomplete() throws {
+        if let v = Value(parsing: "h45m6", hint: .detect) {
+            switch v.type {
+            case .hms(let d, let m, let s):
+                XCTAssertEqual(d, 0)
+                XCTAssertEqual(m, 45)
+                XCTAssertEqual(s, 6)
+                XCTAssertEqual(v.description, "0h45m06s")
+            default:
+                XCTFail("Expected .hms kind")
+            }
+        } else {
+            XCTFail("Expected to parse .hms kind")
+        }
+        if let v = Value(parsing: "45m6", hint: .detect) {
+            switch v.type {
+            case .hms(let d, let m, let s):
+                XCTAssertEqual(d, 0)
+                XCTAssertEqual(m, 45)
+                XCTAssertEqual(s, 6)
+                XCTAssertEqual(v.description, "0h45m06s")
+            default:
+                XCTFail("Expected .hms kind")
+            }
+        } else {
+            XCTFail("Expected to parse .hms kind")
+        }
+        if let v = Value(parsing: "m6", hint: .detect) {
+            switch v.type {
+            case .hms(let d, let m, let s):
+                XCTAssertEqual(d, 0)
+                XCTAssertEqual(m, 0)
+                XCTAssertEqual(s, 6)
+                XCTAssertEqual(v.description, "0h00m06s")
+            default:
+                XCTFail("Expected .hms kind")
+            }
+        } else {
+            XCTFail("Expected to parse .hms kind")
+        }
+        if let v = Value(parsing: "45", hint: .hms) {
+            switch v.type {
+            case .hms(let d, let m, let s):
+                XCTAssertEqual(d, 0)
+                XCTAssertEqual(m, 0)
+                XCTAssertEqual(s, 45)
+                XCTAssertEqual(v.description, "0h00m45s")
+            default:
+                XCTFail("Expected .hms kind")
+            }
+        } else {
+            XCTFail("Expected to parse .hms kind")
+        }
+    }
+    
+    func testHMSNormalise() throws {
         XCTAssertEqual(Value(hours: 0, minutes: 60, seconds: 61).normalised(), Value(hours: 1, minutes: 1, seconds: 1))
+        XCTAssertEqual(Value(hours: 0, minutes: 59, seconds: 61).normalised(), Value(hours: 1, minutes: 0, seconds: 1))
         XCTAssertEqual(Value(hours: 1, minutes: -1, seconds: -1).normalised(), Value(hours: 0, minutes: 58, seconds: 59))
     }
     
-    func testAdding() throws {
+    func testHMSAdding() throws {
         let lhs = Value(hours: 1, minutes: 2, seconds: 3)
         let rhs = Value(hours: 2, minutes: 3, seconds: 4)
         let expected = Value(hours: 3, minutes: 5, seconds: 7)
         XCTAssertEqual(lhs.adding(rhs), expected)
     }
     
-    func testAddingOverflow() throws {
+    func testHMSAddingOverflow() throws {
         let lhs = Value(hours: 359, minutes: 59, seconds: 59)
         let rhs = Value(hours: 1, minutes: 1, seconds: 2)
         let expected = Value(hours: 361, minutes: 1, seconds: 1)
         XCTAssertEqual(lhs.adding(rhs), expected)
     }
     
-    func testSubtracting() throws {
+    func testHMSSubtracting() throws {
         let lhs = Value(hours: 2, minutes: 3, seconds: 4)
         let rhs = Value(hours: 1, minutes: 2, seconds: 3)
         let expected = Value(hours: 1, minutes: 1, seconds: 1)
         XCTAssertEqual(lhs.subtracting(rhs), expected)
     }
     
-    func testSubtractingUnderflow() throws {
+    func testHMSSubtractingUnderflow() throws {
         let lhs = Value(hours: 1, minutes: 2, seconds: 3)
         let rhs = Value(hours: 2, minutes: 3, seconds: 4)
         let expected = Value(hours: -2, minutes: 58, seconds: 59)
         XCTAssertEqual(lhs.subtracting(rhs), expected)
     }
     
-    func testDividing() throws {
+    func testHMSDividing() throws {
         let lhs = Value(hours: 9, minutes: 30, seconds: 4)
         let rhs = Value(integer: 2)
         let expected = Value(hours: 4, minutes: 45, seconds: 2)
