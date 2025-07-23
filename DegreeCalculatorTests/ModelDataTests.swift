@@ -332,6 +332,20 @@ final class ModelDataTests: XCTestCase {
     
     // MARK: Test full expressions
     
+    func testUnterminatedOperators() {
+        md = makeModel(with: .DMS)
+        
+        inputString("1°2'3 +")
+        XCTAssertEqual(md.inputStack, Array("1°2'3+"))
+        XCTAssertEqual(md.currentNumber, "")
+        XCTAssertEqual(md.builtExpressions, [])
+
+        inputString("4°5'6 +")
+        XCTAssertEqual(md.inputStack, Array("1°2'3+4°5'6"))
+        XCTAssertEqual(md.currentNumber, "")
+        XCTAssertEqual(md.builtExpressions, [])
+    }
+    
     func testAddAndEqual() {
         md = makeModel(with: .DMS)
 

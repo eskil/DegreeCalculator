@@ -97,7 +97,7 @@ final class ModelData: ObservableObject {
      
      it is difrerent from the inputStack in that it's manipulated, not just user entered data. Eg. for DMS values, if you enter "'" alone, "0°0" is prepended.
      */
-    var currentNumber: String = ""
+    @Published var currentNumber: String = ""
     
     /**
      expressionStack is the stack of evaluated subexpressions.
@@ -339,9 +339,11 @@ final class ModelData: ObservableObject {
         if let expr = buildExpr() {
             NSLog("Expr \(expr)")
             NSLog("Expr \(expr.description)")
-            NSLog("Expr \(expr.evaluate())")
+            NSLog("Expr \(expr.value ?? Value())")
             inputStack.removeAll()
             currentNumber.removeAll()
+            expressionStack.removeAll()
+            operatorStack.removeAll()
         }
     }
     

@@ -23,46 +23,58 @@ struct CalculatorView: View {
     @State var padTop = 0.0
     @State var padRight = 0.0
 
-    // Note, this should probably be replaced with the displayStack
     struct Line: Hashable {
+        // SwiftUI needs an id
         var id = 0
+        // This is the content of the line
         var value: String
+        // The is the underscore -- or == annotations
         var op: String?
     }
     
     var lines: [Line] {
         NSLog("Expressions changed, recomputing lines")
         var result: [Line] = []
+        var id = 0
         modelData.builtExpressions.forEach { entry in
-            var line: Line = Line(value: "")
-            var tmp: [Line] = []
+            let strings = entry.displayable()
+            for i in strings.indices {
+                let s = strings[i]
+                let isLast = i == strings.index(before: strings.endIndex)
+                let isSecondLast = i == strings.index(before: strings.endIndex) - 1
 
-            // In order traverse the tree and add the left side value to "line", then the op
-            // and emit that line.
-            entry.inOrder { expr in
-                switch expr {
-                case .value(let v):
-                    line.value = v.description.leftPadding(toLength: 11, withPad: " ")
-                case .binary(let op, _, _):
-                    line.op = op.description
-                    tmp.append(Line(value: line.value, op: line.op))
-                    line = Line(value: "")
+                if isLast {
+                    result.append(Line(id: id, value: s, op: "=="))
+
+                } else if isSecondLast {
+                    result.append(Line(id: id, value: s, op: "="))
+                } else {
+                    result.append(Line(id: id, value: s, op: ""))
                 }
+                id += 1
             }
-            // Finally, if there's a result on the entry, add that since the expression is "proper and done". Otherwise just add the line being worked on.
-            // I'm not feeling this, I feel like maybe the "line" should start with the entered string.
-            if let result = entry.value {
-                tmp.append(Line(value: line.value, op: "="))
-                tmp.append(Line(value: result.description.leftPadding(toLength: 11, withPad: " "), op: "=="))
-            }
+        }
+        
+        NSLog("computed lines so far")
+        for line in result {
+            NSLog("\tline \(line)")
+        }
 
-            result = result + tmp
+        modelData.expressionStack.forEach { entry in
+            let strings = entry.displayable()
+            for i in strings.indices {
+                let s = strings[i]
+                result.append(Line(id: id, value: s, op: ""))
+                id += 1
+            }
         }
-        result = result + [Line(value: String(modelData.inputStack), op: nil)]
-        for index in result.indices {
-            result[index].id = index
+        
+        result.append(Line(id: id, value: modelData.currentNumber))
+        
+        NSLog("computed lines")
+        for line in result {
+            NSLog("\tline \(line)")
         }
-        NSLog("computed lines \(result)")
         return result
     }
     
