@@ -49,7 +49,7 @@ struct CalculatorView: View {
                 } else if isSecondLast {
                     result.append(Line(id: id, value: s, op: "="))
                 } else {
-                    result.append(Line(id: id, value: s, op: ""))
+                    result.append(Line(id: id, value: s, op: "#"))
                 }
                 id += 1
             }
@@ -60,13 +60,8 @@ struct CalculatorView: View {
             NSLog("\tline \(line)")
         }
 
-        modelData.expressionStack.forEach { entry in
-            let strings = entry.displayable()
-            for i in strings.indices {
-                let s = strings[i]
-                result.append(Line(id: id, value: s, op: ""))
-                id += 1
-            }
+        modelData.displayStack.forEach { s in
+            result.append(Line(id: id, value: s, op: ""))
         }
         
         result.append(Line(id: id, value: modelData.currentNumber))
@@ -213,18 +208,18 @@ struct CalculatorView: View {
                                 if let op = line.op {
                                     if op == "=" {
                                         // FIXME: this view could be generalised
-                                        Text(line.value + " " + op)
+                                        Text(line.value)
                                             .frame(maxWidth: .infinity, alignment: .leading)
                                             .foregroundColor(.white)
                                         Underscore
                                     } else if op == "==" {
-                                        Text(line.value + " ")
+                                        Text(line.value)
                                             .frame(maxWidth: .infinity, alignment: .leading)
                                             .foregroundColor(.white)
                                         Underscore
                                         Underscore
                                     } else {
-                                        Text(line.value + " " + op)
+                                        Text(line.value)
                                             .frame(maxWidth: .infinity, alignment: .leading)
                                             .foregroundColor(.white)
                                         

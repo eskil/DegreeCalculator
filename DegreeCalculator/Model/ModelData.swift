@@ -133,6 +133,18 @@ final class ModelData: ObservableObject {
      */
     var operatorStack: [Operator] = []
     
+    /**
+     DisplayStack is purely for displaying the input in presentable way.
+     
+     On each operator being entered, the currentNumber is processed put on this stack
+     suffixed with the operator.
+     
+     This allows for "printing" the inmput as lines, but the precedence is still
+     left to the reader. Additionally the processing of the number means a "6" becomes
+     "6.0", and if supported °'" and decimals, that would also show up on the display output.
+     */
+    var displayStack: [String] = []
+    
     /** When last operator is divide, disable degrees/minutes input */
     @Published var disableDegreesAndMinutes: Bool = false
     
@@ -233,6 +245,7 @@ final class ModelData: ObservableObject {
              depending on the precedence of the operator.
              */
             if let val = Value(parsing: currentNumber, hint: exprMode == .DMS ? .dms : .hms) {
+                displayStack.append("\(val) \(inputOp.rawValue)")
                 expressionStack.append(.value(val))
                 currentNumber = ""
             }
@@ -260,6 +273,7 @@ final class ModelData: ObservableObject {
         currentNumber.removeAll()
         expressionStack.removeAll()
         operatorStack.removeAll()
+        displayStack.removeAll()
     }
     
     func clear() {
@@ -344,6 +358,7 @@ final class ModelData: ObservableObject {
             currentNumber.removeAll()
             expressionStack.removeAll()
             operatorStack.removeAll()
+            displayStack.removeAll()
         }
     }
     
@@ -470,6 +485,7 @@ final class ModelData: ObservableObject {
         This manipulates the stacks and why we call rebuildExpr early
         */
         if let val = Value(parsing: currentNumber, hint: exprMode == .DMS ? .dms : .hms) {
+            displayStack.append("\(val) =")
             expressionStack.append(Expr.value(val))
             currentNumber = ""
         } else {
@@ -500,6 +516,21 @@ final class ModelData: ObservableObject {
         */
         if operatorStack.isEmpty, expressionStack.count == 1, let expr = expressionStack.last {
             /* "pretty" print the input from the user */
+            displayStack.append("\(expressionStack.last?.evaluate() ?? Value())")
+            NSLog("----------------")
+            var flip = false
+            for line in displayStack {
+                if flip {
+                    NSLog("----------------")
+                }
+                NSLog("\t\(line)")
+                if flip {
+                    NSLog("================")
+                }
+                if line.contains("=") {
+                    flip = true
+                }
+            }
             builtExpressions.append(expr)
             return expr
         } else {
@@ -550,6 +581,7 @@ final class ModelData: ObservableObject {
         expressionStack.removeAll()
         operatorStack.removeAll()
         currentNumber.removeAll()
+        displayStack.removeAll()
         for char in backup {
             addEntry(char)
         }

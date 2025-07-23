@@ -112,7 +112,7 @@ indirect enum Expr: Codable, Hashable, CustomStringConvertible {
         }
     }
     
-    public func displayable() -> [String] {
+    public func displayable(showValue: Bool = true) -> [String] {
         var result: [String] = []
         var line: String = ""
         self.inOrder { expr in
@@ -125,9 +125,11 @@ indirect enum Expr: Codable, Hashable, CustomStringConvertible {
                 line = ""
             }
         }
-        line.append(" =")
-        result.append(line)
-        if let v = value {
+        if !showValue {
+            result.append(line)
+        } else if let v = value {
+            line.append(" =")
+            result.append(line)
             line = v.description.leftPadding(toLength: 11, withPad: " ")
             result.append(line)
         }
