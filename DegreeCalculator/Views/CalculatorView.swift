@@ -23,48 +23,9 @@ struct CalculatorView: View {
     @State var padTop = 0.0
     @State var padRight = 0.0
 
-    struct Line: Hashable {
-        // SwiftUI needs an id
-        var id = 0
-        // This is the content of the line
-        var value: String
-        // The is the underscore -- or == annotations
-        var op: String?
-    }
-    
-    var lines: [Line] {
+    var lines: [DisplayLine] {
         NSLog("Expressions changed, recomputing lines")
-        var result: [Line] = []
-        var id = 0
-        modelData.builtExpressions.forEach { entry in
-            let strings = entry.displayable()
-            for i in strings.indices {
-                let s = strings[i]
-                let isLast = i == strings.index(before: strings.endIndex)
-                let isSecondLast = i == strings.index(before: strings.endIndex) - 1
-
-                if isLast {
-                    result.append(Line(id: id, value: s, op: "=="))
-
-                } else if isSecondLast {
-                    result.append(Line(id: id, value: s, op: "="))
-                } else {
-                    result.append(Line(id: id, value: s, op: "#"))
-                }
-                id += 1
-            }
-        }
-        
-        NSLog("computed lines so far")
-        for line in result {
-            NSLog("\tline \(line)")
-        }
-
-        modelData.displayStack.forEach { s in
-            result.append(Line(id: id, value: s, op: ""))
-        }
-        
-        result.append(Line(id: id, value: modelData.currentNumber))
+        let result = modelData.displayLines()
         
         NSLog("computed lines")
         for line in result {
@@ -91,7 +52,7 @@ struct CalculatorView: View {
                         ForEach(lines, id: \.id) { line in
                             // https://sarunw.com/posts/how-to-make-swiftui-view-fill-container-width-and-height/
                             VStack {
-                                if let op = line.op {
+                                if let op = line.trailingOperator {
                                     if op == "=" {
                                         // FIXME: this view could be generalised
                                         Text(line.value + " " + op)
@@ -205,7 +166,7 @@ struct CalculatorView: View {
                         ForEach(lines, id: \.id) { line in
                             // https://sarunw.com/posts/how-to-make-swiftui-view-fill-container-width-and-height/
                             VStack {
-                                if let op = line.op {
+                                if let op = line.trailingOperator {
                                     if op == "=" {
                                         // FIXME: this view could be generalised
                                         Text(line.value)
