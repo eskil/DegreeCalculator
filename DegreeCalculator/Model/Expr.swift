@@ -60,7 +60,7 @@ indirect enum Expr: Codable, Hashable, CustomStringConvertible {
         return lhs.value == rhs.value
     }
      */
-        
+    
     init() {
         self = .value(Value())
     }
@@ -106,8 +106,31 @@ indirect enum Expr: Codable, Hashable, CustomStringConvertible {
         case .value:
             visit(self)
         case .binary( _, let lhs, let rhs):
-            visit(lhs)
-            visit(rhs)
+            lhs.inOrder(visit: visit)
+            visit(self)
+            rhs.inOrder(visit: visit)
         }
+    }
+    
+    public func displayable() -> [String] {
+        var result: [String] = []
+        var line: String = ""
+        self.inOrder { expr in
+            switch expr {
+            case .value(let v):
+                line = v.description.leftPadding(toLength: 11, withPad: " ")
+            case .binary(let op, _, _):
+                line.append(" \(op.description)")
+                result.append(line)
+                line = ""
+            }
+        }
+        line.append(" =")
+        result.append(line)
+        if let v = value {
+            line = v.description.leftPadding(toLength: 11, withPad: " ")
+            result.append(line)
+        }
+        return result
     }
 }

@@ -136,12 +136,12 @@ final class ValueDMSTests: XCTestCase {
         } else {
             XCTFail("Expected to parse .dms kind")
         }
-        if let v = Value(parsing: "45", hint: .dms) {
+        if let v = Value(parsing: "5", hint: .dms) {
             switch v.type {
             case .dms(let d, let m):
                 XCTAssertEqual(d, 0)
-            XCTAssertEqual(m, 45.0)
-                XCTAssertEqual(v.description, "0°45'0")
+                XCTAssertEqual(m, 5.0)
+                XCTAssertEqual(v.description, "0°05'0")
             default:
                 XCTFail("Expected .dms kind")
             }

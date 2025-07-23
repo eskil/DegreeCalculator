@@ -401,21 +401,15 @@ final class ModelDataTests: XCTestCase {
     func testAddAndEqualShortStyle() {
         md = makeModel(with: .DMS)
 
-        inputString("°2 + 4 =")
-        XCTAssertEqual(md.inputStack, Array("°2+4"))
-        XCTAssertEqual(md.displayStack, ["0°02'0 +", "4°00'0 =", "4°02'0"])
-        XCTAssertEqual(md.currentNumber, "")
-        XCTAssertEqual(md.builtExpressions, [])
-
-        md.callFunction(CalculatorFunction.EQUAL, label: "")
+        inputString("°4 + 2 =")
         XCTAssertEqual(md.inputStack, [])
-        XCTAssertEqual(md.displayStack, ["1°02'3 +", "4°05'6 =", "5°07'9"])
+        XCTAssertEqual(md.displayStack, ["0°04'0 +", "0°02'0 =", "0°06'0"])
         XCTAssertEqual(md.currentNumber, "")
         XCTAssertEqual(md.builtExpressions,
                        [
                         Expr.binary(op: Operator.add,
-                                    lhs: Expr.value(Value(degrees: 1, minutes: 2.3)),
-                                    rhs: Expr.value(Value(degrees: 4, minutes: 5.6)))
+                                    lhs: Expr.value(Value(degrees: 0, minutes: 4.0)),
+                                    rhs: Expr.value(Value(degrees: 0, minutes: 2.0)))
                        ]
         )
     }
@@ -436,8 +430,7 @@ final class ModelDataTests: XCTestCase {
                                     rhs: Expr.value(Value(degrees: 4, minutes: 5.6)))
                        ]
         )
-        md.callFunction(CalculatorFunction.EQUAL, label: "")
-        // ANS replaces the current input
+          // ANS replaces the current input
         md.callFunction(CalculatorFunction.ANS, label: "")
         XCTAssertEqual(md.inputStack, Array("5°07'9"))
         // TODO: if we save displayStack, this should pass

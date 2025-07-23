@@ -127,4 +127,44 @@ final class ExprTests: XCTestCase {
         let leftSide = Expr.binary(op: Operator.subtract, lhs: Expr.binary(op: Operator.add, lhs: val123, rhs: val456), rhs: val789)
         XCTAssertEqual(leftSide.description, "((1°02'3 + 4°05'6) - 7°08'9)")
     }
+    
+    func testInorder() throws {
+        let val123 = Expr.value(Value(degrees: 1, minutes: 2.3))
+        let val456 = Expr.value(Value(degrees: 4, minutes: 5.6))
+        let val789 = Expr.value(Value(degrees: 7, minutes: 8.9))
+        let expr = Expr.binary(op: Operator.subtract,
+                               lhs: Expr.binary(op: Operator.add,
+                                                lhs: val123,
+                                                rhs: val456),
+                                rhs: val789)
+        var result: [String] = []
+        expr.inOrder { e in
+            switch e {
+            case .value(let v):
+                NSLog("Value \(v)")
+                result.append(v.description)
+            case .binary(let op, _, _):
+                NSLog("BinOp \(op)")
+                result.append(op.description)
+            }
+        }
+        XCTAssertEqual(result, ["1°02'3", "+", "4°05'6", "-", "7°08'9"])
+    }
+
+    func testDisplayable() throws {
+        let val123 = Expr.value(Value(degrees: 1, minutes: 2.3))
+        let val456 = Expr.value(Value(degrees: 4, minutes: 5.6))
+        let val789 = Expr.value(Value(degrees: 7, minutes: 8.9))
+        let expr = Expr.binary(op: Operator.subtract,
+                               lhs: Expr.binary(op: Operator.add,
+                                                lhs: val123,
+                                                rhs: val456),
+                                rhs: val789)
+        XCTAssertEqual(expr.displayable(), [
+            "     1°02'3 +",
+            "     4°05'6 -",
+            "     7°08'9 =",
+            "   357°59'0"
+        ])
+    }
 }

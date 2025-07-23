@@ -244,7 +244,7 @@ final class ModelData: ObservableObject {
              This makes it availble for composing into a new expression
              depending on the precedence of the operator.
              */
-            if let val = Value(parsing: currentNumber, hint: .detect) {
+            if let val = Value(parsing: currentNumber, hint: exprMode == .DMS ? .dms : .hms) {
                 displayStack.append("\(val) \(inputOp.rawValue)")
                 expressionStack.append(.value(val))
                 currentNumber = ""
@@ -480,7 +480,7 @@ final class ModelData: ObservableObject {
         If a number is being entered, ensure it's processed and on the expressionStack.
         This manipulates the stacks and why we call rebuildExpr early
         */
-        if let val = Value(parsing: currentNumber, hint: .detect) {
+        if let val = Value(parsing: currentNumber, hint: exprMode == .DMS ? .dms : .hms) {
             displayStack.append("\(val) =")
             expressionStack.append(Expr.value(val))
             currentNumber = ""
