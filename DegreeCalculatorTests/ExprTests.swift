@@ -11,7 +11,7 @@ import XCTest
 
 final class ExprTests: XCTestCase {
     
-    func testOperator() throws {
+    func testOperator_Description() throws {
         XCTAssertEqual(Operator.add.description, "+")
         XCTAssertEqual(Operator.subtract.description, "-")
         XCTAssertEqual(Operator.divide.description, "/")
@@ -26,19 +26,19 @@ final class ExprTests: XCTestCase {
         let lhs = Expr.value(Value(degrees: 1, minutes: 2.3))
         let expr = Expr.binary(op: Operator.add, lhs: lhs, rhs: Expr())
         XCTAssertEqual(expr.value, nil)
-        XCTAssertEqual(expr.description, "(1°02'3 + <empty>)")
         
     }
 
-    func testAddTwoValues_1() throws {
+    func testAddTwoValues_BasicCase() throws {
         let lhs = Expr.value(Value(degrees: 1, minutes: 2.3))
         let rhs = Expr.value(Value(degrees: 4, minutes: 5.6))
         let expected = Value(degrees: 5, minutes: 7.9)
         let expr = Expr.binary(op: Operator.add, lhs: lhs, rhs: rhs)
         XCTAssertEqual(expr.value, expected)
+        XCTAssertEqual(expr.description, "(1°02'3 + 4°05'6)")
     }
 
-    func testAddTwoValues_minutes_overflow() throws {
+    func testAddTwoValues_MinutesOverflow() throws {
         let lhs = Expr.value(Value(degrees: 4, minutes: 30.0))
         let rhs = Expr.value(Value(degrees: 4, minutes: 30.0))
         let expected = Value(degrees: 9, minutes: 0.0)
@@ -46,13 +46,13 @@ final class ExprTests: XCTestCase {
         XCTAssertEqual(expr.value, expected)
     }
 
-    func test_minutes_overflow() throws {
+    func testMinutes_Overflow() throws {
         let expr = Expr.value(Value(degrees: 0, minutes: 185.0))
         let expected = Value(degrees: 3, minutes: 5.0)
         XCTAssertEqual(expr.value, expected)
     }
 
-    func testSubtractTwoValues() throws {
+    func testSubtractTwoValues_BaseCase() throws {
         let lhs = Expr.value(Value(degrees: 4, minutes: 5.6))
         let rhs = Expr.value(Value(degrees: 1, minutes: 2.3))
         let expected = Value(degrees: 3, minutes: 3.3)
@@ -60,7 +60,7 @@ final class ExprTests: XCTestCase {
         XCTAssertEqual(expr.value, expected)
     }
     
-    func testDivideValues_base_case() throws {
+    func testDivideValues_BaseCase() throws {
         let lhs = Expr.value(Value(degrees: 1023, minutes: 6.3))
         let rhs = Expr.value(Value(integer: 3))
         let expected = Value(degrees: 341, minutes: 2.1)
@@ -68,15 +68,23 @@ final class ExprTests: XCTestCase {
         XCTAssertEqual(expr.value, expected)
     }
 
-    func testDivideValues_degrees_divvy_into_minutes() throws {
+    func testDivideValues_DegreesDivIntoMinutes() throws {
         let lhs = Expr.value(Value(degrees: 9, minutes: 0.0))
         let rhs = Expr.value(Value(integer: 2))
         let expected = Value(degrees: 4, minutes: 30.0)
         let expr = Expr.binary(op: Operator.divide, lhs: lhs, rhs: rhs)
         XCTAssertEqual(expr.value, expected)
     }
-    
-    func testDegreesAndMinutesOverflow() throws {
+
+    func testDivideValues_MinutesDivIntoSeconds() throws {
+        let lhs = Expr.value(Value(degrees: 0, minutes: 1.0))
+        let rhs = Expr.value(Value(integer: 2))
+        let expected = Value(degrees: 0, minutes: 0.5)
+        let expr = Expr.binary(op: Operator.divide, lhs: lhs, rhs: rhs)
+        XCTAssertEqual(expr.value, expected)
+    }
+
+    func testDegreesAndMinutes_AddOverflow() throws {
         let lhs = Expr.value(Value(degrees: 354, minutes: 54.5))
         let rhs = Expr.value(Value(degrees: 6, minutes: 6.6))
         /*
@@ -88,7 +96,7 @@ final class ExprTests: XCTestCase {
         XCTAssertEqual(expr.value, expected)
     }
     
-    func testDegreesAndMinutesUnderflow() throws {
+    func testDegreesAndMinutes_SubtractUnderflow() throws {
         let lhs = Expr.value(Value(degrees: 1, minutes: 1.1))
         let rhs = Expr.value(Value(degrees: 6, minutes: 6.6))
         let expected = Value(degrees: 354, minutes: 54.5)
@@ -136,7 +144,7 @@ final class ExprTests: XCTestCase {
                                lhs: Expr.binary(op: Operator.add,
                                                 lhs: val123,
                                                 rhs: val456),
-                                rhs: val789)
+                               rhs: val789)
         var result: [String] = []
         expr.inOrder { e in
             switch e {

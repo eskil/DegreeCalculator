@@ -112,6 +112,7 @@ indirect enum Expr: Codable, Hashable, CustomStringConvertible {
         }
     }
     
+    /** Generate a debug print friend multi line (list of strings) decsription of the expression. */
     var multiline: [String] {
         var result: [String] = []
         var line: String = ""
