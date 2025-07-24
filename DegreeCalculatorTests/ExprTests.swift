@@ -160,7 +160,7 @@ final class ExprTests: XCTestCase {
                                                 lhs: val123,
                                                 rhs: val456),
                                 rhs: val789)
-        XCTAssertEqual(expr.displayable(), [
+        XCTAssertEqual(expr.multiline, [
             "     1°02'3 +",
             "     4°05'6 -",
             "     7°08'9 =",
