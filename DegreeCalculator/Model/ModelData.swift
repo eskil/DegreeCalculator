@@ -133,8 +133,8 @@ final class ModelData: ObservableObject {
      */
     var operatorStack: [Operator] = []
     
-    /** When last operator is divide, disable degrees/minutes input */
-    @Published var disableDegreesAndMinutes: Bool = false
+    /** When last operator is divide, disable degrees/jhours/minutes input */
+    @Published var intOnly: Bool = false
     
     /** The entry mode for this model.
      NOTE: This could be encapsulated in the class hierarchy and I might do that some day.
@@ -196,22 +196,22 @@ final class ModelData: ObservableObject {
             inputStack.append(char)
             currentNumber.append(char)
         }
-        else if exprMode == .DMS && char == "°" {
+        else if exprMode == .DMS && char == "°" && !intOnly {
             if addDegreeHour() {
                 inputStack.append(char)
             }
         }
-        else if exprMode == .DMS && char == "'" {
+        else if exprMode == .DMS && char == "'" && !intOnly {
             if addMinutes() {
                 inputStack.append(char)
             }
         }
-        else if exprMode == .HMS && char == "h" {
+        else if exprMode == .HMS && char == "h" && !intOnly {
             if addDegreeHour() {
                 inputStack.append(char)
             }
         }
-        else if exprMode == .HMS && char == "m" {
+        else if exprMode == .HMS && char == "m" && !intOnly {
             if addMinutes() {
                 inputStack.append(char)
             }
@@ -224,7 +224,7 @@ final class ModelData: ObservableObject {
             }
         }
         */
-        else if let inputOp = Operator(rawValue: char) {
+        else if !currentNumber.isEmpty, let inputOp = Operator(rawValue: char) {
             inputStack.append(char)
             /**
              We're entering an operator, so convert the currentNumber
@@ -232,7 +232,7 @@ final class ModelData: ObservableObject {
              This makes it availble for composing into a new expression
              depending on the precedence of the operator.
              */
-            if let val = Value(parsing: currentNumber, hint: exprMode == .DMS ? .dms : .hms) {
+            if let val = Value(parsing: currentNumber, hint: intOnly ? .integer : (exprMode == .DMS ? .dms : .hms)) {
                 expressionStack.append(.value(val))
                 currentNumber = ""
             }
@@ -245,8 +245,13 @@ final class ModelData: ObservableObject {
             while let lastOp = operatorStack.last, lastOp.precedence >= inputOp.precedence {
                 popOperator()
             }
-            /* Add the newly input operator */
+            // Add the newly input operator
             operatorStack.append(inputOp)
+            
+            // If we've entered an divide operator, only accept ints - no division by dms/hms.
+            if inputOp == Operator.divide {
+                intOnly = true
+            }
         }
     }
     
@@ -254,7 +259,7 @@ final class ModelData: ObservableObject {
      Reset the entire state.
      */
     func allClear() {
-        disableDegreesAndMinutes = false
+        intOnly = false
         builtExpressions.removeAll()
         inputStack.removeAll()
         currentNumber.removeAll()
@@ -310,20 +315,11 @@ final class ModelData: ObservableObject {
     }
     
     func divide() {
-        /*
-         This is a bit unconventional. But to avoid buildings "a full
-         calculator" and have to make it clear how precedence comes into play, divide
-         first issues an "equal" to reduce to 1 number.
-         This is grosds.
-         */
-        equal()
-        disableDegreesAndMinutes = true
         addEntry(Operator.divide.rawValue)
     }
     
     func minus_360() {
-        // Start a subtractions
-        // If a number is being entered, attempt to close
+        // If a number is being entered, attempt to close expression first.
         if !currentNumber.isEmpty {
             if !(operatorStack.isEmpty && expressionStack.isEmpty) {
                 equal()
@@ -333,6 +329,7 @@ final class ModelData: ObservableObject {
                 }
             }
         }
+        
         // If there's nothing being entered, pull in the previous answer.
         if currentNumber.isEmpty {
             // **nothing** being entered, pull in the previous answer.
@@ -344,6 +341,7 @@ final class ModelData: ObservableObject {
                 return
             }
         }
+        
         addEntry(Operator.subtract.rawValue)
         addEntry("3")
         addEntry("6")
@@ -359,7 +357,8 @@ final class ModelData: ObservableObject {
             return
         }
         // Reenable this in case it was disabled while inputting a number for division
-        disableDegreesAndMinutes = false
+        intOnly = false
+        
         if let expr = buildExpr() {
             NSLog("Expr \(expr)")
             NSLog("Expr \(expr.description)")
@@ -493,7 +492,7 @@ final class ModelData: ObservableObject {
         If a number is being entered, ensure it's processed and on the expressionStack.
         This manipulates the stacks and why we call rebuildExpr early
         */
-        if let val = Value(parsing: currentNumber, hint: exprMode == .DMS ? .dms : .hms) {
+        if let val = Value(parsing: currentNumber, hint: intOnly ? .integer : (exprMode == .DMS ? .dms : .hms)) {
             expressionStack.append(Expr.value(val))
             currentNumber = ""
         } else {

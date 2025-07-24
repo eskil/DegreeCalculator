@@ -104,7 +104,7 @@ struct CalculatorView: View {
                     CalculatorButton(label: "C", function: CalculatorFunction.CLEAR)
                     CalculatorButton(label: "DEL", function: CalculatorFunction.DELETE)
                     CalculatorButton(label: "ANS", function: CalculatorFunction.ANS)
-                        .disabled(modelData.disableDegreesAndMinutes)
+                        .disabled(modelData.intOnly)
                 }
                 GridRow {
                     CalculatorButton(label: "7", function: CalculatorFunction.ENTRY)
@@ -129,9 +129,9 @@ struct CalculatorView: View {
                 GridRow {
                     CalculatorButton(label: "0", function: CalculatorFunction.ENTRY)
                     CalculatorButton(label: "h", function: CalculatorFunction.ENTRY)
-                        .disabled(modelData.disableDegreesAndMinutes)
+                        .disabled(modelData.intOnly)
                     CalculatorButton(label: "m", function: CalculatorFunction.ENTRY)
-                        .disabled(modelData.disableDegreesAndMinutes)
+                        .disabled(modelData.intOnly)
                     CalculatorButton(label: "=", function: CalculatorFunction.EQUAL)
 #if false // double up size of button
                         .background(
@@ -218,7 +218,7 @@ struct CalculatorView: View {
                     CalculatorButton(label: "C", function: CalculatorFunction.CLEAR)
                     CalculatorButton(label: "DEL", function: CalculatorFunction.DELETE)
                     CalculatorButton(label: "ANS", function: CalculatorFunction.ANS)
-                        .disabled(modelData.disableDegreesAndMinutes)
+                        .disabled(modelData.intOnly)
                 }
                 GridRow {
                     CalculatorButton(label: "7", function: CalculatorFunction.ENTRY)
@@ -243,9 +243,9 @@ struct CalculatorView: View {
                 GridRow {
                     CalculatorButton(label: "0", function: CalculatorFunction.ENTRY)
                     CalculatorButton(label: "°", function: CalculatorFunction.ENTRY)
-                        .disabled(modelData.disableDegreesAndMinutes)
+                        .disabled(modelData.intOnly)
                     CalculatorButton(label: "'", function: CalculatorFunction.ENTRY)
-                        .disabled(modelData.disableDegreesAndMinutes)
+                        .disabled(modelData.intOnly)
                     CalculatorButton(label: "=", function: CalculatorFunction.EQUAL)
 #if false // double up size of button
                         .background(
