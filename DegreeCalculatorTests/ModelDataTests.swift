@@ -782,10 +782,9 @@ final class ModelDataTests: XCTestCase {
         XCTAssertEqual(md.builtExpressions, [
             Expr.binary(
                 op: Operator.divide,
-                lhs: Expr.value(Value(hours: 20, minutes: 4, seconds: 8)),
+                lhs: Expr.value(Value(hours: 2, minutes: 4, seconds: 8)),
                 rhs: Expr.value(Value(integer: 2))
             ),
         ])
     }
-
 }
