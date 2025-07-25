@@ -20,6 +20,17 @@ struct DisplayLinesView: View {
             .padding(.bottom, 0)
     }
     
+    var lines: [DisplayLine] {
+        NSLog("Expressions changed, recomputing lines")
+        let result = model.displayLines()
+        NSLog("computed lines model \(model.exprMode) intOnly is \(model.intOnly)")
+        NSLog("computed lines")
+        for line in result {
+            NSLog("\tline \(line)")
+        }
+        return result
+    }
+    
     var body: some View {
         ScrollView {
             ScrollViewReader { scroll_reader in
@@ -52,16 +63,21 @@ struct DisplayLinesView: View {
                         }
                     }
                     .id(line.id)
-                }
-                
-                // https://stackoverflow.com/questions/58376681/swiftui-automatically-scroll-to-bottom-in-scrollview-bottom-first
-                // FIXME: this causes "lines" to be calculated multiple times which is a waste. And doing a single "let lines = lines" earlier doesn't work, since .onChange likely has some wrapper to cache values and thus accesses it... blabla. In short, doing the onChange on lines is needed for some corner case where ANS needs to scoll (ie. entered is unchanges) and all in all, we compute lines 3-4 times on each keypress :-/
-                // I could add a generation counter to the ModelData and +1 on each change, then monitor that... But this "is fine".
-                .onChange(of: model.displayLines()) { lines in
+                }                
+                .onChange(of: lines) { _ in
                     NSLog("change on entered lines count is \(lines.count)")
                     // The -1 is to scroll to id:5 when list has 6 elements - starts at 0.
                     // Alternatively, assign id:1, 2...
-                    scroll_reader.scrollTo(lines.count-1, anchor: .bottom)
+                    DispatchQueue.main.async {
+                        NSLog("onChange scroll to bottom")
+                        scroll_reader.scrollTo(lines.count-1, anchor: .bottom)
+                    }
+                }
+                .onAppear {
+                    DispatchQueue.main.async {
+                        NSLog("onAppear scroll to bottom")
+                        scroll_reader.scrollTo(lines.count-1, anchor: .bottom)
+                    }
                 }
             }
         }

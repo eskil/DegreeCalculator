@@ -9,14 +9,23 @@ import SwiftUI
 
 struct RootView: View {
     @StateObject var appState = AppState()
+    @State private var showingFirst = true
+    @Namespace private var animationNamespace
 
     var body: some View {
-        NavigationView {
-            VStack {
-                CalculatorView()
-                    .environmentObject(appState.dmsData)
-                    .environmentObject(appState.hmsData)
+        NavigationStack {
+            ZStack {
+                if showingFirst {
+                    CalculatorView()
+                        .environmentObject(appState.dmsData)
+                        .transition(.opacity.combined(with: .scale))
+                } else {
+                    CalculatorView()
+                        .environmentObject(appState.hmsData)
+                        .transition(.opacity.combined(with: .scale))
+                }
             }
+            .animation(.easeInOut(duration: 0.2), value: showingFirst)
             .toolbar {
                 ToolbarItemGroup(placement: .navigationBarLeading) {
                     // Intentionally empty for now.
@@ -24,12 +33,14 @@ struct RootView: View {
 
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button(action: {
-                        appState.displayMode = (appState.displayMode == .DMS) ? .HMS : .DMS
+                        showingFirst.toggle()
                     }) {
                         HStack(spacing: 4) {
-                            Text(appState.displayMode == .DMS ? "DMS" : "HMS")
+                            Text(showingFirst ? "DMS" : "HMS")
                                 .font(.headline)
                             Image(systemName: "arrow.2.squarepath")
+                                .rotationEffect(.degrees(showingFirst ? 0 : 180))
+                                .animation(.easeInOut(duration: 0.2), value: showingFirst)
                         }
                         .foregroundColor(.blue)
                     }

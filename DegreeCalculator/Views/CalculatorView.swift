@@ -16,7 +16,7 @@ struct CalculatorView: View {
     var lines: [DisplayLine] {
         NSLog("Expressions changed, recomputing lines")
         let result = modelData.displayLines()
-        
+        NSLog("computed lines modelData intOnly is \(modelData.intOnly)")
         NSLog("computed lines")
         for line in result {
             NSLog("\tline \(line)")
@@ -37,56 +37,14 @@ struct CalculatorView: View {
     private func hmsBody() -> some View {
         VStack {
             GeometryReader { geo in
-                ScrollView {
-                    ScrollViewReader { scroll_reader in
-                        ForEach(lines, id: \.id) { line in
-                            // https://sarunw.com/posts/how-to-make-swiftui-view-fill-container-width-and-height/
-                            VStack {
-                                if let op = line.trailingOperator {
-                                    if op == "=" {
-                                        // FIXME: this view could be generalised
-                                        Text(line.value + " " + op)
-                                            .frame(maxWidth: .infinity, alignment: .leading)
-                                            .foregroundColor(.white)
-                                        Underscore
-                                    } else if op == "==" {
-                                        Text(line.value + " ")
-                                            .frame(maxWidth: .infinity, alignment: .leading)
-                                            .foregroundColor(.white)
-                                        Underscore
-                                        Underscore
-                                    } else {
-                                        Text(line.value + " " + op)
-                                            .frame(maxWidth: .infinity, alignment: .leading)
-                                            .foregroundColor(.white)
-                                        
-                                    }
-                                } else {
-                                    Text(line.value)
-                                        .frame(maxWidth: .infinity, alignment: .leading)
-                                        .foregroundColor(.yellow)
-                                }
-                            }
-                            .id(line.id)
-                        }
-                        
-                        // https://stackoverflow.com/questions/58376681/swiftui-automatically-scroll-to-bottom-in-scrollview-bottom-first
-                        // FIXME: this causes "lines" to be calculated multiple times which is a waste. And doing a single "let lines = lines" earlier doesn't work, since .onChange likely has some wrapper to cache values and thus accesses it... blabla. In short, doing the onChange on lines is needed for some corner case where ANS needs to scoll (ie. entered is unchanges) and all in all, we compute lines 3-4 times on each keypress :-/
-                        // I could add a generation counter to the ModelData and +1 on each change, then monitor that... But this "is fine".
-                        .onChange(of: lines) { _ in
-                            NSLog("change on entered lines count is \(lines.count)")
-                            // The -1 is to scroll to id:5 when list has 6 elements - starts at 0.
-                            // Alternatively, assign id:1, 2...
-                            scroll_reader.scrollTo(lines.count-1, anchor: .bottom)
-                        }
-                    }
-                }
+                DisplayLinesView(model: modelData)
                 //.frame(width: geo.size.width, height: geo.size.height/2)
                 .font(.system(.largeTitle, design: .monospaced))
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .padding(20.0)
             }
-            // Divider()
+            
+            Divider()
             
             Grid(alignment: .topLeading, horizontalSpacing: 1, verticalSpacing: 1) {
                 GridRow {
@@ -151,56 +109,14 @@ struct CalculatorView: View {
     private func dmsBody() -> some View {
         VStack {
             GeometryReader { geo in
-                ScrollView {
-                    ScrollViewReader { scroll_reader in
-                        ForEach(lines, id: \.id) { line in
-                            // https://sarunw.com/posts/how-to-make-swiftui-view-fill-container-width-and-height/
-                            VStack {
-                                if let op = line.trailingOperator {
-                                    if op == "=" {
-                                        // FIXME: this view could be generalised
-                                        Text(line.value + " " + op)
-                                            .frame(maxWidth: .infinity, alignment: .leading)
-                                            .foregroundColor(.white)
-                                        Underscore
-                                    } else if op == "==" {
-                                        Text(line.value + " ")
-                                            .frame(maxWidth: .infinity, alignment: .leading)
-                                            .foregroundColor(.white)
-                                        Underscore
-                                        Underscore
-                                    } else {
-                                        Text(line.value + " " + op)
-                                            .frame(maxWidth: .infinity, alignment: .leading)
-                                            .foregroundColor(.white)
-                                        
-                                    }
-                                } else {
-                                    Text(line.value)
-                                        .frame(maxWidth: .infinity, alignment: .leading)
-                                        .foregroundColor(.yellow)
-                                }
-                            }
-                            .id(line.id)
-                        }
-                        
-                        // https://stackoverflow.com/questions/58376681/swiftui-automatically-scroll-to-bottom-in-scrollview-bottom-first
-                        // FIXME: this causes "lines" to be calculated multiple times which is a waste. And doing a single "let lines = lines" earlier doesn't work, since .onChange likely has some wrapper to cache values and thus accesses it... blabla. In short, doing the onChange on lines is needed for some corner case where ANS needs to scoll (ie. entered is unchanges) and all in all, we compute lines 3-4 times on each keypress :-/
-                        // I could add a generation counter to the ModelData and +1 on each change, then monitor that... But this "is fine".
-                        .onChange(of: lines) { _ in
-                            NSLog("change on entered lines count is \(lines.count)")
-                            // The -1 is to scroll to id:5 when list has 6 elements - starts at 0.
-                            // Alternatively, assign id:1, 2...
-                            scroll_reader.scrollTo(lines.count-1, anchor: .bottom)
-                        }
-                    }
-                }
+                DisplayLinesView(model: modelData)
                 //.frame(width: geo.size.width, height: geo.size.height/2)
                 .font(.system(.largeTitle, design: .monospaced))
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .padding(20.0)
             }
-            // Divider()
+
+            Divider()
             
             Grid(alignment: .topLeading, horizontalSpacing: 1, verticalSpacing: 1) {
                 GridRow {
