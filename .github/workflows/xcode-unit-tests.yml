@@ -20,6 +20,5 @@ jobs:
           
     - name: Format output with xcbeautify
       run: |
-        brew install xcbeautify
         cat xcodebuild.log | xcbeautify
 

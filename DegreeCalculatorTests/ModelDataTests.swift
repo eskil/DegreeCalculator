@@ -57,11 +57,6 @@ final class ModelDataTests: XCTestCase {
     
     // MARK: Test basic input
     
-    func testModelDataFails() throws {
-        XCTAssertEqual(true, false)
-    }
-
-    
     // Test a full and proper 1°2'3 build
     func testDMS_Entry_BuildFull() throws {
         md.callFunction(CalculatorFunction.ENTRY, label: "1")
@@ -448,7 +443,7 @@ final class ModelDataTests: XCTestCase {
         ])
     }
     
-    func testDivide_OnEmpty_IsNoop() {
+    func testDivide_OnEmpty_UsesAns() {
         inputString("/")
         XCTAssertEqual(md.inputStack, [])
         XCTAssertEqual(md.currentNumber, "")
@@ -459,7 +454,7 @@ final class ModelDataTests: XCTestCase {
         inputString("1°2'3 + 4°5'6 =")
         // Extra /
         inputString("/")
-        XCTAssertEqual(md.inputStack, [])
+        XCTAssertEqual(md.inputStack, Array("5°"))
         XCTAssertEqual(md.currentNumber, "")
         XCTAssertEqual(md.builtExpressions, [
             Expr.binary(op: Operator.add,

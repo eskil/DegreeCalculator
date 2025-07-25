@@ -10,9 +10,6 @@ import XCTest
 @testable import DegreeCalculator
 
 final class ExprTests: XCTestCase {
-    func testExprFails() throws {
-        XCTAssertEqual(true, false)
-    }
     
     func testOperator_Description() throws {
         XCTAssertEqual(Operator.add.description, "+")

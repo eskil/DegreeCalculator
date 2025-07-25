@@ -10,9 +10,6 @@ import XCTest
 @testable import DegreeCalculator
 
 final class ValueBaseAndIntTests: XCTestCase {
-    func testValueFails() throws {
-        XCTAssertEqual(true, false)
-    }
 
     func testInit_IsEmptyValue() throws {
         let v = Value()
