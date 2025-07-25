@@ -13,26 +13,26 @@ final class ExprTests: XCTestCase {
     func testExprFails() throws {
         XCTAssertEqual(true, false)
     }
-
-    func testOperatorDescription() throws {
+    
+    func testOperator_Description() throws {
         XCTAssertEqual(Operator.add.description, "+")
         XCTAssertEqual(Operator.subtract.description, "-")
         XCTAssertEqual(Operator.divide.description, "/")
     }
     
-    func testEmptyExprNoValue() throws {
+    func testEmptyExpr_NoValue() throws {
         let expr = Expr()
         XCTAssertEqual(expr.value, Value())
     }
     
-    func testEmptyRightNoValue() throws {
+    func testEmptyRight_NoValue() throws {
         let lhs = Expr.value(Value(degrees: 1, minutes: 2.3))
         let expr = Expr.binary(op: Operator.add, lhs: lhs, rhs: Expr())
         XCTAssertEqual(expr.value, nil)
         
     }
 
-    func testAddTwoValuesBasicCase() throws {
+    func testAddTwoValues_BasicCase() throws {
         let lhs = Expr.value(Value(degrees: 1, minutes: 2.3))
         let rhs = Expr.value(Value(degrees: 4, minutes: 5.6))
         let expected = Value(degrees: 5, minutes: 7.9)
@@ -41,7 +41,7 @@ final class ExprTests: XCTestCase {
         XCTAssertEqual(expr.description, "(1°02'3 + 4°05'6)")
     }
 
-    func testAddTwoValuesMinutesOverflow() throws {
+    func testAddTwoValues_MinutesOverflow() throws {
         let lhs = Expr.value(Value(degrees: 4, minutes: 30.0))
         let rhs = Expr.value(Value(degrees: 4, minutes: 30.0))
         let expected = Value(degrees: 9, minutes: 0.0)
@@ -49,13 +49,13 @@ final class ExprTests: XCTestCase {
         XCTAssertEqual(expr.value, expected)
     }
 
-    func testMinutesOverflow() throws {
+    func testMinutes_Overflow() throws {
         let expr = Expr.value(Value(degrees: 0, minutes: 185.0))
         let expected = Value(degrees: 3, minutes: 5.0)
         XCTAssertEqual(expr.value, expected)
     }
 
-    func testSubtractTwoValuesBaseCase() throws {
+    func testSubtractTwoValues_BaseCase() throws {
         let lhs = Expr.value(Value(degrees: 4, minutes: 5.6))
         let rhs = Expr.value(Value(degrees: 1, minutes: 2.3))
         let expected = Value(degrees: 3, minutes: 3.3)
@@ -63,7 +63,7 @@ final class ExprTests: XCTestCase {
         XCTAssertEqual(expr.value, expected)
     }
     
-    func testDivideValuesBaseCase() throws {
+    func testDivideValues_BaseCase() throws {
         let lhs = Expr.value(Value(degrees: 1023, minutes: 6.3))
         let rhs = Expr.value(Value(integer: 3))
         let expected = Value(degrees: 341, minutes: 2.1)
@@ -71,7 +71,7 @@ final class ExprTests: XCTestCase {
         XCTAssertEqual(expr.value, expected)
     }
 
-    func testDivideValuesDegreesDivIntoMinutes() throws {
+    func testDivideValues_DegreesDivIntoMinutes() throws {
         let lhs = Expr.value(Value(degrees: 9, minutes: 0.0))
         let rhs = Expr.value(Value(integer: 2))
         let expected = Value(degrees: 4, minutes: 30.0)
@@ -79,7 +79,7 @@ final class ExprTests: XCTestCase {
         XCTAssertEqual(expr.value, expected)
     }
 
-    func testDivideValuesMinutesDivIntoSeconds() throws {
+    func testDivideValues_MinutesDivIntoSeconds() throws {
         let lhs = Expr.value(Value(degrees: 0, minutes: 1.0))
         let rhs = Expr.value(Value(integer: 2))
         let expected = Value(degrees: 0, minutes: 0.5)
@@ -87,7 +87,7 @@ final class ExprTests: XCTestCase {
         XCTAssertEqual(expr.value, expected)
     }
 
-    func testDegreesAndMinutesAddOverflow() throws {
+    func testDegreesAndMinutes_AddOverflow() throws {
         let lhs = Expr.value(Value(degrees: 354, minutes: 54.5))
         let rhs = Expr.value(Value(degrees: 6, minutes: 6.6))
         /*
@@ -99,7 +99,7 @@ final class ExprTests: XCTestCase {
         XCTAssertEqual(expr.value, expected)
     }
     
-    func testDegreesAndMinutesSubtractUnderflow() throws {
+    func testDegreesAndMinutes_SubtractUnderflow() throws {
         let lhs = Expr.value(Value(degrees: 1, minutes: 1.1))
         let rhs = Expr.value(Value(degrees: 6, minutes: 6.6))
         let expected = Value(degrees: 354, minutes: 54.5)
