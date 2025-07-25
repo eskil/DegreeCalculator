@@ -315,6 +315,29 @@ final class ModelData: ObservableObject {
     }
     
     func divide() {
+        // If a number is being entered, attempt to close expression first.
+        if !currentNumber.isEmpty {
+            if !(operatorStack.isEmpty && expressionStack.isEmpty) {
+                equal()
+                // If the expr is still open, bail
+                if !currentNumber.isEmpty {
+                    return
+                }
+            }
+        }
+        
+        // If there's nothing being entered, pull in the previous answer.
+        if currentNumber.isEmpty {
+            // **nothing** being entered, pull in the previous answer.
+            if operatorStack.isEmpty && expressionStack.isEmpty {
+                ans()
+            }
+            // Corner case where there's no answer, it's a NOOP.
+            if currentNumber.isEmpty {
+                return
+            }
+        }
+
         addEntry(Operator.divide.rawValue)
     }
     
@@ -360,9 +383,8 @@ final class ModelData: ObservableObject {
         intOnly = false
         
         if let expr = buildExpr() {
-            NSLog("Expr \(expr)")
-            NSLog("Expr \(expr.description)")
-            NSLog("Expr \(expr.value ?? Value())")
+            NSLog("EQUAL Expr = \(expr)")
+            NSLog("    Result = \(expr.value ?? Value())")
             inputStack.removeAll()
             currentNumber.removeAll()
             expressionStack.removeAll()

@@ -7,12 +7,23 @@
 
 import Foundation
 
-/*
 extension String {
     func leftPadding(toLength: Int, withPad: String = " ") -> String {
         let padCount = toLength - self.count
         guard padCount > 0 else { return self }
         return String(repeating: withPad, count: padCount) + self
+    }
+}
+
+/*
+extension String {
+    func leftPadding(toLength: Int, withPad character: Character) -> String {
+        let newLength = self.count
+        if newLength < toLength {
+            return String(repeatElement(character, count: toLength - newLength)) + self
+        } else {
+            return self
+        }
     }
 }
 */

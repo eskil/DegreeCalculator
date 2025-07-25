@@ -57,6 +57,11 @@ final class ModelDataTests: XCTestCase {
     
     // MARK: Test basic input
     
+    func testModelDataFails() throws {
+        XCTAssertEqual(true, false)
+    }
+
+    
     // Test a full and proper 1°2'3 build
     func testDMS_Entry_BuildFull() throws {
         md.callFunction(CalculatorFunction.ENTRY, label: "1")
@@ -756,6 +761,39 @@ final class ModelDataTests: XCTestCase {
             ),
         ])
     }
+    
+    func testDiv_DMS_FromExpr() {
+        inputString("1°2'3 + 4°5'6")
+        // pressing / terminates the expression w/equal and pulls in the answer
+        inputString("/")
+        XCTAssertEqual(md.intOnly, true)
+        XCTAssertEqual(md.inputStack, Array("5°07'9/"))
+        XCTAssertEqual(md.currentNumber, "")
+        XCTAssertEqual(md.builtExpressions, [
+            Expr.binary(
+                op: Operator.add,
+                lhs: Expr.value(Value(degrees: 1, minutes: 2.3)),
+                rhs: Expr.value(Value(degrees: 4, minutes: 5.6))
+            ),
+        ])
+        inputString("2=")
+        XCTAssertEqual(md.inputStack, [])
+        XCTAssertEqual(md.currentNumber, "")
+        XCTAssertEqual(md.builtExpressions, [
+            Expr.binary(
+                op: Operator.add,
+                lhs: Expr.value(Value(degrees: 1, minutes: 2.3)),
+                rhs: Expr.value(Value(degrees: 4, minutes: 5.6))
+            ),
+            Expr.binary(
+                op: Operator.divide,
+                lhs: Expr.value(Value(degrees: 5, minutes: 7.9)),
+                rhs: Expr.value(Value(integer: 2))
+            ),
+        ])
+    }
+
+    
     func testDiv_HMS_BaseCase() {
         md = makeModel(with: .HMS)
         inputString("2h4m8")

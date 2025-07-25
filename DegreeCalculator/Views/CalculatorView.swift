@@ -7,16 +7,6 @@
 
 import SwiftUI
 
-extension String {
-    func leftPadding(toLength: Int, withPad character: Character) -> String {
-        let newLength = self.count
-        if newLength < toLength {
-            return String(repeatElement(character, count: toLength - newLength)) + self
-        } else {
-            return self
-        }
-    }
-}
 
 struct CalculatorView: View {
     @EnvironmentObject var modelData: ModelData
@@ -133,7 +123,7 @@ struct CalculatorView: View {
                     CalculatorButton(label: "m", function: CalculatorFunction.ENTRY)
                         .disabled(modelData.intOnly)
                     CalculatorButton(label: "=", function: CalculatorFunction.EQUAL)
-#if false // double up size of button
+#if false // double up size of button, but since we added /, we don't do that.
                         .background(
                             GeometryReader { geo in
                                 /* See https://stackoverflow.com/a/68291983/21866895
@@ -169,18 +159,18 @@ struct CalculatorView: View {
                                 if let op = line.trailingOperator {
                                     if op == "=" {
                                         // FIXME: this view could be generalised
-                                        Text(line.value)
+                                        Text(line.value + " " + op)
                                             .frame(maxWidth: .infinity, alignment: .leading)
                                             .foregroundColor(.white)
                                         Underscore
                                     } else if op == "==" {
-                                        Text(line.value)
+                                        Text(line.value + " ")
                                             .frame(maxWidth: .infinity, alignment: .leading)
                                             .foregroundColor(.white)
                                         Underscore
                                         Underscore
                                     } else {
-                                        Text(line.value)
+                                        Text(line.value + " " + op)
                                             .frame(maxWidth: .infinity, alignment: .leading)
                                             .foregroundColor(.white)
                                         

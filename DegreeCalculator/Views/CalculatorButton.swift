@@ -89,9 +89,11 @@ struct CalculatorButton: View {
     }
     
     var body: some View {
-        Button(action: {
-            modelData.callFunction(function, label: label)
-        }) {
+        Button(
+            action: {
+                modelData.callFunction(function, label: label)
+            }
+        ) {
             Text(label)
                 .font(.system(.largeTitle, design: .monospaced))
         }

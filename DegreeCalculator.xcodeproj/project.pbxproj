@@ -14,6 +14,7 @@
 		DA61AEFE2A1840FB00048DAB /* DegreeCalculatorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA61AEFD2A1840FB00048DAB /* DegreeCalculatorTests.swift */; };
 		DA61AF082A1840FB00048DAB /* DegreeCalculatorUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA61AF072A1840FB00048DAB /* DegreeCalculatorUITests.swift */; };
 		DA61AF0A2A1840FB00048DAB /* DegreeCalculatorUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA61AF092A1840FB00048DAB /* DegreeCalculatorUITestsLaunchTests.swift */; };
+		DA63AAE72E32F867000C1FFC /* DisplayLinesViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA63AAE62E32F867000C1FFC /* DisplayLinesViews.swift */; };
 		DAA33A8F2A38080F00EA7A2B /* ExprTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAA33A8E2A38080F00EA7A2B /* ExprTests.swift */; };
 		DAB074952E1892E600866A30 /* Value.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAB074942E1892E400866A30 /* Value.swift */; };
 		DAB074972E18934800866A30 /* ValueTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAB074962E18934700866A30 /* ValueTests.swift */; };
@@ -56,6 +57,7 @@
 		DA61AF032A1840FB00048DAB /* DegreeCalculatorUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = DegreeCalculatorUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		DA61AF072A1840FB00048DAB /* DegreeCalculatorUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DegreeCalculatorUITests.swift; sourceTree = "<group>"; };
 		DA61AF092A1840FB00048DAB /* DegreeCalculatorUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DegreeCalculatorUITestsLaunchTests.swift; sourceTree = "<group>"; };
+		DA63AAE62E32F867000C1FFC /* DisplayLinesViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DisplayLinesViews.swift; sourceTree = "<group>"; };
 		DAA33A8E2A38080F00EA7A2B /* ExprTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExprTests.swift; sourceTree = "<group>"; };
 		DAA33A902A38169600EA7A2B /* DegreeCalculator.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = DegreeCalculator.xctestplan; sourceTree = "<group>"; };
 		DAB074942E1892E400866A30 /* Value.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Value.swift; sourceTree = "<group>"; };
@@ -169,6 +171,7 @@
 				DACF745F2A2958D300826755 /* CalculatorView.swift */,
 				DACF74652A2A923300826755 /* CalculatorButton.swift */,
 				DA61AEEE2A1840F900048DAB /* RootView.swift */,
+				DA63AAE62E32F867000C1FFC /* DisplayLinesViews.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -325,6 +328,7 @@
 			files = (
 				DA61AEEF2A1840F900048DAB /* RootView.swift in Sources */,
 				DACF74662A2A923300826755 /* CalculatorButton.swift in Sources */,
+				DA63AAE72E32F867000C1FFC /* DisplayLinesViews.swift in Sources */,
 				DACF745C2A1A834200826755 /* ModelData.swift in Sources */,
 				DADF90C22E1B57060024AE19 /* AppState.swift in Sources */,
 				DAE029632E31538500DE778C /* ModelDisplay.swift in Sources */,
