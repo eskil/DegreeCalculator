@@ -136,10 +136,8 @@ final class ModelData: ObservableObject {
     /** When last operator is divide, disable degrees/jhours/minutes input */
     @Published var intOnly: Bool = false
     
-    /** The entry mode for this model.
-     NOTE: This could be encapsulated in the class hierarchy and I might do that some day.
-     */
-    var exprMode: ExprMode = .DMS
+    /** The entry mode for this model. */
+    let exprMode: ExprMode
     
     /**
      Main access point for the model data
@@ -379,8 +377,6 @@ final class ModelData: ObservableObject {
         if expressionStack.isEmpty {
             return
         }
-        // Reenable this in case it was disabled while inputting a number for division
-        intOnly = false
         
         if let expr = buildExpr() {
             NSLog("EQUAL Expr = \(expr)")
@@ -389,6 +385,9 @@ final class ModelData: ObservableObject {
             currentNumber.removeAll()
             expressionStack.removeAll()
             operatorStack.removeAll()
+            // Reset this now, since buildExpr replays the input,
+            // so it could have gotten toggled.
+            intOnly = false
         }
     }
     
@@ -594,9 +593,12 @@ final class ModelData: ObservableObject {
         expressionStack.removeAll()
         operatorStack.removeAll()
         currentNumber.removeAll()
+        let tmp = intOnly
+        intOnly = false
         for char in backup {
             addEntry(char)
         }
+        intOnly = tmp
     }
 
 }

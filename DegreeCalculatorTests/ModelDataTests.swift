@@ -452,9 +452,9 @@ final class ModelDataTests: XCTestCase {
         
         // Full expression
         inputString("1°2'3 + 4°5'6 =")
-        // Extra /
+        // Extra / on an empty expression uses ans() to start
         inputString("/")
-        XCTAssertEqual(md.inputStack, Array("5°"))
+        XCTAssertEqual(md.inputStack, Array("5°07'9/"))
         XCTAssertEqual(md.currentNumber, "")
         XCTAssertEqual(md.builtExpressions, [
             Expr.binary(op: Operator.add,
@@ -745,7 +745,8 @@ final class ModelDataTests: XCTestCase {
         XCTAssertEqual(md.currentNumber, "2")
         XCTAssertEqual(md.builtExpressions, [])
 
-        md.callFunction(CalculatorFunction.EQUAL, label: "")
+        inputString("=")
+        XCTAssertEqual(md.intOnly, false) // Ensure we again allow DMS/HMS input
         XCTAssertEqual(md.inputStack, [])
         XCTAssertEqual(md.currentNumber, "")
         XCTAssertEqual(md.builtExpressions, [
@@ -809,7 +810,8 @@ final class ModelDataTests: XCTestCase {
         XCTAssertEqual(md.currentNumber, "2")
         XCTAssertEqual(md.builtExpressions, [])
 
-        md.callFunction(CalculatorFunction.EQUAL, label: "")
+        inputString("=")
+        XCTAssertEqual(md.intOnly, false) // Ensure we again allow DMS/HMS input
         XCTAssertEqual(md.inputStack, [])
         XCTAssertEqual(md.currentNumber, "")
         XCTAssertEqual(md.builtExpressions, [
