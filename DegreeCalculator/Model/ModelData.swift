@@ -105,6 +105,7 @@ extension String {
         return true
     }
 }
+
 /**
  ModelData is the observable entity that the UI interacts with.
  
@@ -121,17 +122,31 @@ extension String {
  
  The naming stems from the SwiftUI tutorials.
 */
-final class ModelData: ObservableObject {
+final class ModelData {
     /* Controls whether we're doing degrees-minutes-seconds math or hours-minutes-seconds
      */
     enum ExprMode {
         case DMS
         case HMS
-    }
         
+        func toHint() -> Value.ValueTypeHint {
+            switch self {
+            case .DMS:
+                return .dms
+            case .HMS:
+                return .hms
+            }
+        }
+    }
+
+    /** The entry mode for this model. */
+    let exprMode: ExprMode
+    
+
     init(mode: ExprMode) {
         self.exprMode = mode
     }
+    
     
     /**
      builtExpressions is the list of expressions built.
@@ -140,7 +155,7 @@ final class ModelData: ObservableObject {
      and a new expression is started.
      So in short, this stores all expressions computer until a allClear is issued.
      */
-    @Published var builtExpressions: [Expr] = []
+    var builtExpressions: [Expr] = []
     
     /**
      The inputStack is the raw unprocessed sequence of characters input by the user.
@@ -161,7 +176,7 @@ final class ModelData: ObservableObject {
      
      it is difrerent from the inputStack in that it's manipulated, not just user entered data. Eg. for DMS values, if you enter "'" alone, "0°0" is prepended.
      */
-    @Published var currentNumber: String = ""
+    internal var currentNumber: String = ""
     
     /**
      expressionStack is the stack of evaluated subexpressions.
@@ -198,10 +213,7 @@ final class ModelData: ObservableObject {
     var operatorStack: [Operator] = []
     
     /** When last operator is divide, disable degrees/jhours/minutes input */
-    @Published var intOnly: Bool = false
-    
-    /** The entry mode for this model. */
-    let exprMode: ExprMode
+    internal var intOnly: Bool = false
     
     /**
      Main access point for the model data
@@ -217,32 +229,32 @@ final class ModelData: ObservableObject {
      callFunction(EQUAL, "")
      */
     func callFunction(_ f: CalculatorFunction, label: String) {
-        let _ = ExecutionTimer("thread: \(Thread.current): ModelData.callFunction \(f) label: \(label)")
-        
+        let _ = ExecutionTimer("thread: \(Thread.current): ModelData.callFunction \(f) label: \(label)", indent:1 )
+                
         switch f {
         case .ANS:
-            return ans()
+            ans()
         case .ALL_CLEAR:
-            return allClear()
+            allClear()
         case .CLEAR:
-            return clear()
+            clear()
         case .DELETE:
-            return delete()
+            delete()
         case .ADD:
-             return add()
+             add()
         case .SUBTRACT:
-             return subtract()
+             subtract()
         case .DIV:
-             return divide()
+             divide()
         case .M360:
-             return minus_360()
+             minus_360()
         case .EQUAL:
-            return equal()
+            equal()
         case .ENTRY:
             if label.count == 1,
                let char = label.first
             {
-                return addEntry(char)
+                addEntry(char)
             }
         }
     }
@@ -250,46 +262,35 @@ final class ModelData: ObservableObject {
     // NOTE: _ is a Swift syntax to indicate the argument doesn't need to be named when
     // called, ie. addEntry("str") instead of addEntry(string: "str")
     func addEntry(_ char: Character) {
-        // Copy currentNunmber and mutate via String extentions addDegreeHours and addMinutes.
-        // They then update it and we set updateCurrentNumber to true to update currentNumber
-        // on the appropriate thread. This reduces updates to the @published variable
-        var currentNumberCopy = currentNumber
-        var updateCurrentNumber = false
-
         /**
          If it's a number or dms/hms char, append to currentNumber, otherwise it's an
          operator and we start an expression on expressionStack.
          */
         if char.isNumber {
             inputStack.append(char)
-            currentNumberCopy.append(char)
-            updateCurrentNumber = true
+            currentNumber.append(char)
         }
         else if exprMode == .DMS && char == "°" && !intOnly {
-            if currentNumberCopy.addDegreeHour(mode: exprMode) {
+            if currentNumber.addDegreeHour(mode: exprMode) {
                 inputStack.append(char)
-                updateCurrentNumber = true
             }
         }
         else if exprMode == .DMS && char == "'" && !intOnly {
-            if currentNumberCopy.addMinutes(mode: exprMode) {
+            if currentNumber.addMinutes(mode: exprMode) {
                 inputStack.append(char)
-                updateCurrentNumber = true
             }
         }
         else if exprMode == .HMS && char == "h" && !intOnly {
-            if currentNumberCopy.addDegreeHour(mode: exprMode) {
+            if currentNumber.addDegreeHour(mode: exprMode) {
                 inputStack.append(char)
-                updateCurrentNumber = true
             }
         }
         else if exprMode == .HMS && char == "m" && !intOnly {
-            if currentNumberCopy.addMinutes(mode: exprMode) {
+            if currentNumber.addMinutes(mode: exprMode) {
                 inputStack.append(char)
-                updateCurrentNumber = true
             }
         }
-        else if !currentNumberCopy.isEmpty, let inputOp = Operator(rawValue: char) {
+        else if !currentNumber.isEmpty, let inputOp = Operator(rawValue: char) {
             inputStack.append(char)
             /**
              We're entering an operator, so convert the currentNumber
@@ -297,10 +298,9 @@ final class ModelData: ObservableObject {
              This makes it availble for composing into a new expression
              depending on the precedence of the operator.
              */
-            if let val = Value(parsing: currentNumberCopy, hint: intOnly ? .integer : (exprMode == .DMS ? .dms : .hms)) {
+            if let val = Value(parsing: currentNumber, hint: intOnly ? .integer : exprMode.toHint()) {
                 expressionStack.append(.value(val))
-                currentNumberCopy = ""
-                updateCurrentNumber = true
+                currentNumber = ""
             }
             /**
              As long as the top of the operator stack has higher or equal
@@ -317,16 +317,6 @@ final class ModelData: ObservableObject {
             // If we've entered an divide operator, only accept ints - no division by dms/hms.
             if inputOp == Operator.divide {
                 intOnly = true
-            }
-        }
-        
-        if updateCurrentNumber {
-            if Thread.isMainThread {
-                self.currentNumber = currentNumberCopy
-            } else {
-                DispatchQueue.main.async {
-                    self.currentNumber = currentNumberCopy
-                }
             }
         }
     }
@@ -459,13 +449,13 @@ final class ModelData: ObservableObject {
         if let expr = buildExpr() {
             NSLog("EQUAL Expr = \(expr)")
             NSLog("    Result = \(expr.value ?? Value())")
+            // Reset this now, since buildExpr replays the input,
+            // so it could have gotten toggled.
+            intOnly = false
             inputStack.removeAll()
             currentNumber.removeAll()
             expressionStack.removeAll()
             operatorStack.removeAll()
-            // Reset this now, since buildExpr replays the input,
-            // so it could have gotten toggled.
-            intOnly = false
         }
     }
     
@@ -473,7 +463,7 @@ final class ModelData: ObservableObject {
     Build an expression from the current expressionStack and operatorStack.
     */
     func buildExpr() -> Expr? {
-        let _ = ExecutionTimer("thread: \(Thread.current): ModelData.buildExpr \(self)")
+        let _ = ExecutionTimer("thread: \(Thread.current): ModelData.buildExpr \(self)", indent: 2)
 
         NSLog("BUILD")
         /* Why this rebuild? Because of the expression has become partly formed
@@ -499,7 +489,7 @@ final class ModelData: ObservableObject {
         If a number is being entered, ensure it's processed and on the expressionStack.
         This manipulates the stacks and why we call rebuildExpr early
         */
-        if let val = Value(parsing: currentNumber, hint: intOnly ? .integer : (exprMode == .DMS ? .dms : .hms)) {
+        if let val = Value(parsing: currentNumber, hint: intOnly ? .integer : exprMode.toHint()) {
             expressionStack.append(Expr.value(val))
             currentNumber = ""
         } else {
@@ -579,12 +569,15 @@ final class ModelData: ObservableObject {
         expressionStack.removeAll()
         operatorStack.removeAll()
         currentNumber.removeAll()
-        let tmp = intOnly
+
+        // let tmp = intOnly
+        // defer { intOnly = tmp }
+
+        // Turn off intonly, addEntry sets it to true if we're ending on a /
         intOnly = false
         for char in backup {
             addEntry(char)
         }
-        intOnly = tmp
     }
 
 }

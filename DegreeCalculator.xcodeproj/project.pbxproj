@@ -14,7 +14,7 @@
 		DA61AEFE2A1840FB00048DAB /* DegreeCalculatorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA61AEFD2A1840FB00048DAB /* DegreeCalculatorTests.swift */; };
 		DA61AF082A1840FB00048DAB /* DegreeCalculatorUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA61AF072A1840FB00048DAB /* DegreeCalculatorUITests.swift */; };
 		DA61AF0A2A1840FB00048DAB /* DegreeCalculatorUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA61AF092A1840FB00048DAB /* DegreeCalculatorUITestsLaunchTests.swift */; };
-		DA63AAE72E32F867000C1FFC /* DisplayLinesViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA63AAE62E32F867000C1FFC /* DisplayLinesViews.swift */; };
+		DA63AAE72E32F867000C1FFC /* DisplayLinesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA63AAE62E32F867000C1FFC /* DisplayLinesView.swift */; };
 		DA73AD212E332F8800E85EC9 /* ExecutionTimer.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA73AD202E332F8800E85EC9 /* ExecutionTimer.swift */; };
 		DAA33A8F2A38080F00EA7A2B /* ExprTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAA33A8E2A38080F00EA7A2B /* ExprTests.swift */; };
 		DAB074952E1892E600866A30 /* Value.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAB074942E1892E400866A30 /* Value.swift */; };
@@ -26,7 +26,7 @@
 		DACF74662A2A923300826755 /* CalculatorButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = DACF74652A2A923300826755 /* CalculatorButton.swift */; };
 		DADF90C22E1B57060024AE19 /* AppState.swift in Sources */ = {isa = PBXBuildFile; fileRef = DADF90C12E1B57020024AE19 /* AppState.swift */; };
 		DAE002602A38EF1800502C2E /* ModelDataTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAE0025F2A38EF1800502C2E /* ModelDataTests.swift */; };
-		DAE029632E31538500DE778C /* ModelDisplay.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAE029622E31538500DE778C /* ModelDisplay.swift */; };
+		DAE029632E31538500DE778C /* ObservableModelData.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAE029622E31538500DE778C /* ObservableModelData.swift */; };
 		DAE029682E3156B300DE778C /* ModelDisplayTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAE029672E3156B300DE778C /* ModelDisplayTests.swift */; };
 /* End PBXBuildFile section */
 
@@ -58,7 +58,7 @@
 		DA61AF032A1840FB00048DAB /* DegreeCalculatorUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = DegreeCalculatorUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		DA61AF072A1840FB00048DAB /* DegreeCalculatorUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DegreeCalculatorUITests.swift; sourceTree = "<group>"; };
 		DA61AF092A1840FB00048DAB /* DegreeCalculatorUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DegreeCalculatorUITestsLaunchTests.swift; sourceTree = "<group>"; };
-		DA63AAE62E32F867000C1FFC /* DisplayLinesViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DisplayLinesViews.swift; sourceTree = "<group>"; };
+		DA63AAE62E32F867000C1FFC /* DisplayLinesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DisplayLinesView.swift; sourceTree = "<group>"; };
 		DA73AD202E332F8800E85EC9 /* ExecutionTimer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExecutionTimer.swift; sourceTree = "<group>"; };
 		DAA33A8E2A38080F00EA7A2B /* ExprTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExprTests.swift; sourceTree = "<group>"; };
 		DAA33A902A38169600EA7A2B /* DegreeCalculator.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = DegreeCalculator.xctestplan; sourceTree = "<group>"; };
@@ -73,7 +73,7 @@
 		DACF74652A2A923300826755 /* CalculatorButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalculatorButton.swift; sourceTree = "<group>"; };
 		DADF90C12E1B57020024AE19 /* AppState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppState.swift; sourceTree = "<group>"; };
 		DAE0025F2A38EF1800502C2E /* ModelDataTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModelDataTests.swift; sourceTree = "<group>"; };
-		DAE029622E31538500DE778C /* ModelDisplay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModelDisplay.swift; sourceTree = "<group>"; };
+		DAE029622E31538500DE778C /* ObservableModelData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ObservableModelData.swift; sourceTree = "<group>"; };
 		DAE029672E3156B300DE778C /* ModelDisplayTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModelDisplayTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -173,7 +173,7 @@
 				DACF745F2A2958D300826755 /* CalculatorView.swift */,
 				DACF74652A2A923300826755 /* CalculatorButton.swift */,
 				DA61AEEE2A1840F900048DAB /* RootView.swift */,
-				DA63AAE62E32F867000C1FFC /* DisplayLinesViews.swift */,
+				DA63AAE62E32F867000C1FFC /* DisplayLinesView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -184,7 +184,7 @@
 				DAB074942E1892E400866A30 /* Value.swift */,
 				DACF745D2A266EC000826755 /* Expr.swift */,
 				DACF745B2A1A834200826755 /* ModelData.swift */,
-				DAE029622E31538500DE778C /* ModelDisplay.swift */,
+				DAE029622E31538500DE778C /* ObservableModelData.swift */,
 				DA73AD202E332F8800E85EC9 /* ExecutionTimer.swift */,
 			);
 			path = Model;
@@ -332,10 +332,10 @@
 				DA61AEEF2A1840F900048DAB /* RootView.swift in Sources */,
 				DA73AD212E332F8800E85EC9 /* ExecutionTimer.swift in Sources */,
 				DACF74662A2A923300826755 /* CalculatorButton.swift in Sources */,
-				DA63AAE72E32F867000C1FFC /* DisplayLinesViews.swift in Sources */,
+				DA63AAE72E32F867000C1FFC /* DisplayLinesView.swift in Sources */,
 				DACF745C2A1A834200826755 /* ModelData.swift in Sources */,
 				DADF90C22E1B57060024AE19 /* AppState.swift in Sources */,
-				DAE029632E31538500DE778C /* ModelDisplay.swift in Sources */,
+				DAE029632E31538500DE778C /* ObservableModelData.swift in Sources */,
 				DAB074952E1892E600866A30 /* Value.swift in Sources */,
 				DACF745E2A266EC000826755 /* Expr.swift in Sources */,
 				DACF74602A2958D300826755 /* CalculatorView.swift in Sources */,

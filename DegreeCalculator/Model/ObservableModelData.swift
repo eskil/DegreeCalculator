@@ -55,8 +55,67 @@ extension Expr {
     }
 }
 
-extension ModelData {
-    func displayLines() -> [DisplayLine] {
+final class ObservableModelData: ObservableObject {
+    var md: ModelData
+    
+    init(mode: ModelData.ExprMode) {
+        self.exprMode = mode
+        self.md = ModelData(mode: mode)
+    }
+    
+    let exprMode: ModelData.ExprMode
+    
+    /* UI published version of ModelData variables */
+    @Published var builtExpressions: [Expr] = []
+    @Published private(set) var currentNumber: String = ""
+    @Published private(set) var intOnly: Bool = false
+    @Published var displayLinesCache: [DisplayLine] = []
+
+
+    /**
+     Main access point for the model data
+     It takes a CalculatorFunction (enum) and in the case of ENTRY, the label, a string that
+     contains the text being entered.
+     
+     Eg. a simple addition of 10 + 5
+     ```
+     callFunction(ENTRY, "1")
+     callFunction(ENTRY, "0")
+     callFunction(ADD, "")
+     callFunction(ENTRY, "5")
+     callFunction(EQUAL, "")
+     */
+    func callFunction(_ f: CalculatorFunction, label: String) {
+        let _ = ExecutionTimer("thread: \(Thread.current): ObservableModelData.callFunction \(f) label: \(label)")
+        md.callFunction(f, label: label)
+        displayLinesCache = self.computeDisplayLines()
+        publishVars()
+    }
+    
+    func publishVars() {
+        // Update UI thread
+        let update = {
+            if self.currentNumber != self.md.currentNumber {
+                self.currentNumber = self.md.currentNumber
+            }
+            if self.intOnly != self.md.intOnly {
+                self.intOnly = self.md.intOnly
+            }
+            if self.builtExpressions != self.md.builtExpressions {
+                self.builtExpressions = self.md.builtExpressions
+            }
+        }
+        
+        if Thread.isMainThread {
+            update()
+        } else {
+            DispatchQueue.main.async {
+                update()
+            }
+        }
+    }
+
+    private func computeDisplayLines() -> [DisplayLine] {
         let _ = ExecutionTimer("thread: \(Thread.current): ModelData.displayLines() -> [DisplayLine]")
 
         var result: [DisplayLine] = []
@@ -68,20 +127,20 @@ extension ModelData {
         }
 
         // 2. Current in-progress expression
-        for (i, expr) in expressionStack.enumerated() {
+        for (i, expr) in self.md.expressionStack.enumerated() {
             let displayLines = expr.displayLines(includeResult: false)
             result.append(contentsOf: displayLines.dropLast())
             let line: DisplayLine = displayLines.last!
 
             // Show operator if one exists for this expression
-            if i < operatorStack.count {
-                result.append(DisplayLine(value: line.value, trailingOperator: operatorStack[i].description))
+            if i < self.md.operatorStack.count {
+                result.append(DisplayLine(value: line.value, trailingOperator: self.md.operatorStack[i].description))
             }
         }
 
         // 3. Current input number
-        if !currentNumber.isEmpty {
-            result.append(DisplayLine(value: currentNumber.leftPadding(toLength: 11, withPad: " "), trailingOperator: nil))
+        if !self.md.currentNumber.isEmpty {
+            result.append(DisplayLine(value: self.md.currentNumber.leftPadding(toLength: 11, withPad: " "), trailingOperator: nil))
         }
 
         return result.enumerated().map { DisplayLine(id: $0.offset, value: $0.element.value, trailingOperator: $0.element.trailingOperator) }

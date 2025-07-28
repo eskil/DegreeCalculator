@@ -9,6 +9,6 @@ import SwiftUI
 
 
 final class AppState: ObservableObject {
-    @Published public var dmsData = ModelData(mode: .DMS)
-    @Published public var hmsData = ModelData(mode: .HMS)
+    @Published public var dmsData = ObservableModelData(mode: .DMS)
+    @Published public var hmsData = ObservableModelData(mode: .HMS)
 }

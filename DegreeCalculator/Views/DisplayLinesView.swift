@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct DisplayLinesView: View {
-    @ObservedObject var model: ModelData
+    @ObservedObject var model: ObservableModelData
 
     var Underscore: some View {
         Rectangle()
@@ -19,16 +19,11 @@ struct DisplayLinesView: View {
             .padding(.top, -14)
             .padding(.bottom, 0)
     }
-    
-    var lines: [DisplayLine] {
-        let result = model.displayLines()
-        return result
-    }
-    
+ 
     var body: some View {
         ScrollView {
             ScrollViewReader { scroll_reader in
-                ForEach(model.displayLines(), id: \.id) { line in
+                ForEach(model.displayLinesCache, id: \.id) { line in
                     // https://sarunw.com/posts/how-to-make-swiftui-view-fill-container-width-and-height/
                     VStack {
                         if let op = line.trailingOperator {
@@ -58,23 +53,25 @@ struct DisplayLinesView: View {
                     }
                     .id(line.id)
                 }                
-                .onChange(of: lines) { _ in
+                .onChange(of: model.displayLinesCache) { lines in
                     NSLog("change on entered lines count is \(lines.count)")
                     // The -1 is to scroll to id:5 when list has 6 elements - starts at 0.
                     // Alternatively, assign id:1, 2...
                     DispatchQueue.main.async {
                         NSLog("onChange scroll to bottom")
-                        scroll_reader.scrollTo(lines.count-1, anchor: .bottom)
+                        scroll_reader.scrollTo(l.count-1, anchor: .bottom)
                     }
                 }
                 .onAppear {
                     DispatchQueue.main.async {
                         NSLog("onAppear scroll to bottom")
-                        scroll_reader.scrollTo(lines.count-1, anchor: .bottom)
+                        scroll_reader.scrollTo(model.displayLinesCache.count-1, anchor: .bottom)
                     }
                 }
             }
+            .transaction { $0.animation = nil }
         }
+        .transaction { $0.animation = nil }
         //.frame(width: geo.size.width, height: geo.size.height/2)
         .font(.system(.largeTitle, design: .monospaced))
         .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -84,9 +81,14 @@ struct DisplayLinesView: View {
 
 struct DisplayLinesView_Previews: PreviewProvider {
     static func previewFor(deviceName: String, mode: ModelData.ExprMode) -> some View {
-        let model = ModelData(mode: mode)
-                
-        return DisplayLinesView(model: model)
+        let md = ObservableModelData(mode: mode)
+        
+        md.callFunction(CalculatorFunction.ENTRY, label: "1")
+        md.callFunction(CalculatorFunction.ADD, label: "")
+        md.callFunction(CalculatorFunction.ENTRY, label: "2")
+        md.callFunction(CalculatorFunction.EQUAL, label: "")
+
+        return DisplayLinesView(model: md)
             .previewDevice(PreviewDevice(rawValue: deviceName))
             .previewDisplayName(deviceName + " - \(mode)")
     }

@@ -9,20 +9,9 @@ import SwiftUI
 
 
 struct CalculatorView: View {
-    @EnvironmentObject var modelData: ModelData
+    @EnvironmentObject var modelData: ObservableModelData
     @State var padTop = 0.0
     @State var padRight = 0.0
-
-    var lines: [DisplayLine] {
-        NSLog("Expressions changed, recomputing lines")
-        let result = modelData.displayLines()
-        NSLog("computed lines modelData intOnly is \(modelData.intOnly)")
-        NSLog("computed lines")
-        for line in result {
-            NSLog("\tline \(line)")
-        }
-        return result
-    }
     
     var Underscore: some View {
         Rectangle()
@@ -188,10 +177,15 @@ struct CalculatorView: View {
 
 struct CalculatorView_Previews: PreviewProvider {
     static func previewFor(deviceName: String, mode: ModelData.ExprMode) -> some View {
-        let model = ModelData(mode: mode)
+        let md = ObservableModelData(mode: mode)
                 
+        md.callFunction(CalculatorFunction.ENTRY, label: "1")
+        md.callFunction(CalculatorFunction.ADD, label: "")
+        md.callFunction(CalculatorFunction.ENTRY, label: "2")
+        md.callFunction(CalculatorFunction.EQUAL, label: "")
+
         return CalculatorView()
-            .environmentObject(model)
+            .environmentObject(md)
             .previewDevice(PreviewDevice(rawValue: deviceName))
             .previewDisplayName(deviceName + " - \(mode)")
     }

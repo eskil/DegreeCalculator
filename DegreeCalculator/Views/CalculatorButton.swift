@@ -34,7 +34,7 @@ extension UIColor {
 }
 
 struct CalculatorButton: View {
-    @EnvironmentObject var modelData: ModelData
+    @EnvironmentObject var modelData: ObservableModelData
     @Environment(\.isEnabled) var isEnabled
 
     var label: String
@@ -114,7 +114,7 @@ struct CalculatorButton_Previews: PreviewProvider {
     static var previews: some View {
         ForEach(["iPhone 11 Pro", "iPhone 13 Pro", "iPhone 14 Pro", "iPhone SE (3rd generation)", "iPad (10th generation)"], id: \.self) { deviceName in
             CalculatorButton(label: "Y")
-                .environmentObject(ModelData(mode: .DMS))
+                .environmentObject(ObservableModelData(mode: .DMS))
                 .previewDevice(PreviewDevice(rawValue: deviceName))
                 .previewDisplayName(deviceName)
         }
