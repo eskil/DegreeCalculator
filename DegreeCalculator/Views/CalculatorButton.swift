@@ -91,7 +91,9 @@ struct CalculatorButton: View {
     var body: some View {
         Button(
             action: {
-                modelData.callFunction(function, label: label)
+                DispatchQueue.global().async {
+                    modelData.callFunction(function, label: label)
+                }
             }
         ) {
             Text(label)
@@ -100,7 +102,9 @@ struct CalculatorButton: View {
         .buttonStyle(CalculatorButtonStyle(foregroundColor: fg, backgroundColor: bg))
         .onTapGesture(count: 3) {
              if let fn = tripleTapFunction {
-                 modelData.callFunction(fn, label: label)
+                 DispatchQueue.global().async {
+                     modelData.callFunction(fn, label: label)
+                 }
              }
          }
     }

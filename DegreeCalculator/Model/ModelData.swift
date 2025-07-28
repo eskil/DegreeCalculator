@@ -40,7 +40,71 @@ enum CalculatorFunction: Int {
     case M360
 }
 
+extension String {
+    mutating func addDegreeHour(mode: ModelData.ExprMode) -> Bool {
+        switch mode {
+        case .DMS:
+            guard !self.contains("°") else {
+                return false
+            }
 
+            if self.isEmpty {
+                self = "0°"
+            } else {
+                self += "°"
+            }
+        case .HMS:
+            guard !self.contains("h") else {
+                return false
+            }
+
+            if self.isEmpty {
+                self = "0h"
+            } else {
+                self += "h"
+            }
+        }
+        return true
+    }
+    
+    mutating func addMinutes(mode: ModelData.ExprMode) -> Bool {
+        switch mode {
+        case .DMS:
+            // We already set minutes
+            guard !self.contains("'") else {
+                return false
+            }
+            // If we haven't set °, prefix 0°
+            if !self.contains("°")  {
+                self = "0°" + self
+            }
+            // If the last char isn't a number, we're entering "'", so put a 0
+            if let c = self.last {
+                if !c.isNumber {
+                    self += "0"
+                }
+            }
+            self += "'"
+        case .HMS:
+            // We already set minutes
+            guard !self.contains("m") else {
+                return false
+            }
+            // If we haven't set h, prefix 0h
+            if !self.contains("h") {
+                self = "0h" + self
+            }
+            // If the last char isn't a number, we're entering "m", so put a 0 up front
+            if let c = self.last {
+                if !c.isNumber {
+                    self += "0"
+                }
+            }
+            self += "m"
+        }
+        return true
+    }
+}
 /**
  ModelData is the observable entity that the UI interacts with.
  
@@ -186,7 +250,11 @@ final class ModelData: ObservableObject {
     // NOTE: _ is a Swift syntax to indicate the argument doesn't need to be named when
     // called, ie. addEntry("str") instead of addEntry(string: "str")
     func addEntry(_ char: Character) {
-        NSLog("addEntry (\(char))")
+        // Copy currentNunmber and mutate via String extentions addDegreeHours and addMinutes.
+        // They then update it and we set updateCurrentNumber to true to update currentNumber
+        // on the appropriate thread. This reduces updates to the @published variable
+        var currentNumberCopy = currentNumber
+        var updateCurrentNumber = false
 
         /**
          If it's a number or dms/hms char, append to currentNumber, otherwise it's an
@@ -194,36 +262,33 @@ final class ModelData: ObservableObject {
          */
         if char.isNumber {
             inputStack.append(char)
-            currentNumber.append(char)
+            currentNumberCopy.append(char)
+            updateCurrentNumber = true
         }
         else if exprMode == .DMS && char == "°" && !intOnly {
-            if addDegreeHour() {
+            if currentNumberCopy.addDegreeHour(mode: exprMode) {
                 inputStack.append(char)
+                updateCurrentNumber = true
             }
         }
         else if exprMode == .DMS && char == "'" && !intOnly {
-            if addMinutes() {
+            if currentNumberCopy.addMinutes(mode: exprMode) {
                 inputStack.append(char)
+                updateCurrentNumber = true
             }
         }
         else if exprMode == .HMS && char == "h" && !intOnly {
-            if addDegreeHour() {
+            if currentNumberCopy.addDegreeHour(mode: exprMode) {
                 inputStack.append(char)
+                updateCurrentNumber = true
             }
         }
         else if exprMode == .HMS && char == "m" && !intOnly {
-            if addMinutes() {
+            if currentNumberCopy.addMinutes(mode: exprMode) {
                 inputStack.append(char)
+                updateCurrentNumber = true
             }
         }
-        /*
-        else if exprMode == .HMS && char == "s" {
-            if addSeconds() {
-                inputStack.append(char)
-                currentNumber.append(char)
-            }
-        }
-        */
         else if !currentNumber.isEmpty, let inputOp = Operator(rawValue: char) {
             inputStack.append(char)
             /**
@@ -234,7 +299,8 @@ final class ModelData: ObservableObject {
              */
             if let val = Value(parsing: currentNumber, hint: intOnly ? .integer : (exprMode == .DMS ? .dms : .hms)) {
                 expressionStack.append(.value(val))
-                currentNumber = ""
+                currentNumberCopy = ""
+                updateCurrentNumber = true
             }
             /**
              As long as the top of the operator stack has higher or equal
@@ -251,6 +317,16 @@ final class ModelData: ObservableObject {
             // If we've entered an divide operator, only accept ints - no division by dms/hms.
             if inputOp == Operator.divide {
                 intOnly = true
+            }
+        }
+        
+        if updateCurrentNumber {
+            if Thread.isMainThread {
+                self.currentNumber = currentNumberCopy
+            } else {
+                DispatchQueue.main.async {
+                    self.currentNumber = currentNumberCopy
+                }
             }
         }
     }
@@ -393,104 +469,12 @@ final class ModelData: ObservableObject {
         }
     }
     
-    func addDegreeHour() -> Bool {
-        switch exprMode {
-        case .DMS:
-            if currentNumber.contains("°") {
-                return false
-            }
-            if currentNumber.isEmpty {
-                currentNumber = "0°"
-            } else {
-                currentNumber += "°"
-            }
-        case .HMS:
-            if currentNumber.contains("h") {
-                return false
-            }
-            if currentNumber.isEmpty {
-                currentNumber = "0h"
-            } else {
-                currentNumber += "h"
-            }
-        }
-        return true
-    }
-    
-    func addMinutes() -> Bool {
-        switch exprMode {
-        case .DMS:
-            // We already set minutes
-            if currentNumber.contains("'") {
-                return false
-            }
-            // If we haven't set °, prefix 0°
-            if currentNumber.contains("°") == false {
-                currentNumber = "0°" + currentNumber
-            }
-            // If the last char isn't a number, we're entering "'", so put a 0
-            if let c = currentNumber.last {
-                if c.isNumber == false {
-                    currentNumber += "0"
-                }
-            }
-            currentNumber += "'"
-        case .HMS:
-            // We already set minutes
-            if currentNumber.contains("m") {
-                return false
-            }
-            // If we haven't set h, prefix 0h
-            if currentNumber.contains("h") == false {
-                currentNumber = "0h" + currentNumber
-            }
-            // If the last char isn't a number, we're entering "m", so put a 0 up front
-            if let c = currentNumber.last {
-                if c.isNumber == false {
-                    currentNumber += "0"
-                }
-            }
-            currentNumber += "m"
-        }
-        return true
-    }
-    
-    /*
-    func addSeconds() -> Bool {
-        switch exprMode {
-        case .DMS:
-            break;
-        case .HMS:
-            // We already set seconds
-            if currentNumber.contains("s") {
-                return false
-            }
-            // If we haven't set m, prefix 0m
-            if currentNumber.contains("m") == false {
-                currentNumber = "0m" + currentNumber
-            }
-            // If we haven't set h, prefix 0h
-            if currentNumber.contains("h") == false {
-                currentNumber = "0h" + currentNumber
-            }
-            // If the last char isn't a number, we're entering "hms", so put a 0 up front
-            if let c = currentNumber.last {
-                if c.isNumber == false {
-                    currentNumber += "0"
-                }
-            }
-            currentNumber += "s"
-        }
-        
-        return true
-    }
-    */
-    
     /**
     Build an expression from the current expressionStack and operatorStack.
-    
     */
     func buildExpr() -> Expr? {
+        let _ = ExecutionTimer("thread: \(Thread.current): ModelData.buildExpr \(self)")
+
         NSLog("BUILD")
         /* Why this rebuild? Because of the expression has become partly formed
         after a delete, but buildExpr was called, we may have manipulated the stack.
