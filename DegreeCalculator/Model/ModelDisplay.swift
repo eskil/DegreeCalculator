@@ -14,19 +14,6 @@ extension String {
         return String(repeating: withPad, count: padCount) + self
     }
 }
-
-/*
-extension String {
-    func leftPadding(toLength: Int, withPad character: Character) -> String {
-        let newLength = self.count
-        if newLength < toLength {
-            return String(repeatElement(character, count: toLength - newLength)) + self
-        } else {
-            return self
-        }
-    }
-}
-*/
  
 struct DisplayLine: Identifiable, Hashable {
     let id: Int
@@ -42,6 +29,7 @@ struct DisplayLine: Identifiable, Hashable {
 
 extension Expr {
     public func displayLines(includeResult: Bool = true) -> [DisplayLine] {
+        let _ = ExecutionTimer("thread: \(Thread.current): Expr.displayLines() -> [DisplayLine]", indent: 1)
         var result: [DisplayLine] = []
         var value: String? = nil
         self.inOrder { expr in
@@ -69,6 +57,8 @@ extension Expr {
 
 extension ModelData {
     func displayLines() -> [DisplayLine] {
+        let _ = ExecutionTimer("thread: \(Thread.current): ModelData.displayLines() -> [DisplayLine]")
+
         var result: [DisplayLine] = []
 
         // 1. Show all previous completed expressions

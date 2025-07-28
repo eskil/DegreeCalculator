@@ -15,6 +15,8 @@ struct RootView: View {
     var body: some View {
         NavigationStack {
             ZStack {
+                Color.black.ignoresSafeArea()
+                
                 if showingFirst {
                     CalculatorView()
                         .environmentObject(appState.dmsData)

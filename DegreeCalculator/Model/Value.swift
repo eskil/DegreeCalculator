@@ -99,6 +99,8 @@ struct Value: Codable, Hashable, CustomStringConvertible {
 
     /** Sketch fallback to init?, which falls back to empty values or fails */
     init(parsing string: String, hint: ValueTypeHint = .detect, fallbackToEmpty: Bool = false) throws {
+        let _ = ExecutionTimer("thread: \(Thread.current): Value.init(parssing: \(string), hint: \(hint)")
+
         let actualHint = (hint == .detect) ? Self.detectHint(parsing: string) : hint
         let trimmed = string.trimmingCharacters(in: .whitespacesAndNewlines)
 

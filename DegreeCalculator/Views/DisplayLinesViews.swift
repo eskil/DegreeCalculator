@@ -21,13 +21,7 @@ struct DisplayLinesView: View {
     }
     
     var lines: [DisplayLine] {
-        NSLog("Expressions changed, recomputing lines")
         let result = model.displayLines()
-        NSLog("computed lines model \(model.exprMode) intOnly is \(model.intOnly)")
-        NSLog("computed lines")
-        for line in result {
-            NSLog("\tline \(line)")
-        }
         return result
     }
     

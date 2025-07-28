@@ -153,6 +153,8 @@ final class ModelData: ObservableObject {
      callFunction(EQUAL, "")
      */
     func callFunction(_ f: CalculatorFunction, label: String) {
+        let _ = ExecutionTimer("thread: \(Thread.current): ModelData.callFunction \(f) label: \(label)")
+        
         switch f {
         case .ANS:
             return ans()
