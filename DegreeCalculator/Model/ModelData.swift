@@ -289,7 +289,7 @@ final class ModelData: ObservableObject {
                 updateCurrentNumber = true
             }
         }
-        else if !currentNumber.isEmpty, let inputOp = Operator(rawValue: char) {
+        else if !currentNumberCopy.isEmpty, let inputOp = Operator(rawValue: char) {
             inputStack.append(char)
             /**
              We're entering an operator, so convert the currentNumber
@@ -297,7 +297,7 @@ final class ModelData: ObservableObject {
              This makes it availble for composing into a new expression
              depending on the precedence of the operator.
              */
-            if let val = Value(parsing: currentNumber, hint: intOnly ? .integer : (exprMode == .DMS ? .dms : .hms)) {
+            if let val = Value(parsing: currentNumberCopy, hint: intOnly ? .integer : (exprMode == .DMS ? .dms : .hms)) {
                 expressionStack.append(.value(val))
                 currentNumberCopy = ""
                 updateCurrentNumber = true
