@@ -9,6 +9,7 @@ import SwiftUI
 
 struct DisplayLinesView: View {
     @ObservedObject var model: ObservableModelData
+    @State private var previousLastLineID: Int? = nil
 
     var Underscore: some View {
         Rectangle()
@@ -22,28 +23,26 @@ struct DisplayLinesView: View {
  
     var body: some View {
         ScrollView {
-            ScrollViewReader { scroll_reader in
+            ScrollViewReader { scrollReader in
                 ForEach(model.displayLines, id: \.id) { line in
-                    // https://sarunw.com/posts/how-to-make-swiftui-view-fill-container-width-and-height/
-                    VStack {
+                    LazyVStack {
                         if let op = line.trailingOperator {
-                            if op == "=" {
-                                // FIXME: this view could be generalised
+                            switch op {
+                            case "=":
                                 Text(line.value + " " + op)
                                     .frame(maxWidth: .infinity, alignment: .leading)
                                     .foregroundColor(.white)
                                 Underscore
-                            } else if op == "==" {
+                            case "==":
                                 Text(line.value + " ")
                                     .frame(maxWidth: .infinity, alignment: .leading)
                                     .foregroundColor(.white)
                                 Underscore
                                 Underscore
-                            } else {
+                            default:
                                 Text(line.value + " " + op)
                                     .frame(maxWidth: .infinity, alignment: .leading)
                                     .foregroundColor(.white)
-                                
                             }
                         } else {
                             Text(line.value)
@@ -54,18 +53,18 @@ struct DisplayLinesView: View {
                     .id(line.id)
                 }                
                 .onChange(of: model.displayLines) { lines in
-                    NSLog("change on entered lines count is \(lines.count)")
-                    // The -1 is to scroll to id:5 when list has 6 elements - starts at 0.
-                    // Alternatively, assign id:1, 2...
-                    DispatchQueue.main.async {
-                        NSLog("onChange scroll to bottom")
-                        scroll_reader.scrollTo(lines.count-1, anchor: .bottom)
+                    guard let last = lines.last else { return }
+                    if last.id != previousLastLineID {
+                        withAnimation(.easeOut(duration: 0.2)) {
+                            scrollReader.scrollTo(last.id, anchor: .bottom)
+                        }
+                        previousLastLineID = last.id
                     }
                 }
                 .onAppear {
+                    NSLog("appear \(model.exprMode)")
                     DispatchQueue.main.async {
-                        NSLog("onAppear scroll to bottom")
-                        scroll_reader.scrollTo(model.displayLines.count-1, anchor: .bottom)
+                        scrollReader.scrollTo(model.displayLines.count-1, anchor: .bottom)
                     }
                 }
             }

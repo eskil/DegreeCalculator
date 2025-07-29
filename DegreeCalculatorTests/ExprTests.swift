@@ -149,10 +149,8 @@ final class ExprTests: XCTestCase {
         expr.inOrder { e in
             switch e {
             case .value(let v):
-                NSLog("Value \(v)")
                 result.append(v.description)
             case .binary(let op, _, _):
-                NSLog("BinOp \(op)")
                 result.append(op.description)
             }
         }

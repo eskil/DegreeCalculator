@@ -61,7 +61,8 @@ extension Expr {
     }
 }
 
-final class ObservableModelData: ObservableObject {
+@MainActor
+class ObservableModelData: ObservableObject {
     var md: ModelData
     
     init(mode: ModelData.ExprMode) {
@@ -92,14 +93,12 @@ final class ObservableModelData: ObservableObject {
      callFunction(ENTRY, "5")
      callFunction(EQUAL, "")
      */
-    func callFunctionAsync(_ f: CalculatorFunction, label: String) async {
-        return self.callFunction(f, label: label)
-    }
+
     func callFunction(_ f: CalculatorFunction, label: String) {
         let _ = ExecutionTimer("thread: \(Thread.current): ObservableModelData.callFunction \(f) label: \(label)")
         md.callFunction(f, label: label)
         self.displayLinesCache = self.computeDisplayLines()
-        publishVars()
+        self.publishVars()
     }
     
     func publishVars() {
@@ -114,7 +113,7 @@ final class ObservableModelData: ObservableObject {
             if self.builtExpressions != self.md.builtExpressions {
                 self.builtExpressions = self.md.builtExpressions
             }
-            if self.displayLines != self.displayLinesCache {
+            if !self.displayLines.elementsEqual(self.displayLinesCache) {
                 self.displayLines = self.displayLinesCache
             }
         }

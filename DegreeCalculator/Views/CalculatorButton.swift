@@ -33,6 +33,7 @@ extension UIColor {
     }
 }
 
+
 struct CalculatorButton: View {
     @EnvironmentObject var modelData: ObservableModelData
     @Environment(\.isEnabled) var isEnabled
@@ -89,29 +90,41 @@ struct CalculatorButton: View {
         return result
     }
     
-    var body: some View {
+    private func buttonContent() -> some View {
         Button(
             action: {
+                let _ = ExecutionTimer("thread: \(Thread.current): button \(function) label: \(label)")
+
                 isProcessing = true
-                DispatchQueue.global().async {
+                Task {
                     modelData.callFunction(function, label: label)
+                    isProcessing = false
                 }
-                isProcessing = false
             }
         ) {
             Text(label)
                 .font(.system(.largeTitle, design: .monospaced))
         }
         .buttonStyle(CalculatorButtonStyle(foregroundColor: fg, backgroundColor: bg))
-        .onTapGesture(count: 3) {
-             if let fn = tripleTapFunction {
-                 DispatchQueue.global().async {
-                     modelData.callFunction(fn, label: label)
-                 }
-             }
-         }
         .disabled(isProcessing)
         .opacity(isProcessing ? 0.3 : 1.0)
+    }
+    
+    var body: some View {
+        let content = buttonContent()
+        if let fn = tripleTapFunction {
+            content.onTapGesture(count: 3) {
+                let _ = ExecutionTimer("thread: \(Thread.current): 3tap button \(fn) label: \(label)")
+                
+                isProcessing = true
+                Task {
+                    modelData.callFunction(fn, label: label)
+                    isProcessing = false
+                }
+            }
+        } else {
+            content
+        }
     }
 }
 

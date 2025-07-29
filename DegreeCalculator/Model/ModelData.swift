@@ -341,17 +341,13 @@ class ModelData {
     }
     
     func delete() {
-        NSLog("DEL")
         guard !inputStack.isEmpty else { return }
-        let removedChar = inputStack.removeLast()
-        NSLog("\tdeleted \(removedChar)")
+        let _ = inputStack.removeLast()
         rebuildExpr()
     }
     
     func ans() {
-        NSLog("ANS")
         if let val = builtExpressions.last?.value {
-            NSLog("ANS replaying \(val.description)")
             inputStack.removeAll()
             currentNumber.removeAll()
             for c in val.description {
@@ -440,15 +436,12 @@ class ModelData {
     }
     
     func equal() {
-        debugLog("EQUAL")
         // Avoid cases like "1=" leaving 1 on the builtExpressions.
         if expressionStack.isEmpty {
             return
         }
         
-        if let expr = buildExpr() {
-            NSLog("EQUAL Expr = \(expr)")
-            NSLog("    Result = \(expr.value ?? Value())")
+        if let _ = buildExpr() {
             // Reset this now, since buildExpr replays the input,
             // so it could have gotten toggled.
             intOnly = false
@@ -465,7 +458,6 @@ class ModelData {
     func buildExpr() -> Expr? {
         let _ = ExecutionTimer("thread: \(Thread.current): ModelData.buildExpr \(self)", indent: 2)
 
-        NSLog("BUILD")
         /* Why this rebuild? Because of the expression has become partly formed
         after a delete, but buildExpr was called, we may have manipulated the stack.
 
@@ -476,14 +468,9 @@ class ModelData {
         */
         rebuildExpr()
 
-        NSLog("\tPRE")
-        NSLog("\t\tbuild expressionStack")
         for expr in expressionStack {
             print("\t\t\t- \(expr)")
         }
-        NSLog("\t\tbuild operatorStack \(operatorStack)")
-        NSLog("\t\tbuild inputStack \(inputStack)")
-        NSLog("\t\tbuild currentNumber \(currentNumber)")
 
         /*
         If a number is being entered, ensure it's processed and on the expressionStack.
@@ -501,14 +488,9 @@ class ModelData {
             popOperator()
         }
 
-        NSLog("\tPOST")
-        NSLog("\t\tbuild expressionStack after pop")
         for expr in expressionStack {
             NSLog("\t\t\t- \(expr)")
         }
-        NSLog("\t\tbuild operatorStack \(operatorStack)")
-        NSLog("\t\tbuild inputStack \(inputStack)")
-        NSLog("\t\tbuild currentNumber \(currentNumber)")
 
         /*
         The operatorStack can be non-empty if eg. buildExpr is called,
@@ -533,11 +515,9 @@ class ModelData {
      See comment for operatorStack for details.
      */
     private func popOperator() {
-        NSLog("\t\tpop expressionStack")
         for expr in expressionStack {
             print("\t\t\t- \(expr)")
         }
-        NSLog("\t\tpop operatorStack \(operatorStack)")
         guard operatorStack.count > 0, expressionStack.count > 0 else { return }
         guard let op = operatorStack.popLast(),
               let right = expressionStack.popLast(),
