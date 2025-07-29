@@ -7,6 +7,9 @@
 
 import Foundation
 
+/**
+ This extension is for `ObservableModelData.displayLines` to make left padding easier.
+ */
 extension String {
     func leftPadding(toLength: Int, withPad: String = " ") -> String {
         let padCount = toLength - self.count
@@ -15,6 +18,10 @@ extension String {
     }
 }
  
+/**
+ Structure for the DisplayLinesViews to use. If eg. we wanted to add a little superscript ⁺¹ (+1) to
+ HMS values over 24 hours, it should be added here and the view is responsible for rendering it.
+ */
 struct DisplayLine: Identifiable, Hashable {
     let id: Int
     let value: String
@@ -27,6 +34,10 @@ struct DisplayLine: Identifiable, Hashable {
     }
 }
 
+/**
+ Extension `ObservableModelData.displayLines` to get the `DisplayLine` structs for a single
+ `Expr`.
+ */
 extension Expr {
     public func displayLines(includeResult: Bool = true) -> [DisplayLine] {
         let _ = ExecutionTimer("thread: \(Thread.current): Expr.displayLines() -> [DisplayLine]", indent: 3)
@@ -55,23 +66,28 @@ extension Expr {
     }
 }
 
+/**
+ `ObservableModelData` is a wrapper around `ModelData`.
+ This keeps the latter purely business logic focused - no SwiftUI `@published` etc.
+ 
+ This is responsible for publishing and only updating when necessary.
+ This helps keep the UI swift hahaha pun intenden.
+ */
 @MainActor
 class ObservableModelData: ObservableObject {
     var md: ModelData
     
     init(mode: ModelData.ExprMode) {
-        self.exprMode = mode
         self.md = ModelData(mode: mode)
     }
     
-    let exprMode: ModelData.ExprMode
-    
-    /* UI published version of ModelData variables */
+    /** UI published versions of `ModelData` variables */
     @Published var builtExpressions: [Expr] = []
     @Published private(set) var currentNumber: String = ""
     @Published private(set) var intOnly: Bool = false
     @Published var displayLines: [DisplayLine] = []
-    var displayLinesCache: [DisplayLine] = []
+    /** Internal copy of the generated `DisplayLine` objects. Copied to the published var when they're different. */
+    internal var displayLinesCache: [DisplayLine] = []
 
     /**
      Main access point for the model data
@@ -87,6 +103,10 @@ class ObservableModelData: ObservableObject {
      callFunction(EQUAL, "")
      */
 
+    var exprMode: ModelData.ExprMode {
+        get { return md.exprMode }
+    }
+    
     func callFunction(_ f: CalculatorFunction, label: String) {
         let _ = ExecutionTimer("thread: \(Thread.current): ObservableModelData.callFunction \(f) label: \(label)")
         md.callFunction(f, label: label)
@@ -95,7 +115,7 @@ class ObservableModelData: ObservableObject {
     }
     
     func publishVars() {
-        // Update UI thread
+        // Closure that compares published values and updates when appropriate.
         let update = {
             if self.currentNumber != self.md.currentNumber {
                 self.currentNumber = self.md.currentNumber

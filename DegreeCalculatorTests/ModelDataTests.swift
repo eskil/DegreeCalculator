@@ -459,7 +459,7 @@ final class ModelDataTests: XCTestCase {
         XCTAssertEqual(md.builtExpressions, [
             Expr.binary(op: Operator.add,
                         lhs: Expr.value(Value(degrees: 1, minutes: 2.3)),
-                        rhs: Expr.value(Value(degrees: 4, minutes: 5.6)))
+                        rhs: Expr.value(Value(degrees: 4, minutes: 5.6))),
         ])
     }
     
@@ -479,7 +479,7 @@ final class ModelDataTests: XCTestCase {
         XCTAssertEqual(md.builtExpressions, [
             Expr.binary(op: Operator.add,
                         lhs: Expr.value(Value(degrees: 1, minutes: 2.3)),
-                        rhs: Expr.value(Value(degrees: 4, minutes: 5.6)))
+                        rhs: Expr.value(Value(degrees: 4, minutes: 5.6))),
         ])
         md.callFunction(CalculatorFunction.ANS, label: "")
         XCTAssertEqual(md.inputStack, Array("5°07'9"))
@@ -490,24 +490,52 @@ final class ModelDataTests: XCTestCase {
         inputString("1°2'3 + 4°5'6 = 1°2'")
         XCTAssertEqual(md.inputStack, Array("1°2'"))
         XCTAssertEqual(md.currentNumber, "1°2'")
-        XCTAssertEqual(md.builtExpressions,
-                       [
-                        Expr.binary(op: Operator.add,
-                                    lhs: Expr.value(Value(degrees: 1, minutes: 2.3)),
-                                    rhs: Expr.value(Value(degrees: 4, minutes: 5.6)))
-                       ]
-        )
+        XCTAssertEqual(md.builtExpressions, [
+            Expr.binary(op: Operator.add,
+                        lhs: Expr.value(Value(degrees: 1, minutes: 2.3)),
+                        rhs: Expr.value(Value(degrees: 4, minutes: 5.6))),
+        ])
+
         // ANS replaces the current input
         md.callFunction(CalculatorFunction.ANS, label: "")
         XCTAssertEqual(md.inputStack, Array("5°07'9"))
         XCTAssertEqual(md.currentNumber, "5°07'9")
-        XCTAssertEqual(md.builtExpressions,
-                       [
-                        Expr.binary(op: Operator.add,
-                                    lhs: Expr.value(Value(degrees: 1, minutes: 2.3)),
-                                    rhs: Expr.value(Value(degrees: 4, minutes: 5.6)))
-                       ]
-        )
+        XCTAssertEqual(md.builtExpressions, [
+            Expr.binary(op: Operator.add,
+                        lhs: Expr.value(Value(degrees: 1, minutes: 2.3)),
+                        rhs: Expr.value(Value(degrees: 4, minutes: 5.6))),
+        ])
+    }
+
+    func testAns_AfterOpInput() {
+        inputString("1°2'3 + 4°5'6 = 1°2'3 + ")
+        XCTAssertEqual(md.inputStack, Array("1°2'3+"))
+        XCTAssertEqual(md.currentNumber, "")
+        XCTAssertEqual(md.builtExpressions, [
+            Expr.binary(op: Operator.add,
+                        lhs: Expr.value(Value(degrees: 1, minutes: 2.3)),
+                        rhs: Expr.value(Value(degrees: 4, minutes: 5.6))),
+        ])
+        // ANS adds after the op the current input
+        md.callFunction(CalculatorFunction.ANS, label: "")
+        XCTAssertEqual(md.inputStack, Array("1°2'3+5°07'9"))
+        XCTAssertEqual(md.currentNumber, "5°07'9")
+        XCTAssertEqual(md.builtExpressions, [
+            Expr.binary(op: Operator.add,
+                        lhs: Expr.value(Value(degrees: 1, minutes: 2.3)),
+                        rhs: Expr.value(Value(degrees: 4, minutes: 5.6)))
+        ])
+
+        md.callFunction(CalculatorFunction.EQUAL, label: "")
+        XCTAssertEqual(md.builtExpressions, [
+            Expr.binary(op: Operator.add,
+                        lhs: Expr.value(Value(degrees: 1, minutes: 2.3)),
+                        rhs: Expr.value(Value(degrees: 4, minutes: 5.6))),
+            Expr.binary(op: Operator.add,
+                        lhs: Expr.value(Value(degrees: 1, minutes: 2.3)),
+                        rhs: Expr.value(Value(degrees: 5, minutes: 7.9)))
+
+        ])
     }
     
     // Test behaviour of clear, specifically that inputStack is reset and expressions is unchanged.
@@ -724,6 +752,27 @@ final class ModelDataTests: XCTestCase {
         XCTAssertEqual(md.inputStack,Array("361°2'3+"))
         XCTAssertEqual(md.currentNumber, "")
         XCTAssertEqual(md.builtExpressions, [])
+    }
+
+    func testMinus360_HMS_OnOpenExpr() {
+        md = makeModel(with: .HMS)
+        inputString("36h+1h2m3")
+        
+        md.callFunction(CalculatorFunction.M360, label: "")
+        XCTAssertEqual(md.inputStack, [])
+        XCTAssertEqual(md.currentNumber, "")
+        XCTAssertEqual(md.builtExpressions, [
+            Expr.binary(
+                op: Operator.add,
+                lhs: Expr.value(Value(hours: 36, minutes: 0, seconds: 0)),
+                rhs: Expr.value(Value(hours: 1, minutes: 2, seconds: 3))
+            ),
+            Expr.binary(
+                op: Operator.subtract,
+                lhs: Expr.value(Value(hours: 37, minutes: 2, seconds: 3)),
+                rhs: Expr.value(Value(hours: 24, minutes: 0, seconds: 0))
+            ),
+        ])
     }
     
     func testDiv_DMS_BaseCase() {

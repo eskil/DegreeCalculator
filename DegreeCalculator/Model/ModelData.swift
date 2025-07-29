@@ -40,6 +40,16 @@ enum CalculatorFunction: Int {
     case M360
 }
 
+/**
+ Extension that adds some helpers to `String` to optionall add DMS/HMS symbols if "ok".
+ 
+ Each function checks if adding the symbol is ok. Eg. if the string already has a ° symbol, you can't add another.
+ And when it can be added, it might insert other chars early. Eg. if adding ' after a number to make it a minute,
+ we add 0° iff there's no degree already added.
+ 
+ They all return true if the symbol can be added and false if not. On false, the calling code should _not_ add
+ the symbol to the input stack.
+ */
 extension String {
     mutating func addDegreeHour(mode: ModelData.ExprMode) -> Bool {
         switch mode {
@@ -163,7 +173,7 @@ class ModelData {
      and a new expression is started.
      So in short, this stores all expressions computer until a allClear is issued.
      */
-    var builtExpressions: [Expr] = []
+    internal var builtExpressions: [Expr] = []
     
     /**
      The inputStack is the raw unprocessed sequence of characters input by the user.
@@ -171,7 +181,7 @@ class ModelData {
      This allows for editing the input, eg. the most basic operation is backspace - pop
      the last input - and the current inputStack can be replayed to a new expression.
      */
-    var inputStack: [Character] = []
+    internal var inputStack: [Character] = []
     
     /**
      currentNumber is the current Value being input, as a string.
@@ -201,7 +211,7 @@ class ModelData {
      
      After "+", the operatorStack has "+" and the expressionStack has "10/2".
      */
-    var expressionStack: [Expr] = []
+    internal var expressionStack: [Expr] = []
     
     /**
      OperatorStack contains the operators input but _not yet_ evaluated.
@@ -218,7 +228,7 @@ class ModelData {
      But if we enter "2 + 4 /", we'd have - on the stack until / is entered.
      Since / higher precedence then +, we can't evaluate "2 + 4" yet, so the stack is now "+ /".
      */
-    var operatorStack: [Operator] = []
+    internal var operatorStack: [Operator] = []
     
     /** When last operator is divide, disable degrees/jhours/minutes input */
     internal var intOnly: Bool = false
@@ -263,6 +273,36 @@ class ModelData {
                let char = label.first
             {
                 addEntry(char)
+            }
+        }
+    }
+    
+    /**
+     Helper function to input a string. This is primarily for testing/preview uses.
+     */
+    func inputString(_ string: String) {
+        for ch in string {
+            switch ch {
+            case _ where ch.isWhitespace:
+                break
+            case "+":
+                callFunction(CalculatorFunction.ADD, label: "")
+            case "-":
+                callFunction(CalculatorFunction.SUBTRACT, label: "")
+            case "/":
+                callFunction(CalculatorFunction.DIV, label: "")
+            case "=":
+                callFunction(CalculatorFunction.EQUAL, label: "")
+            case "D":
+                callFunction(CalculatorFunction.DELETE, label: "")
+            case "C":
+                callFunction(CalculatorFunction.CLEAR, label: "")
+            case "A":
+                callFunction(CalculatorFunction.ALL_CLEAR, label: "")
+            case "M":
+                callFunction(CalculatorFunction.M360, label: "")
+            default:
+                callFunction(CalculatorFunction.ENTRY, label: String(ch))
             }
         }
     }
@@ -356,8 +396,10 @@ class ModelData {
     
     func ans() {
         if let val = builtExpressions.last?.value {
-            inputStack.removeAll()
-            currentNumber.removeAll()
+            if !currentNumber.isEmpty {                
+                inputStack.removeAll()
+                currentNumber.removeAll()
+            }
             for c in val.description {
                 addEntry(c)
             }

@@ -8,6 +8,7 @@
 import XCTest
 @testable import DegreeCalculator
 
+@MainActor
 final class ObservableModelDisplayTests: XCTestCase {
     var md: ObservableModelData! = nil
     

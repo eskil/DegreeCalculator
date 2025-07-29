@@ -148,9 +148,9 @@
 		DA61AEFC2A1840FB00048DAB /* DegreeCalculatorTests */ = {
 			isa = PBXGroup;
 			children = (
-				DAB074962E18934700866A30 /* ValueTests.swift */,
 				DA61AEFD2A1840FB00048DAB /* DegreeCalculatorTests.swift */,
 				DAA33A8E2A38080F00EA7A2B /* ExprTests.swift */,
+				DAB074962E18934700866A30 /* ValueTests.swift */,
 				DAE0025F2A38EF1800502C2E /* ModelDataTests.swift */,
 				DAE029672E3156B300DE778C /* ObservableModelDataTests.swift */,
 			);
@@ -172,8 +172,8 @@
 				DACF74582A18675D00826755 /* CalculatorButtonStyle.swift */,
 				DACF745F2A2958D300826755 /* CalculatorView.swift */,
 				DACF74652A2A923300826755 /* CalculatorButton.swift */,
-				DA61AEEE2A1840F900048DAB /* RootView.swift */,
 				DA63AAE62E32F867000C1FFC /* DisplayLinesView.swift */,
+				DA61AEEE2A1840F900048DAB /* RootView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";

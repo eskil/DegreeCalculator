@@ -58,38 +58,35 @@ indirect enum Expr: Codable, Hashable, CustomStringConvertible {
     init() {
         self = .value(Value())
     }
-    
-    func evaluate() -> Value? {
-        switch self {
-        case .value(let v):
-            return v
-        case .binary(let op, let lhs, let rhs):
-            guard let lv = lhs.evaluate(),
-                  let rv = rhs.evaluate() else { return nil }
-            switch op {
-            case .add:
-                return lv.adding(rv)
-            case .subtract:
-                return lv.subtracting(rv)
-            case .divide:
-                return lv.dividing(rv)
-            }
-        }
-    }
-    
+        
     /**
-     'value' recursively computes the expression result.
+     `value` recursively computes the expression result.
      
      If the expression is fully formed (has operator, left and right), this function
      computes the value by applying the operator to the result of calling
      value on the left and right nodes.
      
-     There's no caching since it's an enum and it can't have a "Value?" var.
-     The operations are also ridiculously cheap.
+     There's no caching since it's an enum and it can't have a `Value?` var.
+     
+     The operations are also ridiculously cheap since it's basic arithmetic.
      */
     var value: Value? {
         get {
-            return evaluate()
+            switch self {
+            case .value(let v):
+                return v
+            case .binary(let op, let lhs, let rhs):
+                guard let lv = lhs.value,
+                      let rv = rhs.value else { return nil }
+                switch op {
+                case .add:
+                    return lv.adding(rv)
+                case .subtract:
+                    return lv.subtracting(rv)
+                case .divide:
+                    return lv.dividing(rv)
+                }
+            }
         }
     }
     
@@ -107,7 +104,11 @@ indirect enum Expr: Codable, Hashable, CustomStringConvertible {
         }
     }
     
-    /** Generate a debug print friend multi line (list of strings) decsription of the expression. */
+    /**
+     Generate a debug print friend multi line (list of strings) decsription of the expression.
+     
+     This isn't used anywhere, it's left as it's useful for debugging.
+     */
     var multiline: [String] {
         var result: [String] = []
         var line: String = ""

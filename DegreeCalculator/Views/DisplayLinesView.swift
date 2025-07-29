@@ -9,6 +9,8 @@ import SwiftUI
 
 struct DisplayLinesView: View {
     @ObservedObject var model: ObservableModelData
+    // Track last `DisplayLine` id shown. We scroll to the bottom
+    // when `ObservableModelData`'s `displayLines`'s last id is different.
     @State private var previousLastLineID: Int? = nil
 
     // Draw a thin line
