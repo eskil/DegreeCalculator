@@ -13,16 +13,6 @@ struct CalculatorView: View {
     @State var padTop = 0.0
     @State var padRight = 0.0
     
-    var Underscore: some View {
-        Rectangle()
-            .frame(height: 1)
-            .foregroundColor(.white)
-            .padding(.trailing, 48)
-            .padding(.leading, 48)
-            .padding(.top, -14)
-            .padding(.bottom, 0)
-    }
-    
     private func hmsBody() -> some View {
         VStack {
             GeometryReader { geo in

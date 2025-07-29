@@ -11,6 +11,7 @@ struct DisplayLinesView: View {
     @ObservedObject var model: ObservableModelData
     @State private var previousLastLineID: Int? = nil
 
+    // Draw a thin line
     var Underscore: some View {
         Rectangle()
             .frame(height: 1)
@@ -21,6 +22,14 @@ struct DisplayLinesView: View {
             .padding(.bottom, 0)
     }
  
+    // Guess what...
+    var DoubleUnderscore: some View {
+        VStack(spacing: 6) {
+            Underscore
+            Underscore
+        }
+    }
+    
     var body: some View {
         ScrollView {
             ScrollViewReader { scrollReader in
@@ -37,8 +46,7 @@ struct DisplayLinesView: View {
                                 Text(line.value + " ")
                                     .frame(maxWidth: .infinity, alignment: .leading)
                                     .foregroundColor(.white)
-                                Underscore
-                                Underscore
+                                DoubleUnderscore
                             default:
                                 Text(line.value + " " + op)
                                     .frame(maxWidth: .infinity, alignment: .leading)
@@ -55,16 +63,17 @@ struct DisplayLinesView: View {
                 .onChange(of: model.displayLines) { lines in
                     guard let last = lines.last else { return }
                     if last.id != previousLastLineID {
-                        withAnimation(.easeOut(duration: 0.2)) {
-                            scrollReader.scrollTo(last.id, anchor: .bottom)
-                        }
+                        scrollReader.scrollTo(last.id, anchor: .bottom)
                         previousLastLineID = last.id
                     }
                 }
                 .onAppear {
-                    NSLog("appear \(model.exprMode)")
-                    DispatchQueue.main.async {
-                        scrollReader.scrollTo(model.displayLines.count-1, anchor: .bottom)
+                    guard let last = model.displayLines.last else { return }
+                    if last.id != previousLastLineID {
+                        withAnimation(.easeOut(duration: 0.0)) {
+                            scrollReader.scrollTo(last.id, anchor: .bottom)
+                        }
+                        previousLastLineID = last.id
                     }
                 }
             }
@@ -81,13 +90,17 @@ struct DisplayLinesView: View {
 struct DisplayLinesView_Previews: PreviewProvider {
     static func previewFor(deviceName: String, mode: ModelData.ExprMode) -> some View {
         let md = ObservableModelData(mode: mode)
-        
+
         md.callFunction(CalculatorFunction.ENTRY, label: "1")
         md.callFunction(CalculatorFunction.ADD, label: "")
         md.callFunction(CalculatorFunction.ENTRY, label: "2")
         md.callFunction(CalculatorFunction.EQUAL, label: "")
 
         return DisplayLinesView(model: md)
+            .background(Color.black)
+            .previewLayout(.sizeThatFits)
+            .padding()
+            .environmentObject(md)
             .previewDevice(PreviewDevice(rawValue: deviceName))
             .previewDisplayName(deviceName + " - \(mode)")
     }
@@ -100,5 +113,4 @@ struct DisplayLinesView_Previews: PreviewProvider {
             }
         }
     }
-
 }
