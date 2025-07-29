@@ -22,7 +22,7 @@ struct Value: Codable, Hashable, CustomStringConvertible {
         case integer
         case dms
         case hms
-        /** Use detect to infer the value type from the string. */
+        /** Use .detect to infer the value type from the string. */
         case detect
     }
     
@@ -99,7 +99,7 @@ struct Value: Codable, Hashable, CustomStringConvertible {
 
     /** Sketch fallback to init?, which falls back to empty values or fails */
     init(parsing string: String, hint: ValueTypeHint = .detect, fallbackToEmpty: Bool = false) throws {
-        let _ = ExecutionTimer("thread: \(Thread.current): Value.init(parssing: \(string), hint: \(hint)")
+        let _ = ExecutionTimer("thread: \(Thread.current): Value.init(parsing: \(string), hint: \(hint)", indent: 1)
 
         let actualHint = (hint == .detect) ? Self.detectHint(parsing: string) : hint
         let trimmed = string.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -148,6 +148,7 @@ struct Value: Codable, Hashable, CustomStringConvertible {
     }
 
     static func parseDMS(_ input: String) -> Value? {
+        // ChatGPT generated
         let pattern = #"(?:(?<deg>\d*)°)?\s*(?:(?<min>\d+))?'?\s*(?:(?<sec>\d))?"#
         guard let regex = try? NSRegularExpression(pattern: pattern) else { return nil }
 
@@ -171,6 +172,7 @@ struct Value: Codable, Hashable, CustomStringConvertible {
     }
 
     static func parseHMS(_ input: String) -> Value? {
+        // ChatGPT generated
         let pattern = #"(?:(?<hr>\d*)h)?\s*(?:(?<min>\d*)m)?\s*(?:(?<sec>\d+))?"#
         guard let regex = try? NSRegularExpression(pattern: pattern) else { return nil }
 
@@ -246,6 +248,7 @@ struct Value: Codable, Hashable, CustomStringConvertible {
         }
     }
     
+    /** Normalise the value to eg. 61 seconds is 1 minute 1 second. */
     mutating func normalise() -> Self {
         switch type {
         case .dms(let d, let m):
@@ -267,7 +270,7 @@ struct Value: Codable, Hashable, CustomStringConvertible {
              NOTE: disable auto overflow subtractions as we add -360 button
              instead. This allows adding eg. 250° + 251°= 501° to divide
              by 2 to get 250°30'0. If we still did this, 501 would become
-             141° and /2 would yield 70°30'0.
+             141° and /2 would yield 70°30'0. We do not want that.
              
              while degrees >= 360 {
              degrees -= 360
@@ -297,20 +300,19 @@ struct Value: Codable, Hashable, CustomStringConvertible {
                 minutes += 60
             }
             type = .hms(hours: hours, minutes: minutes, seconds: seconds)
-            
         default:
             break
         }
         return self
     }
 
+    /** Non-mutating version of normalise */
     func normalised() -> Value {
         var copy = self
         _ = copy.normalise()
         return copy
     }
 
-    
     func adding(_ other: Value) -> Value? {
         switch (self.type, other.type) {
         case (.integer(let a), .integer(let b)):
@@ -345,7 +347,10 @@ struct Value: Codable, Hashable, CustomStringConvertible {
     
     func dividing(_ other: Value) -> Value? {
         switch (self.type, other.type) {
+            // Use pattern matching here to ensure we only use
+            // a denominator that's an integer and it's > 0
         case (_, .integer(let denom)) where denom != 0:
+            // Now match on the numerator type
             switch(self.type) {
             case .integer(let v):
                 return Value(integer: v / denom)

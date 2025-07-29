@@ -8,11 +8,11 @@
 import Foundation
 
 
+/**
+ Define operators as an enum based on Character, and provide a function
+ that returns the operators position in the precedence hierarchy.
+*/
 enum Operator: Character, CustomStringConvertible, Hashable, Codable  {
-    /**
-    Define operators as an enum based on Character, and provide a function
-    that returns the operators position in the precedence hierarchy.
-    */
     case add = "+"
     case subtract = "-"
     case divide = "/"
@@ -35,9 +35,9 @@ enum Operator: Character, CustomStringConvertible, Hashable, Codable  {
 indirect enum Expr: Codable, Hashable, CustomStringConvertible {
     case value(Value)
     case binary(op: Operator, lhs: Expr, rhs: Expr)
-    // Vars not support
+    // Variables not supported, but here's the basic start for them.
     //case variable(String)
-    // Unary ops (negate) not supported
+    // Unary ops (negate) not supported, ditto.
     //case unary(op: Operator, expr: Expr)
 
     var description: String {
@@ -46,7 +46,7 @@ indirect enum Expr: Codable, Hashable, CustomStringConvertible {
             return v.description
         case .binary(let op, let lhs, let rhs):
             return "(\(lhs) \(op) \(rhs))"
-        /*
+        /* Nope.
         case .variable(let name):
             return name
         case .unary(let op, let expr):
@@ -54,12 +54,6 @@ indirect enum Expr: Codable, Hashable, CustomStringConvertible {
         */
         }
     }
-
-    /*
-    static func == (lhs: Expr, rhs: Expr) -> Bool {
-        return lhs.value == rhs.value
-    }
-     */
     
     init() {
         self = .value(Value())
@@ -84,13 +78,14 @@ indirect enum Expr: Codable, Hashable, CustomStringConvertible {
     }
     
     /**
-     value recursively computes the expression value.
+     'value' recursively computes the expression result.
+     
      If the expression is fully formed (has operator, left and right), this function
      computes the value by applying the operator to the result of calling
      value on the left and right nodes.
      
-     There's no caching of the value (for simplicity's sake), but the operations
-     are so simple that this should not pose a problem.
+     There's no caching since it's an enum and it can't have a "Value?" var.
+     The operations are also ridiculously cheap.
      */
     var value: Value? {
         get {
