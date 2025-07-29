@@ -8,13 +8,13 @@
 import XCTest
 @testable import DegreeCalculator
 
-final class ModelDisplayTests: XCTestCase {
-    var md: ModelData! = nil
+final class ObservableModelDisplayTests: XCTestCase {
+    var md: ObservableModelData! = nil
     
     // MARK: Setup and helpers
 
-    func makeModel(with mode: ModelData.ExprMode) -> ModelData {
-        return ModelData(mode: mode)
+    func makeModel(with mode: ModelData.ExprMode) -> ObservableModelData {
+        return ObservableModelData(mode: mode)
     }
     
     /**
@@ -49,60 +49,55 @@ final class ModelDisplayTests: XCTestCase {
         md = makeModel(with: .DMS)
         inputString("2'3")
 
-        let lines = md.displayLines()
         let expectedLines: [DisplayLine] = [
             DisplayLine(id: 0, value: "      0°2'3", trailingOperator: nil),
         ]
 
-        XCTAssertEqual(lines, expectedLines)
+        XCTAssertEqual(md.displayLines, expectedLines)
     }
 
     func testDisplayLines_UnterminatedAfterExpression() {
         md = makeModel(with: .DMS)
         inputString("1°2'3 + 4°5'6")
 
-        let lines = md.displayLines()
         let expectedLines: [DisplayLine] = [
             DisplayLine(id: 0, value: "     1°02'3", trailingOperator: "+"),
             DisplayLine(id: 1, value: "      4°5'6", trailingOperator: nil),
         ]
 
-        XCTAssertEqual(lines, expectedLines)
+        XCTAssertEqual(md.displayLines, expectedLines)
     }
 
     func testDisplayLines_UnterminatedAfterExpressions() {
         md = makeModel(with: .DMS)
         inputString("1°2'3 + 4°5'6 - 5°7'9")
 
-        let lines = md.displayLines()
         let expectedLines: [DisplayLine] = [
             DisplayLine(id: 0, value: "     1°02'3", trailingOperator: "+"),
             DisplayLine(id: 1, value: "     4°05'6", trailingOperator: "-"),
             DisplayLine(id: 2, value: "      5°7'9", trailingOperator: nil),
         ]
 
-        XCTAssertEqual(lines, expectedLines)
+        XCTAssertEqual(md.displayLines, expectedLines)
     }
 
     func testDisplayLines_Terminated() {
         md = makeModel(with: .DMS)
         inputString("1°2'3 + 4°5'6 =")
 
-        let lines = md.displayLines()
         let expectedLines: [DisplayLine] = [
             DisplayLine(id: 0, value: "     1°02'3", trailingOperator: "+"),
             DisplayLine(id: 1, value: "     4°05'6", trailingOperator: "="),
             DisplayLine(id: 2, value: "     5°07'9", trailingOperator: "=="),
         ]
 
-        XCTAssertEqual(lines, expectedLines)
+        XCTAssertEqual(md.displayLines, expectedLines)
     }
 
     func testDisplayLines_UnterminatedAfterNumber() {
         md = makeModel(with: .DMS)
         inputString("1°2'3 + 4°5'6 = 7°8'9")
 
-        let lines = md.displayLines()
         let expectedLines: [DisplayLine] = [
             DisplayLine(id: 0, value: "     1°02'3", trailingOperator: "+"),
             DisplayLine(id: 1, value: "     4°05'6", trailingOperator: "="),
@@ -110,14 +105,13 @@ final class ModelDisplayTests: XCTestCase {
             DisplayLine(id: 3, value: "      7°8'9", trailingOperator: nil),
         ]
 
-        XCTAssertEqual(lines, expectedLines)
+        XCTAssertEqual(md.displayLines, expectedLines)
     }
     
     func testDisplayLines_UnterminatedAfterOperator() {
         md = makeModel(with: .DMS)
         inputString("1°2'3 + 4°5'6 = 7°8'9 -")
 
-        let lines = md.displayLines()
         let expectedLines: [DisplayLine] = [
             DisplayLine(id: 0, value: "     1°02'3", trailingOperator: "+"),
             DisplayLine(id: 1, value: "     4°05'6", trailingOperator: "="),
@@ -125,6 +119,6 @@ final class ModelDisplayTests: XCTestCase {
             DisplayLine(id: 3, value: "     7°08'9", trailingOperator: "-"),
         ]
 
-        XCTAssertEqual(lines, expectedLines)
+        XCTAssertEqual(md.displayLines, expectedLines)
     }
 }

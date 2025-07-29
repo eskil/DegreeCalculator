@@ -122,7 +122,7 @@ extension String {
  
  The naming stems from the SwiftUI tutorials.
 */
-final class ModelData {
+class ModelData {
     /* Controls whether we're doing degrees-minutes-seconds math or hours-minutes-seconds
      */
     enum ExprMode {

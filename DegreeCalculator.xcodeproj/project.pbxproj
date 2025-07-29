@@ -27,7 +27,7 @@
 		DADF90C22E1B57060024AE19 /* AppState.swift in Sources */ = {isa = PBXBuildFile; fileRef = DADF90C12E1B57020024AE19 /* AppState.swift */; };
 		DAE002602A38EF1800502C2E /* ModelDataTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAE0025F2A38EF1800502C2E /* ModelDataTests.swift */; };
 		DAE029632E31538500DE778C /* ObservableModelData.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAE029622E31538500DE778C /* ObservableModelData.swift */; };
-		DAE029682E3156B300DE778C /* ModelDisplayTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAE029672E3156B300DE778C /* ModelDisplayTests.swift */; };
+		DAE029682E3156B300DE778C /* ObservableModelDataTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAE029672E3156B300DE778C /* ObservableModelDataTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -74,7 +74,7 @@
 		DADF90C12E1B57020024AE19 /* AppState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppState.swift; sourceTree = "<group>"; };
 		DAE0025F2A38EF1800502C2E /* ModelDataTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModelDataTests.swift; sourceTree = "<group>"; };
 		DAE029622E31538500DE778C /* ObservableModelData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ObservableModelData.swift; sourceTree = "<group>"; };
-		DAE029672E3156B300DE778C /* ModelDisplayTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModelDisplayTests.swift; sourceTree = "<group>"; };
+		DAE029672E3156B300DE778C /* ObservableModelDataTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ObservableModelDataTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -152,7 +152,7 @@
 				DA61AEFD2A1840FB00048DAB /* DegreeCalculatorTests.swift */,
 				DAA33A8E2A38080F00EA7A2B /* ExprTests.swift */,
 				DAE0025F2A38EF1800502C2E /* ModelDataTests.swift */,
-				DAE029672E3156B300DE778C /* ModelDisplayTests.swift */,
+				DAE029672E3156B300DE778C /* ObservableModelDataTests.swift */,
 			);
 			path = DegreeCalculatorTests;
 			sourceTree = "<group>";
@@ -263,7 +263,7 @@
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
 				LastSwiftUpdateCheck = 1430;
-				LastUpgradeCheck = 1620;
+				LastUpgradeCheck = 1640;
 				TargetAttributes = {
 					DA61AEE82A1840F900048DAB = {
 						CreatedOnToolsVersion = 14.3;
@@ -348,7 +348,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				DAE029682E3156B300DE778C /* ModelDisplayTests.swift in Sources */,
+				DAE029682E3156B300DE778C /* ObservableModelDataTests.swift in Sources */,
 				DAA33A8F2A38080F00EA7A2B /* ExprTests.swift in Sources */,
 				DA61AEFE2A1840FB00048DAB /* DegreeCalculatorTests.swift in Sources */,
 				DAB074972E18934800866A30 /* ValueTests.swift in Sources */,
@@ -416,6 +416,7 @@
 				CODE_SIGN_IDENTITY = "Apple Distribution";
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = XD79E3HMQG;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
@@ -479,6 +480,7 @@
 				CODE_SIGN_IDENTITY = "Apple Distribution";
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = XD79E3HMQG;
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
@@ -511,7 +513,6 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 4;
 				DEVELOPMENT_ASSET_PATHS = "\"DegreeCalculator/Preview Content\"";
-				DEVELOPMENT_TEAM = XD79E3HMQG;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = "Degree Calculator";
@@ -545,7 +546,6 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 4;
 				DEVELOPMENT_ASSET_PATHS = "\"DegreeCalculator/Preview Content\"";
-				DEVELOPMENT_TEAM = XD79E3HMQG;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = "Degree Calculator";
@@ -577,7 +577,6 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = XD79E3HMQG;
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 16.4;
 				MARKETING_VERSION = 1.0;
@@ -598,7 +597,6 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = XD79E3HMQG;
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 16.4;
 				MARKETING_VERSION = 1.0;
@@ -618,7 +616,6 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = XD79E3HMQG;
 				GENERATE_INFOPLIST_FILE = YES;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = org.eskil.DegreeCalculatorUITests;
@@ -637,7 +634,6 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = XD79E3HMQG;
 				GENERATE_INFOPLIST_FILE = YES;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = org.eskil.DegreeCalculatorUITests;

@@ -23,7 +23,7 @@ struct DisplayLinesView: View {
     var body: some View {
         ScrollView {
             ScrollViewReader { scroll_reader in
-                ForEach(model.displayLinesCache, id: \.id) { line in
+                ForEach(model.displayLines, id: \.id) { line in
                     // https://sarunw.com/posts/how-to-make-swiftui-view-fill-container-width-and-height/
                     VStack {
                         if let op = line.trailingOperator {
@@ -53,19 +53,19 @@ struct DisplayLinesView: View {
                     }
                     .id(line.id)
                 }                
-                .onChange(of: model.displayLinesCache) { lines in
+                .onChange(of: model.displayLines) { lines in
                     NSLog("change on entered lines count is \(lines.count)")
                     // The -1 is to scroll to id:5 when list has 6 elements - starts at 0.
                     // Alternatively, assign id:1, 2...
                     DispatchQueue.main.async {
                         NSLog("onChange scroll to bottom")
-                        scroll_reader.scrollTo(l.count-1, anchor: .bottom)
+                        scroll_reader.scrollTo(lines.count-1, anchor: .bottom)
                     }
                 }
                 .onAppear {
                     DispatchQueue.main.async {
                         NSLog("onAppear scroll to bottom")
-                        scroll_reader.scrollTo(model.displayLinesCache.count-1, anchor: .bottom)
+                        scroll_reader.scrollTo(model.displayLines.count-1, anchor: .bottom)
                     }
                 }
             }

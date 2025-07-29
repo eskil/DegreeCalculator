@@ -40,7 +40,8 @@ struct CalculatorButton: View {
     var label: String
     var function: CalculatorFunction = CalculatorFunction.ENTRY
     var tripleTapFunction: CalculatorFunction?
-    
+    @State private var isProcessing = false
+
     // This functions returns the default color of a button by it's function,
     // then `fg` mutes it if it's disbled.
     var enabled_fg: Color {
@@ -91,9 +92,11 @@ struct CalculatorButton: View {
     var body: some View {
         Button(
             action: {
+                isProcessing = true
                 DispatchQueue.global().async {
                     modelData.callFunction(function, label: label)
                 }
+                isProcessing = false
             }
         ) {
             Text(label)
@@ -107,6 +110,8 @@ struct CalculatorButton: View {
                  }
              }
          }
+        .disabled(isProcessing)
+        .opacity(isProcessing ? 0.3 : 1.0)
     }
 }
 
