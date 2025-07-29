@@ -109,6 +109,9 @@ extension String {
 /**
  ModelData is the observable entity that the UI interacts with.
  
+ For performance reasons, the UI goes through ObservableModelData instead.
+ It provides observable published fields.
+ 
  The primary access is callFunction, called by button widgets to operate on the model.
  
  Internally it maintains a list of Expr objects (from DegreeCore). Where Expr is only
@@ -125,16 +128,23 @@ extension String {
 class ModelData {
     /* Controls whether we're doing degrees-minutes-seconds math or hours-minutes-seconds
      */
-    enum ExprMode {
+    enum ExprMode: CaseIterable{
         case DMS
         case HMS
         
-        func toHint() -> Value.ValueTypeHint {
+        var valueHint: Value.ValueTypeHint {
             switch self {
             case .DMS:
                 return .dms
             case .HMS:
                 return .hms
+            }
+        }
+        
+        var label: String {
+            switch self {
+            case .DMS: return "DMS"
+            case .HMS: return "HMS"
             }
         }
     }
@@ -298,7 +308,7 @@ class ModelData {
              This makes it availble for composing into a new expression
              depending on the precedence of the operator.
              */
-            if let val = Value(parsing: currentNumber, hint: intOnly ? .integer : exprMode.toHint()) {
+            if let val = Value(parsing: currentNumber, hint: intOnly ? .integer : exprMode.valueHint) {
                 expressionStack.append(.value(val))
                 currentNumber = ""
             }
@@ -476,7 +486,7 @@ class ModelData {
         If a number is being entered, ensure it's processed and on the expressionStack.
         This manipulates the stacks and why we call rebuildExpr early
         */
-        if let val = Value(parsing: currentNumber, hint: intOnly ? .integer : exprMode.toHint()) {
+        if let val = Value(parsing: currentNumber, hint: intOnly ? .integer : exprMode.valueHint) {
             expressionStack.append(Expr.value(val))
             currentNumber = ""
         } else {
@@ -542,7 +552,6 @@ class ModelData {
     since we don't have to try and manage the tree.
     */
     func rebuildExpr() {
-        print("REBUILD")
         // copy the array
         let backup = inputStack
         inputStack.removeAll()

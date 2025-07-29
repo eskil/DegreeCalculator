@@ -7,14 +7,17 @@
 
 import SwiftUI
 
-
+// The RootView instantiates the appstate.
 @MainActor
 final class AppState: ObservableObject {
-    @Published public var dmsData: ObservableModelData
-    @Published public var hmsData: ObservableModelData
+    // We create an map of mode to observable model for each
+    // expression mode. This generalises supporting multiple modes
+    // even if we only do HMS and DMS right now.
+    @Published var models: [ModelData.ExprMode: ObservableModelData] = [:]
     
     init() {
-        self.dmsData = ObservableModelData(mode: .DMS)
-        self.hmsData = ObservableModelData(mode: .HMS)
+        for mode in ModelData.ExprMode.allCases {
+            models[mode] = ObservableModelData(mode: mode)
+        }
     }
 }
