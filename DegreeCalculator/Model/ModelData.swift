@@ -36,7 +36,7 @@ enum CalculatorFunction: Int {
     case EQUAL
     // Entry is a single number entered
     case ENTRY
-    // M360 is a triple tap on - to subtract 360
+    // M360 is a triple tap on - to subtract 360° / 24h
     case M360
 }
 
@@ -152,11 +152,9 @@ class ModelData {
     /** The entry mode for this model. */
     let exprMode: ExprMode
     
-
     init(mode: ExprMode) {
         self.exprMode = mode
     }
-    
     
     /**
      builtExpressions is the list of expressions built.
@@ -437,11 +435,19 @@ class ModelData {
             }
         }
         
-        addEntry(Operator.subtract.rawValue)
-        addEntry("3")
-        addEntry("6")
-        addEntry("0")
-        addEntry("°")
+        switch exprMode {
+        case .DMS:
+            addEntry(Operator.subtract.rawValue)
+            addEntry("3")
+            addEntry("6")
+            addEntry("0")
+            addEntry("°")
+        case .HMS:
+            addEntry(Operator.subtract.rawValue)
+            addEntry("2")
+            addEntry("4")
+            addEntry("h")
+        }
         return equal()
     }
     
