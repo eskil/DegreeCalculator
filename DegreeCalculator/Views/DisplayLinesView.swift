@@ -7,12 +7,21 @@
 
 import SwiftUI
 
+struct ScrollOffsetPreferenceKey: PreferenceKey {
+    static var defaultValue: CGPoint = .zero
+    
+    static func reduce(value: inout CGPoint, nextValue: () -> CGPoint) {
+    }
+}
+
 struct DisplayLinesView: View {
     @ObservedObject var model: ObservableModelData
     // Track last `DisplayLine` id shown. We scroll to the bottom
     // when `ObservableModelData`'s `displayLines`'s last id is different.
     @State private var previousLastLineID: Int? = nil
 
+    @State private var scrollPosition: CGPoint = .zero
+    
     // Draw a thin line
     var Underscore: some View {
         Rectangle()
@@ -32,57 +41,74 @@ struct DisplayLinesView: View {
         }
     }
     
-    var body: some View {
-        ScrollView {
-            ScrollViewReader { scrollReader in
-                ForEach(model.displayLines, id: \.id) { line in
-                    LazyVStack {
-                        if let op = line.trailingOperator {
-                            switch op {
-                            case "=":
-                                Text(line.value + " " + op)
-                                    .frame(maxWidth: .infinity, alignment: .leading)
-                                    .foregroundColor(.white)
-                                Underscore
-                            case "==":
-                                Text(line.value + " ")
-                                    .frame(maxWidth: .infinity, alignment: .leading)
-                                    .foregroundColor(.white)
-                                DoubleUnderscore
-                            default:
-                                Text(line.value + " " + op)
-                                    .frame(maxWidth: .infinity, alignment: .leading)
-                                    .foregroundColor(.white)
-                            }
-                        } else {
-                            Text(line.value)
-                                .frame(maxWidth: .infinity, alignment: .leading)
-                                .foregroundColor(.yellow)
-                        }
-                    }
-                    .id(line.id)
-                }                
-                .onChange(of: model.displayLines) { lines in
-                    guard let last = lines.last else { return }
-                    if last.id != previousLastLineID {
-                        scrollReader.scrollTo(last.id, anchor: .bottom)
-                        previousLastLineID = last.id
-                    }
+    func DisplayLine(_ line: DisplayLine) -> some View {
+        LazyVStack {
+            if let op = line.trailingOperator {
+                switch op {
+                case "=":
+                    Text(line.value + " " + op)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .foregroundColor(.white)
+                    Underscore
+                case "==":
+                    Text(line.value + " ")
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .foregroundColor(.white)
+                    DoubleUnderscore
+                default:
+                    Text(line.value + " " + op)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .foregroundColor(.white)
                 }
-                .onAppear {
-                    guard let last = model.displayLines.last else { return }
-                    if last.id != previousLastLineID {
-                        withAnimation(.easeOut(duration: 0.0)) {
-                            scrollReader.scrollTo(last.id, anchor: .bottom)
-                        }
-                        previousLastLineID = last.id
-                    }
+            } else {
+                Text(line.value)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .foregroundColor(.yellow)
+            }
+        }
+        .id(line.id)
+    }
+    
+    var DisplayLines: some View {
+        ScrollViewReader { scrollReader in
+            
+            ForEach(model.displayLines, id: \.id) { line in
+                DisplayLine(line)
+            }
+            .onChange(of: model.displayLines) { lines in
+                guard let last = lines.last else { return }
+                if last.id != previousLastLineID {
+                    scrollReader.scrollTo(last.id, anchor: .bottom)
+                    previousLastLineID = last.id
                 }
             }
-            .transaction { $0.animation = nil }
+            .onAppear {
+                guard let last = model.displayLines.last else { return }
+                if last.id != previousLastLineID {
+                    withAnimation(.easeOut(duration: 0.0)) {
+                        scrollReader.scrollTo(last.id, anchor: .bottom)
+                    }
+                    previousLastLineID = last.id
+                }
+            }
         }
+    }
+    
+    var body: some View {
+
+        ScrollView {
+            DisplayLines
+                .background(GeometryReader { geometry in
+                    Color.clear
+                        .preference(key: ScrollOffsetPreferenceKey.self, value: geometry.frame(in: .named("scroll")).origin)
+                })
+                .onPreferenceChange(ScrollOffsetPreferenceKey.self) { value in
+                    self.scrollPosition = value
+                    NSLog("scrollPos \(value)")
+                }
+        }
+        .coordinateSpace(name: "scroll")
         .transaction { $0.animation = nil }
-        //.frame(width: geo.size.width, height: geo.size.height/2)
         .font(.system(.largeTitle, design: .monospaced))
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .padding(20.0)
