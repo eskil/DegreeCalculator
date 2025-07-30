@@ -16,9 +16,9 @@ This is written for celestial navigation using tables. The features are
 
 It was also for me to experiment with and try learning some Swift and SwiftUI.
 
-![screenshot showing app in basic use](Screenshot-v2-base.png?raw=true "screenshot showing app" in basic use)
-![screenshot showing app doing division](Screenshot-v2-div.png?raw=true "screenshot showing app doing division")
-![screenshot showing app in hours-minutes-seconds](Screenshot-v2-hms.png?raw=true "screenshot showing app in hours-minutes-seconds")
+![screenshot showing app in basic use](Screenshots/Screenshot-v2-base.png?raw=true "screenshot showing app in basic use")
+![screenshot showing app doing division](Screenshots/Screenshot-v2-div.png?raw=true "screenshot showing app doing division")
+![screenshot showing app in hours-minutes-seconds](Screenshots/Screenshot-v2-hms.png?raw=true "screenshot showing app in hours-minutes-seconds")
 
 Todo
 
