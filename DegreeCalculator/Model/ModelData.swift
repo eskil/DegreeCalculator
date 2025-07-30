@@ -30,17 +30,97 @@ enum CalculatorFunction: Int {
     case ADD
     // Start - operation
     case SUBTRACT
+    // Start / operation, only accept "normal" numeric input
+    case DIV
     // Compute current math operationr
     case EQUAL
     // Entry is a single number entered
     case ENTRY
-    // M360 is a triple tap on - to subtract 360
+    // M360 is a triple tap on - to subtract 360° / 24h
     case M360
 }
 
+/**
+ Extension that adds some helpers to `String` to optionall add DMS/HMS symbols if "ok".
+ 
+ Each function checks if adding the symbol is ok. Eg. if the string already has a ° symbol, you can't add another.
+ And when it can be added, it might insert other chars early. Eg. if adding ' after a number to make it a minute,
+ we add 0° iff there's no degree already added.
+ 
+ They all return true if the symbol can be added and false if not. On false, the calling code should _not_ add
+ the symbol to the input stack.
+ */
+extension String {
+    mutating func addDegreeHour(mode: ModelData.ExprMode) -> Bool {
+        switch mode {
+        case .DMS:
+            guard !self.contains("°") else {
+                return false
+            }
+
+            if self.isEmpty {
+                self = "0°"
+            } else {
+                self += "°"
+            }
+        case .HMS:
+            guard !self.contains("h") else {
+                return false
+            }
+
+            if self.isEmpty {
+                self = "0h"
+            } else {
+                self += "h"
+            }
+        }
+        return true
+    }
+    
+    mutating func addMinutes(mode: ModelData.ExprMode) -> Bool {
+        switch mode {
+        case .DMS:
+            // We already set minutes
+            guard !self.contains("'") else {
+                return false
+            }
+            // If we haven't set °, prefix 0°
+            if !self.contains("°")  {
+                self = "0°" + self
+            }
+            // If the last char isn't a number, we're entering "'", so put a 0
+            if let c = self.last {
+                if !c.isNumber {
+                    self += "0"
+                }
+            }
+            self += "'"
+        case .HMS:
+            // We already set minutes
+            guard !self.contains("m") else {
+                return false
+            }
+            // If we haven't set h, prefix 0h
+            if !self.contains("h") {
+                self = "0h" + self
+            }
+            // If the last char isn't a number, we're entering "m", so put a 0 up front
+            if let c = self.last {
+                if !c.isNumber {
+                    self += "0"
+                }
+            }
+            self += "m"
+        }
+        return true
+    }
+}
 
 /**
  ModelData is the observable entity that the UI interacts with.
+ 
+ For performance reasons, the UI goes through ObservableModelData instead.
+ It provides observable published fields.
  
  The primary access is callFunction, called by button widgets to operate on the model.
  
@@ -55,60 +135,104 @@ enum CalculatorFunction: Int {
  
  The naming stems from the SwiftUI tutorials.
 */
-final class ModelData: ObservableObject {
+class ModelData {
+    /* Controls whether we're doing degrees-minutes-seconds math or hours-minutes-seconds
+     */
+    enum ExprMode: CaseIterable{
+        case DMS
+        case HMS
+        
+        var valueHint: Value.ValueTypeHint {
+            switch self {
+            case .DMS:
+                return .dms
+            case .HMS:
+                return .hms
+            }
+        }
+        
+        var label: String {
+            switch self {
+            case .DMS: return "DMS"
+            case .HMS: return "HMS"
+            }
+        }
+    }
+
+    /** The entry mode for this model. */
+    let exprMode: ExprMode
+    
+    init(mode: ExprMode) {
+        self.exprMode = mode
+    }
+    
     /**
-     Entries is the list of expressions.
+     builtExpressions is the list of expressions built.
      
      Each time EQUAL is executed, the current expression is computed (via value)
      and a new expression is started.
      So in short, this stores all expressions computer until a allClear is issued.
      */
-    @Published var entries: [Expr] = [
-        // These comments are various test cases I used regularly.
-        /*
-        // Basic, add two values
-        Expr(op: Operator.Add,
-              left: Expr(Value(degrees: 39, minutes: 15.2)),
-              right: Expr(Value(degrees: 1, minutes: 21.9))),
-        */
-        /*
-        // Unsupported right-leaning tree
-        Expr(op: Operator.Add,
-                       left: Expr(Value(degrees: 39, minutes: 15.2)),
-                       right: Expr(op: Operator.Subtract,
-                                    left: Expr(Value(degrees: 1, minutes: 21.9)),
-                                    right: Expr(op: Operator.Add,
-                                                 left: Expr(Value(degrees: 49, minutes: 37.1)),
-                                                 right: Expr(Value(degrees: 350, minutes: 51.9))))),
-         */
-        /*
-        // Supported left-leaning tree
-        Expr(op: Operator.Add,
-                       left: Expr(op: Operator.Subtract,
-                                   left: Expr(op: Operator.Add,
-                                               left: Expr(Value(degrees: 39, minutes: 15.2)),
-                                               right: Expr(Value(degrees: 1, minutes: 21.9))),
-                                   right: Expr(Value(degrees: 49, minutes: 37.1))),
-                       right: Expr(Value(degrees: 350, minutes: 51.9))),
-         */
-        /*
-        // Unclosed tree
-        Expr(op: Operator.Subtract,
-             left: Expr(op: Operator.Add,
-                        left: Expr(Value(degrees: 1, minutes: 2.3)),
-                        right: Expr(Value(degrees: 4, minutes: 5.6))),
-             right: nil),
-         */
-        // The initial value is a empty expression that we're inserting into.
-        Expr(),
-    ]
+    internal var builtExpressions: [Expr] = []
     
     /**
-     This is the string that is currently being edited. By keeping it as a simple string, we can delete
-     (edit) it by simply removing chars.
+     The inputStack is the raw unprocessed sequence of characters input by the user.
+     
+     This allows for editing the input, eg. the most basic operation is backspace - pop
+     the last input - and the current inputStack can be replayed to a new expression.
      */
-    @Published var entered: String = ""
-
+    internal var inputStack: [Character] = []
+    
+    /**
+     currentNumber is the current Value being input, as a string.
+     
+     As long as the input character is part of a Value, it's appended to this.
+     
+     At any time this value should be convertible to a Value. This is relied on
+     when the input is an operator (and non-number charactor). Then currentNumber is
+     used to construct a Value..
+     
+     it is difrerent from the inputStack in that it's manipulated, not just user entered data. Eg. for DMS values, if you enter "'" alone, "0°0" is prepended.
+     */
+    internal var currentNumber: String = ""
+    
+    /**
+     expressionStack is the stack of evaluated subexpressions.
+     
+     As operators are entered (see operatorStack), we can process the input into
+     expressions. These are kept in this stack.
+     
+     Eg. when entering "10/2+", when + is entered, before it's pushed onto the operatorStack
+     (which already has /) we eval the expression.
+     
+     The expressionStack has two Expr.num values (10 and 2), that can popped along with the
+     operatorStack, those three components are used to make a Expr.operation that's put
+     on the expressionStack.
+     
+     After "+", the operatorStack has "+" and the expressionStack has "10/2".
+     */
+    internal var expressionStack: [Expr] = []
+    
+    /**
+     OperatorStack contains the operators input but _not yet_ evaluated.
+     
+     This is key to handling precedence. As numbers and operators are entered, we keep a stack of
+     operators entered. Eg. entering "2 + 4 -" will have + on the stack until -
+     is entered. Since it's same-or-lower precedence, we can pop + from the stack and
+     process "2 + 4" into a new expression and put into expressionStack.
+     
+     If we entered "2 / 4 + ", we'd have / on the stack until + is entered.
+     Since + is same-or-lower precedence then /, we can pop / from the stack and process "2 / 4".
+     This leaves - on the operator stack.
+     
+     But if we enter "2 + 4 /", we'd have - on the stack until / is entered.
+     Since / higher precedence then +, we can't evaluate "2 + 4" yet, so the stack is now "+ /".
+     */
+    internal var operatorStack: [Operator] = []
+    
+    /** When last operator is divide, disable degrees/jhours/minutes input */
+    internal var intOnly: Bool = false
+    
     /**
      Main access point for the model data
      It takes a CalculatorFunction (enum) and in the case of ENTRY, the label, a string that
@@ -123,44 +247,124 @@ final class ModelData: ObservableObject {
      callFunction(EQUAL, "")
      */
     func callFunction(_ f: CalculatorFunction, label: String) {
+        let _ = ExecutionTimer("thread: \(Thread.current): ModelData.callFunction \(f) label: \(label)", indent:1 )
+                
         switch f {
         case .ANS:
-            return ans()
+            ans()
         case .ALL_CLEAR:
-            return allClear()
+            allClear()
         case .CLEAR:
-            return clear()
+            clear()
         case .DELETE:
-            return delete()
+            delete()
         case .ADD:
-            return add()
+             add()
         case .SUBTRACT:
-            return subtract()
-        case .EQUAL:
-            return equal()
-        case .ENTRY:
-            return addEntry(label)
+             subtract()
+        case .DIV:
+             divide()
         case .M360:
-            return minus_360()
+             minus_360()
+        case .EQUAL:
+            equal()
+        case .ENTRY:
+            if label.count == 1,
+               let char = label.first
+            {
+                addEntry(char)
+            }
         }
     }
     
-    func addEntry(_ string: String) {
-        if string == "°" {
-            setDegree()
-        } else if string == "'" {
-            setMinutes()
-        } else {
-            // If we have a ' and it's the last, we can add a number. But if not, we've already
-            // maxed our string
-            if entered.contains("'") {
-                if let c = entered.last {
-                    if c == "'" {
-                        entered += string
-                    }
-                }
-            } else {
-                entered += string
+    /**
+     Helper function to input a string. This is primarily for testing/preview uses.
+     */
+    func inputString(_ string: String) {
+        for ch in string {
+            switch ch {
+            case _ where ch.isWhitespace:
+                break
+            case "+":
+                callFunction(CalculatorFunction.ADD, label: "")
+            case "-":
+                callFunction(CalculatorFunction.SUBTRACT, label: "")
+            case "/":
+                callFunction(CalculatorFunction.DIV, label: "")
+            case "=":
+                callFunction(CalculatorFunction.EQUAL, label: "")
+            case "D":
+                callFunction(CalculatorFunction.DELETE, label: "")
+            case "C":
+                callFunction(CalculatorFunction.CLEAR, label: "")
+            case "A":
+                callFunction(CalculatorFunction.ALL_CLEAR, label: "")
+            case "M":
+                callFunction(CalculatorFunction.M360, label: "")
+            default:
+                callFunction(CalculatorFunction.ENTRY, label: String(ch))
+            }
+        }
+    }
+    
+    // NOTE: _ is a Swift syntax to indicate the argument doesn't need to be named when
+    // called, ie. addEntry("str") instead of addEntry(string: "str")
+    func addEntry(_ char: Character) {
+        /**
+         If it's a number or dms/hms char, append to currentNumber, otherwise it's an
+         operator and we start an expression on expressionStack.
+         */
+        if char.isNumber {
+            inputStack.append(char)
+            currentNumber.append(char)
+        }
+        else if exprMode == .DMS && char == "°" && !intOnly {
+            if currentNumber.addDegreeHour(mode: exprMode) {
+                inputStack.append(char)
+            }
+        }
+        else if exprMode == .DMS && char == "'" && !intOnly {
+            if currentNumber.addMinutes(mode: exprMode) {
+                inputStack.append(char)
+            }
+        }
+        else if exprMode == .HMS && char == "h" && !intOnly {
+            if currentNumber.addDegreeHour(mode: exprMode) {
+                inputStack.append(char)
+            }
+        }
+        else if exprMode == .HMS && char == "m" && !intOnly {
+            if currentNumber.addMinutes(mode: exprMode) {
+                inputStack.append(char)
+            }
+        }
+        else if !currentNumber.isEmpty, let inputOp = Operator(rawValue: char) {
+            inputStack.append(char)
+            /**
+             We're entering an operator, so convert the currentNumber
+             input into an Expr.value and push onto the expressionStack.
+             This makes it availble for composing into a new expression
+             depending on the precedence of the operator.
+             */
+            if let val = Value(parsing: currentNumber, hint: intOnly ? .integer : exprMode.valueHint) {
+                expressionStack.append(.value(val))
+                currentNumber = ""
+            }
+            /**
+             As long as the top of the operator stack has higher or equal
+             precedence than the operator entered, we pop the operator, which will
+             replace the last two entries on expressionStack with a "left op right"
+             expression. This handles precedence.
+             */
+            while let lastOp = operatorStack.last, lastOp.precedence >= inputOp.precedence {
+                popOperator()
+            }
+            // Add the newly input operator
+            operatorStack.append(inputOp)
+            
+            // If we've entered an divide operator, only accept ints - no division by dms/hms.
+            if inputOp == Operator.divide {
+                intOnly = true
             }
         }
     }
@@ -169,219 +373,250 @@ final class ModelData: ObservableObject {
      Reset the entire state.
      */
     func allClear() {
-        entries = [Expr()]
-        entered = ""
+        intOnly = false
+        builtExpressions.removeAll()
+        inputStack.removeAll()
+        currentNumber.removeAll()
+        expressionStack.removeAll()
+        operatorStack.removeAll()
     }
     
     func clear() {
-        // FIXME: if entered is empty it should delete the current expression.
+        // FIXME: if inputStack is empty it should delete the current expression.
         // Eg. "enter 1d2'3+", pressing clear should remove that.
-        entered = ""
+        inputStack.removeAll()
+        currentNumber.removeAll()
     }
     
     func delete() {
-        if entered.isEmpty {
-            if let root = entries.last {
-                if root.nodes.isEmpty && root.op == nil {
-                    return
-                }
-                let left = root.nodes[0]
-                
-                // Reset the entered string to right.v, left.v or .v in that order of preference.
-                if left.nodes.count == 2, let rightv = left.nodes[1].v {
-                    entered = rightv.description
-                } else if left.nodes.count == 1, let leftv = left.nodes[0].v {
-                    entered = leftv.description
-                } else if let v = left.v {
-                    entered = v.description
-                }
-                
-                var newRoot: Expr
-                if left.op == nil {
-                    // If left has no op, it's a value, so we're at the first entry of the expression - reset tree.
-                    newRoot = Expr()
-                } else {
-                    // Otherwise, left side forms new root, but we go back to the "pre-operator" state
-                    newRoot = Expr(op: left.op, left: left.nodes[0], right: nil)
-                }
-                entries.removeLast()
-                entries.append(newRoot)
-            }
-        } else {
-            entered.removeLast()
-        }
-        debugLog("DEL")
+        guard !inputStack.isEmpty else { return }
+        let _ = inputStack.removeLast()
+        rebuildExpr()
     }
     
     func ans() {
-        if entries.count > 1 {
-            let last = entries[entries.count-2]
-            if let val = last.value {
-                entered = val.description
+        if let val = builtExpressions.last?.value {
+            if !currentNumber.isEmpty {                
+                inputStack.removeAll()
+                currentNumber.removeAll()
+            }
+            for c in val.description {
+                addEntry(c)
             }
         }
     }
-    
-    func parseValue(_ s: String) -> Value {
-        // Simple parse by just splitting on ° and '. This works since
-        // prepExpr inserts ° and ' and trailing 0.
-        var degrees = 0
-        var minutes: Decimal = 0.0
         
-        let trimmed = s.trimmingCharacters(in: .whitespaces)
-        let dgm = trimmed.split(separator: "°")
-        if dgm.count > 0 {
-            degrees = Int(dgm[0]) ?? 0
-            if dgm.count == 2 {
-                let mins = dgm[1].split(separator: "'")
-                if mins.count == 2 {
-                    minutes = Decimal(Int(mins[0]) ?? 0) + (Decimal((Int(mins[1]) ?? 0)) / 10.0)
-                } else {
-                    minutes = Decimal(Int(mins[0]) ?? 0)
-                }
-            }
-        }
-        
-        return Value(degrees: degrees, minutes: minutes)
-    }
-    
-    func prepExpr() -> Expr {
-        // If the string is emptish, this will create a 0d0'0
-        // First add a d symbol, which will add a leading 0
-        setDegree()
-        // Then add ' symbol, which will add 0 after degree is there's no numbers
-        setMinutes()
-        // Then add a 0 after the last '
-        addEntry("0")
-        
-        let value = parseValue(entered)
-        return Expr(value)
-    }
-    
     private func debugLog(_ name: String) {
         do {
             let encoder = JSONEncoder()
             encoder.outputFormatting = .prettyPrinted
-            let data = try encoder.encode(entries)
+            let data = try encoder.encode(builtExpressions)
             NSLog("JSON for \(name)")
             NSLog(String(data: data, encoding: .utf8)!)
         } catch {
             NSLog("oops")
         }
     }
-    
-    func startExpr(op: Operator) {
-        if entered.isEmpty {
-            ans()
-        }
-        if entered.isEmpty {
-            // No previous answer
-            return
-        }
-        let node = prepExpr()
         
-        if var root = entries.last {
-            if root.op == nil  {
-                // Fresh root
-                root.op = op
-                root.nodes.append(node)
-                entries.removeLast()
-                entries.append(root)
-            } else if root.op != nil && root.nodes.count == 1 {
-                // Root has a left side & operator, add right side value and new operator
-                root.nodes.append(node)
-                let newRoot = Expr(op: op, left: root, right: nil)
-                entries.removeLast()
-                entries.append(newRoot)
-            }
-        } else {
-            NSLog("entries has no root?")
-        }
-        
-        debugLog("op \(op.description)")
-        
-        entered = ""
-    }
-    
     func add() {
-        startExpr(op: Operator.Add)
-    }
-
-    func subtract() {
-        startExpr(op: Operator.Subtract)
+        addEntry(Operator.add.rawValue)
     }
     
-    func equal() {
-        if let root = entries.last {
-            if root.nodes.count == 0 {
+    func subtract() {
+        addEntry(Operator.subtract.rawValue)
+    }
+    
+    func divide() {
+        // If a number is being entered, attempt to close expression first.
+        if !currentNumber.isEmpty {
+            if !(operatorStack.isEmpty && expressionStack.isEmpty) {
+                equal()
+                // If the expr is still open, bail
+                if !currentNumber.isEmpty {
+                    return
+                }
+            }
+        }
+        
+        // If there's nothing being entered, pull in the previous answer.
+        if currentNumber.isEmpty {
+            // **nothing** being entered, pull in the previous answer.
+            if operatorStack.isEmpty && expressionStack.isEmpty {
+                ans()
+            }
+            // Corner case where there's no answer, it's a NOOP.
+            if currentNumber.isEmpty {
                 return
             }
         }
-        let node = prepExpr()
-        
-        if var root = entries.last {
-            if root.op != nil && root.nodes.count == 1 {
-                // Root has a left side & operator, add right side value and new operator
-                root.nodes.append(node)
-                entries.removeLast()
-                entries.append(root)
-                entries.append(Expr())
-            }
-        } else {
-            NSLog("entries has no root?")
-        }
-        
-        debugLog("=")
 
-        entered = ""
+        addEntry(Operator.divide.rawValue)
     }
     
     func minus_360() {
-        // If there's an op, del() so eg. "+" gets removed.
-        if let root = entries.last {
-            if root.op != nil && root.nodes.count == 1 {
-                delete()
+        // If a number is being entered, attempt to close expression first.
+        if !currentNumber.isEmpty {
+            if !(operatorStack.isEmpty && expressionStack.isEmpty) {
+                equal()
+                // If the expr is still open, bail
+                if !currentNumber.isEmpty {
+                    return
+                }
             }
         }
-        // Start a subtractions
-        startExpr(op: Operator.Subtract)
-        // and erase whatever was entered and insert 360 degrees
-        entered = "360"
-        setDegree()
+        
+        // If there's nothing being entered, pull in the previous answer.
+        if currentNumber.isEmpty {
+            // **nothing** being entered, pull in the previous answer.
+            if operatorStack.isEmpty && expressionStack.isEmpty {
+                ans()
+            }
+            // Corner case where there's no answer, it's a NOOP.
+            if currentNumber.isEmpty {
+                return
+            }
+        }
+        
+        switch exprMode {
+        case .DMS:
+            addEntry(Operator.subtract.rawValue)
+            addEntry("3")
+            addEntry("6")
+            addEntry("0")
+            addEntry("°")
+        case .HMS:
+            addEntry(Operator.subtract.rawValue)
+            addEntry("2")
+            addEntry("4")
+            addEntry("h")
+        }
         return equal()
     }
     
-    func setDegree() {
-        if entered.contains("'") {
+    func equal() {
+        // Avoid cases like "1=" leaving 1 on the builtExpressions.
+        if expressionStack.isEmpty {
             return
         }
-        if entered.contains("°") {
-            return
-        }
-        if entered.isEmpty {
-            entered = "0°" + entered
-        } else {
-            entered += "°"
+        
+        if let _ = buildExpr() {
+            // Reset this now, since buildExpr replays the input,
+            // so it could have gotten toggled.
+            intOnly = false
+            inputStack.removeAll()
+            currentNumber.removeAll()
+            expressionStack.removeAll()
+            operatorStack.removeAll()
         }
     }
     
-    func setMinutes() {
-        // We already set minutes
-        if entered.contains("'") {
+    /**
+    Build an expression from the current expressionStack and operatorStack.
+    */
+    func buildExpr() -> Expr? {
+        let _ = ExecutionTimer("thread: \(Thread.current): ModelData.buildExpr \(self)", indent: 2)
+
+        /* Why this rebuild? Because of the expression has become partly formed
+        after a delete, but buildExpr was called, we may have manipulated the stack.
+
+        Calling rebuild is a simple/safe way to hard reset the whole thing.
+
+        It's possible this function could be fixed to not need this, but it's not
+        worth saving a few cpu cycles for this.
+        */
+        rebuildExpr()
+
+        for expr in expressionStack {
+            print("\t\t\t- \(expr)")
+        }
+
+        /*
+        If a number is being entered, ensure it's processed and on the expressionStack.
+        This manipulates the stacks and why we call rebuildExpr early
+        */
+        if let val = Value(parsing: currentNumber, hint: intOnly ? .integer : exprMode.valueHint) {
+            expressionStack.append(Expr.value(val))
+            currentNumber = ""
+        } else {
+            NSLog("Cannot convert currentNumber to value")
+            return nil
+        }
+        /* Now clear the operator stack. */
+        while !operatorStack.isEmpty {
+            popOperator()
+        }
+
+        for expr in expressionStack {
+            NSLog("\t\t\t- \(expr)")
+        }
+
+        /*
+        The operatorStack can be non-empty if eg. buildExpr is called,
+        but there's no number entered after an operator (for example, "2+2/").
+
+        In that case we return nil as there's no value to compute.
+
+        As a sanity check, ensure the expressionStack is 1.
+        */
+        if operatorStack.isEmpty, expressionStack.count == 1, let expr = expressionStack.last {
+            builtExpressions.append(expr)
+            return expr
+        } else {
+            NSLog("Expression not closed, operatorStack not empty")
+        }
+        return nil
+    }
+
+    
+    /**
+     Pop a single operator from the operatorStack and build an expression.
+     See comment for operatorStack for details.
+     */
+    private func popOperator() {
+        for expr in expressionStack {
+            print("\t\t\t- \(expr)")
+        }
+        guard operatorStack.count > 0, expressionStack.count > 0 else { return }
+        guard let op = operatorStack.popLast(),
+              let right = expressionStack.popLast(),
+              let left = expressionStack.popLast()
+        else {
+            /*
+            NO, if there's an op but no rhs, we did go get gone fucked'
+             */
+            NSLog("\t\tpop missing element")
             return
         }
-        // If there's no degrees, insert 0 degrees up front
-        if entered.contains("°") == false {
-            entered = "0°" + entered
-        }
-        // If the last char isn't a number, we're entering "'", so put a 0 up front
-        if let c = entered.last {
-            if c.isNumber == false {
-                entered += "0"
-            }
-        }
-        entered += "'"
+        expressionStack.append(Expr.binary(op: op, lhs: left, rhs: right))
     }
+    
+    /**
+    Rebuild the expression from scratch.
+    
+    This clears all the stacks and replays (from a copy)
+    all the characters input.
+    
+    This simplifies a lot of stack management, eg. during "backspace",
+    since we don't have to try and manage the tree.
+    */
+    func rebuildExpr() {
+        // copy the array
+        let backup = inputStack
+        inputStack.removeAll()
+        expressionStack.removeAll()
+        operatorStack.removeAll()
+        currentNumber.removeAll()
+
+        // let tmp = intOnly
+        // defer { intOnly = tmp }
+
+        // Turn off intonly, addEntry sets it to true if we're ending on a /
+        intOnly = false
+        for char in backup {
+            addEntry(char)
+        }
+    }
+
 }
 
 

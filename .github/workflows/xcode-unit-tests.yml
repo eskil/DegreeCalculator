@@ -10,4 +10,15 @@ jobs:
     - name: Select Xcode
       run: sudo xcode-select -switch /Applications/Xcode_14.3.app && /usr/bin/xcodebuild -version
     - name: Run tests
-      run: xcodebuild test -project DegreeCalculator.xcodeproj -scheme DegreeCalculator -sdk iphonesimulator -destination 'platform=iOS Simulator,name=iPhone 14,OS=16.4' | xcpretty && exit ${PIPESTATUS[0]}
+      run: |
+        xcodebuild test \
+          -project DegreeCalculator.xcodeproj \
+          -scheme DegreeCalculator \
+          -sdk iphonesimulator \
+          -destination 'platform=iOS Simulator,name=iPhone 14,OS=16.4' \
+          -enableCodeCoverage YES | tee xcodebuild.log
+          
+    - name: Format output with xcbeautify
+      run: |
+        cat xcodebuild.log | xcbeautify
+
