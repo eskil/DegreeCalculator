@@ -1,5 +1,4 @@
-//
-//  RootView.swift
+//  RootView.swifta
 //  DegreeCalculator
 //
 //  Created by Eskil Olsen on 5/19/23.
@@ -8,11 +7,9 @@
 import SwiftUI
 
 struct RootView: View {
-    // The root instantiates the app state
     @StateObject var appState = AppState()
-    // We support all the expression modes the ModelData supports
     @State private var currentMode: ModelData.ExprMode = .DMS
-    
+
     // This is our toggle widget in the toolbar.
     var modeToggleButton: some View {
         Button(action: {
@@ -35,28 +32,45 @@ struct RootView: View {
             .foregroundColor(.blue)
         }
         .accessibilityLabel("Toggle Mode")
-
     }
     
     var body: some View {
         NavigationStack {
             ZStack {
                 Color.black.ignoresSafeArea()
-                if let model = appState.models[currentMode] {
+                
+                /* This seems odd, but if I instead just do;
+                 
+                     CalculatorView()
+                       .environmentObject(appState.models[currentMode]!)
+                       .transition(.opacity.combined(with: .scale))
+                 
+                   the .transition(...) doesn't take effect. :shrug:
+                 */
+                switch currentMode {
+                case .DMS:
                     CalculatorView()
-                        .environmentObject(model)
+                        .environmentObject(appState.models[ModelData.ExprMode.DMS]!)
+                        .transition(.opacity.combined(with: .scale))
+                case .HMS:
+                    CalculatorView()
+                        .environmentObject(appState.models[ModelData.ExprMode.HMS]!)
                         .transition(.opacity.combined(with: .scale))
                 }
             }
             .animation(.easeInOut(duration: 0.2), value: currentMode)
             .toolbar {
-                /* I tried a picker as well, but prefer the togglebuttons
-                Picker("Mode", selection: $currentMode) {
-                    ForEach(ModelData.ExprMode.allCases, id: \.self) { mode in
-                        Text(mode.label).tag(mode)
-                    }
-                }
-                .pickerStyle(.segmented)
+                /*
+                 I tried a picker as well
+                 
+                   Picker("Mode", selection: $currentMode) {
+                      ForEach(ModelData.ExprMode.allCases, id: \.self) { mode in
+                          Text(mode.label).tag(mode)
+                      }
+                   }
+                   .pickerStyle(.segmented)
+                 
+                 but prefer the togglebuttons
                 */
                 
                 ToolbarItemGroup(placement: .navigationBarLeading) {
