@@ -106,12 +106,46 @@ class ObservableModelData: ObservableObject {
     var exprMode: ModelData.ExprMode {
         get { return md.exprMode }
     }
-    
-    func callFunction(_ f: CalculatorFunction, label: String) {
+
+    /**
+     FIXME: This is not great subclassing...
+     */
+    func callFunction(_ f: CalculatorFunction, label: String) throws {
         let _ = ExecutionTimer("thread: \(Thread.current): ObservableModelData.callFunction \(f) label: \(label)")
-        md.callFunction(f, label: label)
+        try md.callFunction(f, label: label)
         self.displayLinesCache = self.computeDisplayLines()
         self.publishVars()
+    }
+    
+    /**
+     Helper function to input a string. This is primarily for testing/preview uses.
+     FIXME: This is not great subclassing...
+     */
+    func inputString(_ string: String) throws {
+        for ch in string {
+            switch ch {
+            case _ where ch.isWhitespace:
+                break
+            case "+":
+                try callFunction(CalculatorFunction.ADD, label: "")
+            case "-":
+                try callFunction(CalculatorFunction.SUBTRACT, label: "")
+            case "/":
+                try callFunction(CalculatorFunction.DIV, label: "")
+            case "=":
+                try callFunction(CalculatorFunction.EQUAL, label: "")
+            case "D":
+                try callFunction(CalculatorFunction.DELETE, label: "")
+            case "C":
+                try callFunction(CalculatorFunction.CLEAR, label: "")
+            case "A":
+                try callFunction(CalculatorFunction.ALL_CLEAR, label: "")
+            case "M":
+                try callFunction(CalculatorFunction.M360, label: "")
+            default:
+                try callFunction(CalculatorFunction.ENTRY, label: String(ch))
+            }
+        }
     }
     
     func publishVars() {
