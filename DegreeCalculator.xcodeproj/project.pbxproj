@@ -17,6 +17,7 @@
 		DA63AAE72E32F867000C1FFC /* DisplayLinesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA63AAE62E32F867000C1FFC /* DisplayLinesView.swift */; };
 		DA73AD212E332F8800E85EC9 /* ExecutionTimer.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA73AD202E332F8800E85EC9 /* ExecutionTimer.swift */; };
 		DAA33A8F2A38080F00EA7A2B /* ExprTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAA33A8E2A38080F00EA7A2B /* ExprTests.swift */; };
+		DAA930A82E3B12CD00E62C19 /* Launch Screen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = DAA930A72E3B12CD00E62C19 /* Launch Screen.storyboard */; };
 		DAB074952E1892E600866A30 /* Value.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAB074942E1892E400866A30 /* Value.swift */; };
 		DAB074972E18934800866A30 /* ValueTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAB074962E18934700866A30 /* ValueTests.swift */; };
 		DACF74592A18675D00826755 /* CalculatorButtonStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = DACF74582A18675D00826755 /* CalculatorButtonStyle.swift */; };
@@ -62,6 +63,7 @@
 		DA73AD202E332F8800E85EC9 /* ExecutionTimer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExecutionTimer.swift; sourceTree = "<group>"; };
 		DAA33A8E2A38080F00EA7A2B /* ExprTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExprTests.swift; sourceTree = "<group>"; };
 		DAA33A902A38169600EA7A2B /* DegreeCalculator.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = DegreeCalculator.xctestplan; sourceTree = "<group>"; };
+		DAA930A72E3B12CD00E62C19 /* Launch Screen.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = "Launch Screen.storyboard"; sourceTree = "<group>"; };
 		DAB074942E1892E400866A30 /* Value.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Value.swift; sourceTree = "<group>"; };
 		DAB074962E18934700866A30 /* ValueTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ValueTests.swift; sourceTree = "<group>"; };
 		DABA948D2A3D2D4700D1EC60 /* SimpleIcon.pxd */ = {isa = PBXFileReference; lastKnownFileType = file; path = SimpleIcon.pxd; sourceTree = "<group>"; };
@@ -195,6 +197,7 @@
 			children = (
 				DABA948E2A3D2D4700D1EC60 /* SimpleIcon.png */,
 				DABA948D2A3D2D4700D1EC60 /* SimpleIcon.pxd */,
+				DAA930A72E3B12CD00E62C19 /* Launch Screen.storyboard */,
 			);
 			path = Assets;
 			sourceTree = "<group>";
@@ -303,6 +306,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				DAA930A82E3B12CD00E62C19 /* Launch Screen.storyboard in Resources */,
 				DA61AEF42A1840FB00048DAB /* Preview Assets.xcassets in Resources */,
 				DA61AEF12A1840FB00048DAB /* Assets.xcassets in Resources */,
 			);
@@ -511,7 +515,7 @@
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 4;
+				CURRENT_PROJECT_VERSION = 6;
 				DEVELOPMENT_ASSET_PATHS = "\"DegreeCalculator/Preview Content\"";
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -519,6 +523,7 @@
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UILaunchStoryboardName = SimpleIcon;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
 				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
@@ -544,7 +549,7 @@
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 4;
+				CURRENT_PROJECT_VERSION = 6;
 				DEVELOPMENT_ASSET_PATHS = "\"DegreeCalculator/Preview Content\"";
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -552,6 +557,7 @@
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UILaunchStoryboardName = SimpleIcon;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
 				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
