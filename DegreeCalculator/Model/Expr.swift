@@ -32,6 +32,10 @@ enum Operator: Character, CustomStringConvertible, Hashable, Codable  {
 }
 
 
+/**
+ `Enum` is the core expressions. It's an enum with associated values to encode
+ binary operations or values.
+ */
 indirect enum Expr: Codable, Hashable, CustomStringConvertible {
     case value(Value)
     case binary(op: Operator, lhs: Expr, rhs: Expr)
@@ -91,7 +95,7 @@ indirect enum Expr: Codable, Hashable, CustomStringConvertible {
     }
     
     /**
-     Inorder visit the tree, apply visit function to each node.
+     Inorder visit the tree and apply `visit` function to each node.
      */
     public func inOrder(visit: (Expr) -> Void) {
         switch self {
@@ -107,7 +111,7 @@ indirect enum Expr: Codable, Hashable, CustomStringConvertible {
     /**
      Generate a debug print friend multi line (list of strings) decsription of the expression.
      
-     This isn't used anywhere, it's left as it's useful for debugging.
+     NOTE: This isn't used anywhere, it's left as it's useful for debugging.
      */
     var multiline: [String] {
         var result: [String] = []
