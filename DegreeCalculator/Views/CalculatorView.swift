@@ -122,7 +122,7 @@ struct CalculatorView: View {
                     CalculatorButton(label: "'", function: CalculatorFunction.ENTRY)
                         .disabled(modelData.intOnly)
                     CalculatorButton(label: "=", function: CalculatorFunction.EQUAL)
-#if false // double up size of button
+#if false // double up size of button, since introducing division, the equal button is normal size
                         .background(
                             GeometryReader { geo in
                                 /* See https://stackoverflow.com/a/68291983/21866895
