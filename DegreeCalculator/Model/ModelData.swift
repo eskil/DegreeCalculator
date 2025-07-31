@@ -499,6 +499,11 @@ class ModelData {
             return
         }
         
+        // If there's an operator but no number (1+), delete the operator
+        if !operatorStack.isEmpty && currentNumber.isEmpty {
+            delete()
+        }
+        
         if let _ = buildExpr() {
             // Reset this now, since buildExpr replays the input,
             // so it could have gotten toggled.

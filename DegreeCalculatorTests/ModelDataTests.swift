@@ -373,7 +373,19 @@ final class ModelDataTests: XCTestCase {
         XCTAssertEqual(md.currentNumber, "1°2'3")
         XCTAssertEqual(md.builtExpressions, [])
     }
-    
+
+    func testEqual_OnInput_Operator_CancelsOperator() {
+        inputString("1°2'3+4°5'6-")
+        inputString("=")
+        XCTAssertEqual(md.inputStack, [])
+        XCTAssertEqual(md.currentNumber, "")
+        XCTAssertEqual(md.builtExpressions, [
+            Expr.binary(op: Operator.add,
+                        lhs: Expr.value(Value(degrees: 1, minutes: 2.3)),
+                        rhs: Expr.value(Value(degrees: 4, minutes: 5.6))),
+        ])
+    }
+
     func testAdd_AndEqual() {
         inputString("1°2'3 + 4°5'6")
         XCTAssertEqual(md.inputStack, Array("1°2'3+4°5'6"))
@@ -383,26 +395,22 @@ final class ModelDataTests: XCTestCase {
         md.callFunction(CalculatorFunction.EQUAL, label: "")
         XCTAssertEqual(md.inputStack, [])
         XCTAssertEqual(md.currentNumber, "")
-        XCTAssertEqual(md.builtExpressions,
-                       [
-                        Expr.binary(op: Operator.add,
-                                    lhs: Expr.value(Value(degrees: 1, minutes: 2.3)),
-                                    rhs: Expr.value(Value(degrees: 4, minutes: 5.6)))
-                       ]
-        )
+        XCTAssertEqual(md.builtExpressions, [
+            Expr.binary(op: Operator.add,
+                        lhs: Expr.value(Value(degrees: 1, minutes: 2.3)),
+                        rhs: Expr.value(Value(degrees: 4, minutes: 5.6))),
+        ])
     }
     
     func testAdd_AndEqualShortStyle() {
         inputString("°4 + 2 =")
         XCTAssertEqual(md.inputStack, [])
         XCTAssertEqual(md.currentNumber, "")
-        XCTAssertEqual(md.builtExpressions,
-                       [
-                        Expr.binary(op: Operator.add,
-                                    lhs: Expr.value(Value(degrees: 0, minutes: 4.0)),
-                                    rhs: Expr.value(Value(degrees: 0, minutes: 2.0)))
-                       ]
-        )
+        XCTAssertEqual(md.builtExpressions, [
+            Expr.binary(op: Operator.add,
+                        lhs: Expr.value(Value(degrees: 0, minutes: 4.0)),
+                        rhs: Expr.value(Value(degrees: 0, minutes: 2.0))),
+        ])
     }
     
     func testAdd_OnEmpty_IsNoop() {
