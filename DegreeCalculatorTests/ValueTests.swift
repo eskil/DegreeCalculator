@@ -10,12 +10,12 @@ import XCTest
 @testable import DegreeCalculator
 
 final class ValueBaseAndIntTests: XCTestCase {
-
+    
     func testInit_IsEmptyValue() throws {
         let v = Value()
         XCTAssert(v.type == .empty)
     }
-
+    
     func testInt_Init() throws {
         let v = Value(integer: 2)
         switch v.type {
@@ -40,7 +40,7 @@ final class ValueBaseAndIntTests: XCTestCase {
             XCTFail("Expected to parse .integer kind")
         }
     }
-
+    
     func testInt_Addding() throws {
         let lhs = Value(integer: 1)
         let rhs = Value(integer: 2)
@@ -54,7 +54,7 @@ final class ValueBaseAndIntTests: XCTestCase {
         let expected = Value(integer: 1)
         XCTAssertEqual(lhs.subtracting(rhs), expected)
     }
-
+    
     func testInt_Dividing() throws {
         let lhs = Value(integer: 8)
         let rhs = Value(integer: 2)
@@ -62,10 +62,24 @@ final class ValueBaseAndIntTests: XCTestCase {
         XCTAssertEqual(lhs.dividing(rhs), expected)
     }
     
-    func testInt_DividingOdd() throws {
+    func testInt_DividingOdd_1() throws {
         let lhs = Value(integer: 9)
         let rhs = Value(integer: 2)
-        let expected = Value(integer: 4)
+        let expected = Value(integer: 5) // verify round up
+        XCTAssertEqual(lhs.dividing(rhs), expected)
+    }
+
+    func testInt_DividingOdd_2() throws {
+        let lhs = Value(integer: 7)
+        let rhs = Value(integer: 3)
+        let expected = Value(integer: 2) // verify round down
+        XCTAssertEqual(lhs.dividing(rhs), expected)
+    }
+
+    func testInt_DividingOdd_3() throws {
+        let lhs = Value(integer: 17)
+        let rhs = Value(integer: 3)
+        let expected = Value(integer: 6) // verify round up
         XCTAssertEqual(lhs.dividing(rhs), expected)
     }
 }
@@ -188,6 +202,13 @@ final class ValueDMSTests: XCTestCase {
         let lhs = Value(degrees: 9, minutes: 30.4)
         let rhs = Value(integer: 2)
         let expected = Value(degrees: 4, minutes: 45.2)
+        XCTAssertEqual(lhs.dividing(rhs), expected)
+    }
+    
+    func testDMS_Dividing_Odd_Up() throws {
+        let lhs = Value(degrees: 31, minutes: 30.8)
+        let rhs = Value(integer: 3)
+        let expected = Value(degrees: 10, minutes: 30.3)
         XCTAssertEqual(lhs.dividing(rhs), expected)
     }
 }
@@ -316,6 +337,13 @@ final class ValueHMSTests: XCTestCase {
         let lhs = Value(hours: 9, minutes: 30, seconds: 4)
         let rhs = Value(integer: 2)
         let expected = Value(hours: 4, minutes: 45, seconds: 2)
+        XCTAssertEqual(lhs.dividing(rhs), expected)
+    }
+
+    func testHMS_Dividing_Odd_Up() throws {
+        let lhs = Value(hours: 31, minutes: 30, seconds: 17)
+        let rhs = Value(integer: 3)
+        let expected = Value(hours: 10, minutes: 30, seconds: 6)
         XCTAssertEqual(lhs.dividing(rhs), expected)
     }
 }
