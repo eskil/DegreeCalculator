@@ -7,8 +7,13 @@
 import SwiftUI
 
 struct RootView: View {
+    @Environment(\.colorScheme) var colorScheme
     @StateObject var appState = AppState()
     @State private var currentMode: ModelData.ExprMode = .DMS
+
+    var backgroundColor: Color {
+        colorScheme == .dark ? Color.black : Color(UIColor.systemGray5)
+    }
 
     // This is our toggle widget in the toolbar.
     var modeToggleButton: some View {
@@ -37,7 +42,7 @@ struct RootView: View {
     var body: some View {
         NavigationStack {
             ZStack {
-                Color.black.ignoresSafeArea()
+                backgroundColor.ignoresSafeArea()
                 
                 /* This seems odd, but if I instead just do;
                  

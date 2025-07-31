@@ -8,16 +8,25 @@
 import SwiftUI
 
 struct DisplayLinesView: View {
+    @Environment(\.colorScheme) var colorScheme
     @ObservedObject var model: ObservableModelData
     // Track last `DisplayLine` id shown. We scroll to the bottom
     // when `ObservableModelData`'s `displayLines`'s last id is different.
     @State private var previousLastLineID: Int? = nil
 
+    var textColor: Color {
+        return colorScheme == .dark ? .white : .black
+    }
+
+    var activeTextColor: Color {
+        return colorScheme == .dark ? .yellow : .blue
+    }
+
     // Draw a thin line
     var Underscore: some View {
         Rectangle()
             .frame(height: 1)
-            .foregroundColor(.white)
+            .foregroundColor(textColor)
             .padding(.trailing, 48)
             .padding(.leading, 48)
             .padding(.top, -14)
@@ -31,7 +40,6 @@ struct DisplayLinesView: View {
             Underscore
         }
     }
-    
     var body: some View {
         ScrollView {
             ScrollViewReader { scrollReader in
@@ -42,22 +50,22 @@ struct DisplayLinesView: View {
                             case "=":
                                 Text(line.value + " " + op)
                                     .frame(maxWidth: .infinity, alignment: .leading)
-                                    .foregroundColor(.white)
+                                    .foregroundColor(textColor)
                                 Underscore
                             case "==":
                                 Text(line.value + " ")
                                     .frame(maxWidth: .infinity, alignment: .leading)
-                                    .foregroundColor(.white)
+                                    .foregroundColor(textColor)
                                 DoubleUnderscore
                             default:
                                 Text(line.value + " " + op)
                                     .frame(maxWidth: .infinity, alignment: .leading)
-                                    .foregroundColor(.white)
+                                    .foregroundColor(textColor)
                             }
                         } else {
                             Text(line.value)
                                 .frame(maxWidth: .infinity, alignment: .leading)
-                                .foregroundColor(.yellow)
+                                .foregroundColor(activeTextColor)
                         }
                     }
                     .id(line.id)
@@ -85,7 +93,8 @@ struct DisplayLinesView: View {
         //.frame(width: geo.size.width, height: geo.size.height/2)
         .font(.system(.largeTitle, design: .monospaced))
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .padding(20.0)
+        .padding([.top], 10.0)
+        .padding([.bottom], 0)
     }
 }
 
@@ -99,7 +108,7 @@ struct DisplayLinesView_Previews: PreviewProvider {
         md.callFunction(CalculatorFunction.EQUAL, label: "")
 
         return DisplayLinesView(model: md)
-            .background(Color.black)
+            .background(.black)
             .previewLayout(.sizeThatFits)
             .padding()
             .environmentObject(md)

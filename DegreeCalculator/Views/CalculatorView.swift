@@ -9,21 +9,18 @@ import SwiftUI
 
 
 struct CalculatorView: View {
+    @Environment(\.colorScheme) var colorScheme
     @EnvironmentObject var modelData: ObservableModelData
     @State var padTop = 0.0
     @State var padRight = 0.0
     
+    var backgroundColor: Color {
+        colorScheme == .dark ? Color.black : Color(UIColor.systemGray5)
+    }
+    
     private func hmsBody() -> some View {
         VStack {
-            GeometryReader { geo in
-                DisplayLinesView(model: modelData)
-                //.frame(width: geo.size.width, height: geo.size.height/2)
-                .font(.system(.largeTitle, design: .monospaced))
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .padding(20.0)
-            }
-            
-            Divider()
+            DisplayLinesView(model: modelData)
             
             Grid(alignment: .topLeading, horizontalSpacing: 1, verticalSpacing: 1) {
                 GridRow {
@@ -80,22 +77,15 @@ struct CalculatorView: View {
                 }
             }
             .padding([.bottom], 20)
-            .background(Color.black)
+            .padding([.top], 0)
+            .background(backgroundColor)
         }
-        .background(.black) //Color(UIColor.lightGray))
+        .background(backgroundColor)
     }
   
     private func dmsBody() -> some View {
         VStack {
-            GeometryReader { geo in
-                DisplayLinesView(model: modelData)
-                //.frame(width: geo.size.width, height: geo.size.height/2)
-                .font(.system(.largeTitle, design: .monospaced))
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .padding(20.0)
-            }
-
-            Divider()
+            DisplayLinesView(model: modelData)
             
             Grid(alignment: .topLeading, horizontalSpacing: 1, verticalSpacing: 1) {
                 GridRow {
@@ -150,9 +140,10 @@ struct CalculatorView: View {
                 }
             }
             .padding([.bottom], 20)
-            .background(Color.black)
+            .padding([.top], 0)
+            .background(backgroundColor)
         }
-        .background(.black) //Color(UIColor.lightGray))
+        .background(backgroundColor)
     }
     
     var body: some View {
