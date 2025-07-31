@@ -122,7 +122,7 @@ struct CalculatorView: View {
                     CalculatorButton(label: "'", function: CalculatorFunction.ENTRY)
                         .disabled(modelData.intOnly)
                     CalculatorButton(label: "=", function: CalculatorFunction.EQUAL)
-#if false // double up size of button
+#if false // double up size of button, since introducing division, the equal button is normal size
                         .background(
                             GeometryReader { geo in
                                 /* See https://stackoverflow.com/a/68291983/21866895
@@ -159,12 +159,15 @@ struct CalculatorView: View {
 struct CalculatorView_Previews: PreviewProvider {
     static func previewFor(deviceName: String, mode: ModelData.ExprMode) -> some View {
         let md = ObservableModelData(mode: mode)
-                
-        md.callFunction(CalculatorFunction.ENTRY, label: "1")
-        md.callFunction(CalculatorFunction.ADD, label: "")
-        md.callFunction(CalculatorFunction.ENTRY, label: "2")
-        md.callFunction(CalculatorFunction.EQUAL, label: "")
-
+            
+        do {
+            try md.callFunction(CalculatorFunction.ENTRY, label: "1")
+            try md.callFunction(CalculatorFunction.ADD, label: "")
+            try md.callFunction(CalculatorFunction.ENTRY, label: "2")
+            try md.callFunction(CalculatorFunction.EQUAL, label: "")
+        } catch {
+            NSLog("Bad input: \(error)")
+        }
         return CalculatorView()
             .environmentObject(md)
             .previewDevice(PreviewDevice(rawValue: deviceName))

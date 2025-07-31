@@ -7,6 +7,9 @@
 
 import Foundation
 
+/**
+ Timer function used while ensuring everything is low latency for the UI.
+ */
 final class ExecutionTimer {
     private let label: String
     private let start: DispatchTime

@@ -15,7 +15,8 @@ import Foundation
  */
 
 /**
- This enum represents the possible functions
+ This enum represents the functions supported in the calculator model.
+ FIXME: should be moved into `ModelData`
  */
 enum CalculatorFunction: Int {
     // Insert last answer as entry
@@ -50,7 +51,7 @@ enum CalculatorFunction: Int {
  They all return true if the symbol can be added and false if not. On false, the calling code should _not_ add
  the symbol to the input stack.
  */
-extension String {
+private extension String {
     mutating func addDegreeHour(mode: ModelData.ExprMode) -> Bool {
         switch mode {
         case .DMS:
@@ -117,31 +118,33 @@ extension String {
 }
 
 /**
- ModelData is the observable entity that the UI interacts with.
+ `ModelData` models the calculator functions.
  
- For performance reasons, the UI goes through ObservableModelData instead.
- It provides observable published fields.
+ For performance reasons, the UI goes through `ObservableModelData` instead, it provides observable published fields
+ that are copies of the ones in `ModelData`
  
- The primary access is callFunction, called by button widgets to operate on the model.
+ The primary access is `callFunction`, called by button widgets to operate on the model.
  
- Internally it maintains a list of Expr objects (from DegreeCore). Where Expr is only
+ Internally it maintains a list of `Expr` objects.. Where `Expr` is only
  responsible for storing the expressions and values and converting to a displayable string,
  ModeData controls the operations.
  
  MVC style, It'd be a better naming to have
  - ModelData is the Controller
- - DegreeCode (Expr & Value) are the Models.
+ - DegreeCore (Expr & Value) are the Models.
  - The UI is the View that uses the descriptions() from the Expr/Value
  
  The naming stems from the SwiftUI tutorials.
 */
 class ModelData {
-    /* Controls whether we're doing degrees-minutes-seconds math or hours-minutes-seconds
+    /**
+     Controls whether we're doing degrees-minutes-seconds math or hours-minutes-seconds
      */
     enum ExprMode: CaseIterable{
         case DMS
         case HMS
-        
+     
+        // Utility to convert to a hint for parsing.
         var valueHint: Value.ValueTypeHint {
             switch self {
             case .DMS:
@@ -151,6 +154,7 @@ class ModelData {
             }
         }
         
+        // Label used in UI.
         var label: String {
             switch self {
             case .DMS: return "DMS"
@@ -159,7 +163,9 @@ class ModelData {
         }
     }
 
-    /** The entry mode for this model. */
+    /**
+     The entry mode for this model.
+     */
     let exprMode: ExprMode
     
     init(mode: ExprMode) {
@@ -167,78 +173,89 @@ class ModelData {
     }
     
     /**
-     builtExpressions is the list of expressions built.
+     `builtExpressions` is the list of expressions built.
      
-     Each time EQUAL is executed, the current expression is computed (via value)
+     Each time `EQUAL` is executed, the current expression is computed (via value)
      and a new expression is started.
-     So in short, this stores all expressions computer until a allClear is issued.
+     
+     So in short, this stores all expressions computer until an `ALL_CLEAR` is issued.
      */
     internal var builtExpressions: [Expr] = []
     
     /**
-     The inputStack is the raw unprocessed sequence of characters input by the user.
+     The `inputStack` is the raw unprocessed sequence of characters input by the user.
      
      This allows for editing the input, eg. the most basic operation is backspace - pop
-     the last input - and the current inputStack can be replayed to a new expression.
+     the last input - and the current `inputStack` can be replayed to a new expression.
      */
     internal var inputStack: [Character] = []
     
     /**
-     currentNumber is the current Value being input, as a string.
+     `currentNumber` is the current `Value` being input, as a `String`.
      
-     As long as the input character is part of a Value, it's appended to this.
+     As long as the input character is part of a `Value`, it's appended to this. If an operator is entered,
+     we push the value and operator the the proper stacks.
      
-     At any time this value should be convertible to a Value. This is relied on
-     when the input is an operator (and non-number charactor). Then currentNumber is
-     used to construct a Value..
+     At any time this value should be convertible to a `Value`. This is relied on
+     when the input is an operator (and non-number charactor). Then `currentNumber` is
+     used to construct a `Value`.
      
-     it is difrerent from the inputStack in that it's manipulated, not just user entered data. Eg. for DMS values, if you enter "'" alone, "0°0" is prepended.
+     it is different from the `inputStack` in that it's manipulated, not just user entered data.
+     Eg. for DMS values, if you enter "'" alone, "0°0" is prepended.
      */
     internal var currentNumber: String = ""
     
     /**
-     expressionStack is the stack of evaluated subexpressions.
+     `expressionStack` is the stack of evaluated subexpressions.
      
-     As operators are entered (see operatorStack), we can process the input into
+     As operators are entered (see `operatorStack`), we can process the input into
      expressions. These are kept in this stack.
      
-     Eg. when entering "10/2+", when + is entered, before it's pushed onto the operatorStack
+     Eg. when entering `10/2+`, when `+` is entered, before it's pushed onto the `operatorStack`
      (which already has /) we eval the expression.
      
-     The expressionStack has two Expr.num values (10 and 2), that can popped along with the
-     operatorStack, those three components are used to make a Expr.operation that's put
-     on the expressionStack.
+     The `expressionStack` has two `Expr.value` values (10 and 2), that can popped along with the
+     `operatorStack`, those three components are used to make a `Expr.binary` that's put
+     on the `expressionStack`.
      
-     After "+", the operatorStack has "+" and the expressionStack has "10/2".
+     After `+`, the `operatorStack` has `+` and the `expressionStack` has `10/2` as a `Expr.binary`.
      */
     internal var expressionStack: [Expr] = []
     
     /**
-     OperatorStack contains the operators input but _not yet_ evaluated.
+     `operatorStack` contains the operators input but _not yet_ evaluated.
      
      This is key to handling precedence. As numbers and operators are entered, we keep a stack of
-     operators entered. Eg. entering "2 + 4 -" will have + on the stack until -
-     is entered. Since it's same-or-lower precedence, we can pop + from the stack and
-     process "2 + 4" into a new expression and put into expressionStack.
+     operators entered. Eg. entering `2 + 4 -` will have `+` on the stack until `-`
+     is entered. Since it's same-or-lower precedence, we can pop `+` from the `operatorStack` and
+     process `2 + 4` into a new expression and put into `expressionStack`.
      
-     If we entered "2 / 4 + ", we'd have / on the stack until + is entered.
-     Since + is same-or-lower precedence then /, we can pop / from the stack and process "2 / 4".
-     This leaves - on the operator stack.
+     If we entered `2 / 4 +`, we'd have `/` on the `operatorStack` until `+` is entered.
+     Since `+` is same-or-lower precedence then `/`, we can pop `/` from the stack and process `2 / 4`.
+     This leaves `+` on the operator stack.
      
-     But if we enter "2 + 4 /", we'd have - on the stack until / is entered.
-     Since / higher precedence then +, we can't evaluate "2 + 4" yet, so the stack is now "+ /".
+     But if we enter `2 + 4 /`, we'd have `+` on the stack until `/` is entered.
+     Since `/` has higher precedence than `+`, we can't evaluate `2 + 4` yet, so `/` is pushed onto
+     `operatorStack` and the stack is now `+ /`.
      */
     internal var operatorStack: [Operator] = []
     
-    /** When last operator is divide, disable degrees/jhours/minutes input */
+    /**
+     When the most recent operator is `divide`, disable degrees/jhours/minutes input.
+     */
     internal var intOnly: Bool = false
+    
+    enum InputError : Error {
+        case tooLong
+    }
     
     /**
      Main access point for the model data
-     It takes a CalculatorFunction (enum) and in the case of ENTRY, the label, a string that
+     It takes a `CalculatorFunction` (enum) and in the case of ENTRY, the `label`, a string that
      contains the text being entered.
      
      Eg. a simple addition of 10 + 5
+     
      ```
      callFunction(ENTRY, "1")
      callFunction(ENTRY, "0")
@@ -246,9 +263,9 @@ class ModelData {
      callFunction(ENTRY, "5")
      callFunction(EQUAL, "")
      */
-    func callFunction(_ f: CalculatorFunction, label: String) {
-        let _ = ExecutionTimer("thread: \(Thread.current): ModelData.callFunction \(f) label: \(label)", indent:1 )
-                
+    func callFunction(_ f: CalculatorFunction, label: String?) throws {
+        let _ = ExecutionTimer("thread: \(Thread.current): ModelData.callFunction \(f) label: \(label ?? "nil")", indent:1 )
+
         switch f {
         case .ANS:
             ans()
@@ -269,10 +286,14 @@ class ModelData {
         case .EQUAL:
             equal()
         case .ENTRY:
-            if label.count == 1,
-               let char = label.first
-            {
-                addEntry(char)
+            if let s = label {
+                guard s.count == 1 else {
+                    NSLog("siently swalling this error, input is >1 char")
+                    throw InputError.tooLong
+                }
+                if let char = s.first {
+                    addEntry(char)
+                }
             }
         }
     }
@@ -280,29 +301,29 @@ class ModelData {
     /**
      Helper function to input a string. This is primarily for testing/preview uses.
      */
-    func inputString(_ string: String) {
+    func inputString(_ string: String) throws {
         for ch in string {
             switch ch {
             case _ where ch.isWhitespace:
                 break
             case "+":
-                callFunction(CalculatorFunction.ADD, label: "")
+                try callFunction(CalculatorFunction.ADD, label: "")
             case "-":
-                callFunction(CalculatorFunction.SUBTRACT, label: "")
+                try callFunction(CalculatorFunction.SUBTRACT, label: "")
             case "/":
-                callFunction(CalculatorFunction.DIV, label: "")
+                try callFunction(CalculatorFunction.DIV, label: "")
             case "=":
-                callFunction(CalculatorFunction.EQUAL, label: "")
+                try callFunction(CalculatorFunction.EQUAL, label: "")
             case "D":
-                callFunction(CalculatorFunction.DELETE, label: "")
+                try callFunction(CalculatorFunction.DELETE, label: "")
             case "C":
-                callFunction(CalculatorFunction.CLEAR, label: "")
+                try callFunction(CalculatorFunction.CLEAR, label: "")
             case "A":
-                callFunction(CalculatorFunction.ALL_CLEAR, label: "")
+                try callFunction(CalculatorFunction.ALL_CLEAR, label: "")
             case "M":
-                callFunction(CalculatorFunction.M360, label: "")
+                try callFunction(CalculatorFunction.M360, label: "")
             default:
-                callFunction(CalculatorFunction.ENTRY, label: String(ch))
+                try callFunction(CalculatorFunction.ENTRY, label: String(ch))
             }
         }
     }

@@ -17,38 +17,10 @@ final class ObservableModelDisplayTests: XCTestCase {
     func makeModel(with mode: ModelData.ExprMode) -> ObservableModelData {
         return ObservableModelData(mode: mode)
     }
-    
-    /**
-     Helper function to input a string into the test md.
-     */
-    func inputString(_ string: String) {
-        for ch in string {
-            switch ch {
-            case _ where ch.isWhitespace:
-                break
-            case "+":
-                md.callFunction(CalculatorFunction.ADD, label: "")
-            case "-":
-                md.callFunction(CalculatorFunction.SUBTRACT, label: "")
-            case "/":
-                md.callFunction(CalculatorFunction.DIV, label: "")
-            case "=":
-                md.callFunction(CalculatorFunction.EQUAL, label: "")
-            case "D":
-                md.callFunction(CalculatorFunction.DELETE, label: "")
-            case "C":
-                md.callFunction(CalculatorFunction.CLEAR, label: "")
-            case "A":
-                md.callFunction(CalculatorFunction.ALL_CLEAR, label: "")
-            default:
-                md.callFunction(CalculatorFunction.ENTRY, label: String(ch))
-            }
-        }
-    }
 
-    func testDisplayLines_SingleNumber() {
+    func testDisplayLines_SingleNumber() throws {
         md = makeModel(with: .DMS)
-        inputString("2'3")
+        try md.inputString("2'3")
 
         let expectedLines: [DisplayLine] = [
             DisplayLine(id: 0, value: "      0°2'3", trailingOperator: nil),
@@ -57,9 +29,9 @@ final class ObservableModelDisplayTests: XCTestCase {
         XCTAssertEqual(md.displayLines, expectedLines)
     }
 
-    func testDisplayLines_UnterminatedAfterExpression() {
+    func testDisplayLines_UnterminatedAfterExpression() throws {
         md = makeModel(with: .DMS)
-        inputString("1°2'3 + 4°5'6")
+        try md.inputString("1°2'3 + 4°5'6")
 
         let expectedLines: [DisplayLine] = [
             DisplayLine(id: 0, value: "     1°02'3", trailingOperator: "+"),
@@ -69,9 +41,9 @@ final class ObservableModelDisplayTests: XCTestCase {
         XCTAssertEqual(md.displayLines, expectedLines)
     }
 
-    func testDisplayLines_UnterminatedAfterExpressions() {
+    func testDisplayLines_UnterminatedAfterExpressions() throws {
         md = makeModel(with: .DMS)
-        inputString("1°2'3 + 4°5'6 - 5°7'9")
+        try md.inputString("1°2'3 + 4°5'6 - 5°7'9")
 
         let expectedLines: [DisplayLine] = [
             DisplayLine(id: 0, value: "     1°02'3", trailingOperator: "+"),
@@ -82,9 +54,9 @@ final class ObservableModelDisplayTests: XCTestCase {
         XCTAssertEqual(md.displayLines, expectedLines)
     }
 
-    func testDisplayLines_Terminated() {
+    func testDisplayLines_Terminated() throws {
         md = makeModel(with: .DMS)
-        inputString("1°2'3 + 4°5'6 =")
+        try md.inputString("1°2'3 + 4°5'6 =")
 
         let expectedLines: [DisplayLine] = [
             DisplayLine(id: 0, value: "     1°02'3", trailingOperator: "+"),
@@ -95,9 +67,9 @@ final class ObservableModelDisplayTests: XCTestCase {
         XCTAssertEqual(md.displayLines, expectedLines)
     }
 
-    func testDisplayLines_UnterminatedAfterNumber() {
+    func testDisplayLines_UnterminatedAfterNumber() throws {
         md = makeModel(with: .DMS)
-        inputString("1°2'3 + 4°5'6 = 7°8'9")
+        try md.inputString("1°2'3 + 4°5'6 = 7°8'9")
 
         let expectedLines: [DisplayLine] = [
             DisplayLine(id: 0, value: "     1°02'3", trailingOperator: "+"),
@@ -109,9 +81,9 @@ final class ObservableModelDisplayTests: XCTestCase {
         XCTAssertEqual(md.displayLines, expectedLines)
     }
     
-    func testDisplayLines_UnterminatedAfterOperator() {
+    func testDisplayLines_UnterminatedAfterOperator() throws {
         md = makeModel(with: .DMS)
-        inputString("1°2'3 + 4°5'6 = 7°8'9 -")
+        try md.inputString("1°2'3 + 4°5'6 = 7°8'9 -")
 
         let expectedLines: [DisplayLine] = [
             DisplayLine(id: 0, value: "     1°02'3", trailingOperator: "+"),

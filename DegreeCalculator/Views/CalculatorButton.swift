@@ -43,7 +43,8 @@ struct CalculatorButton: View {
     var function: CalculatorFunction = CalculatorFunction.ENTRY
     var tripleTapFunction: CalculatorFunction?
     @State private var isProcessing = false
-
+    @State private var showError = false
+    
     // This functions returns the default color of a button by it's function,
     // then `foregroundColor` mutes it if it's disbled.
     var enabledForegroundColor: Color {
@@ -82,10 +83,20 @@ struct CalculatorButton: View {
     }
     
     var backgroundColor: Color {
-        if (!isEnabled) {
+        if !isEnabled {
             return enabledBackgroundColor.withMutedAdjustment(0.4)
         }
+        if showError {
+            return Color.red
+        }
         return enabledBackgroundColor
+    }
+    
+    private func flashRed() {
+        showError = true
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+            showError = false
+        }
     }
     
     // buttonContent is the button base view, `body` then optionally
@@ -97,7 +108,11 @@ struct CalculatorButton: View {
 
                 isProcessing = true
                 Task {
-                    modelData.callFunction(function, label: label)
+                    do {
+                        try modelData.callFunction(function, label: label)
+                    } catch ModelData.InputError.tooLong {
+                        flashRed()
+                    }
                     isProcessing = false
                 }
             }
@@ -118,9 +133,12 @@ struct CalculatorButton: View {
                 
                 isProcessing = true
                 Task {
-                    modelData.callFunction(fn, label: label)
-                    isProcessing = false
-                }
+                    do {
+                        try modelData.callFunction(function, label: label)
+                    } catch ModelData.InputError.tooLong {
+                        flashRed()
+                    }
+                    isProcessing = false                }
             }
         } else {
             content

@@ -40,7 +40,7 @@ final class ValueBaseAndIntTests: XCTestCase {
             XCTFail("Expected to parse .integer kind")
         }
     }
-    
+
     func testInt_Addding() throws {
         let lhs = Value(integer: 1)
         let rhs = Value(integer: 2)
