@@ -346,6 +346,7 @@ struct Value: Codable, Hashable, CustomStringConvertible {
     }
     
     func dividing(_ other: Value) -> Value? {
+
         switch (self.type, other.type) {
             // Use pattern matching here to ensure we only use
             // a denominator that's an integer and it's > 0
@@ -353,7 +354,17 @@ struct Value: Codable, Hashable, CustomStringConvertible {
             // Now match on the numerator type
             switch(self.type) {
             case .integer(let v):
-                return Value(integer: v / denom)
+                let roundingBehavior = NSDecimalNumberHandler(
+                    roundingMode: NSDecimalNumber.RoundingMode.plain,
+                    scale: 0, // Round to integer
+                    raiseOnExactness: false,
+                    raiseOnOverflow: false,
+                    raiseOnUnderflow: false,
+                    raiseOnDivideByZero: false
+                )
+                let unrounded = NSDecimalNumber(decimal: Decimal(v) / Decimal(denom))
+                let rounded = unrounded.rounding(accordingToBehavior: roundingBehavior)
+                return Value(integer: rounded.intValue)
             case .dms(let deg, let min):
                 let roundingBehavior = NSDecimalNumberHandler(
                     roundingMode: NSDecimalNumber.RoundingMode.plain,
@@ -363,7 +374,6 @@ struct Value: Codable, Hashable, CustomStringConvertible {
                     raiseOnUnderflow: false,
                     raiseOnDivideByZero: false
                 )
-                
                 let full_minutes = Decimal(deg * 60) + min
                 let unrounded = NSDecimalNumber(decimal: full_minutes / Decimal(denom))
                 let rounded = unrounded.rounding(accordingToBehavior: roundingBehavior)
@@ -376,13 +386,12 @@ struct Value: Codable, Hashable, CustomStringConvertible {
             case .hms(let h, let m, let s):
                 let roundingBehavior = NSDecimalNumberHandler(
                     roundingMode: NSDecimalNumber.RoundingMode.plain,
-                    scale: 1, // One decimal place
+                    scale: 0, // Round to integer
                     raiseOnExactness: false,
                     raiseOnOverflow: false,
                     raiseOnUnderflow: false,
                     raiseOnDivideByZero: false
                 )
-                
                 let full_seconds = Decimal(h * 3600) + Decimal(m * 60) + Decimal(s)
                 let unrounded = NSDecimalNumber(decimal: full_seconds / Decimal(denom))
                 let rounded = unrounded.rounding(accordingToBehavior: roundingBehavior)
