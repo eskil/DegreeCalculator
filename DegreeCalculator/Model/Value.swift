@@ -7,8 +7,15 @@
 
 import Foundation
 
+/**
+ `Value`s contain the base values that make up `Expr`essions.
+ Operations (add/subtract etc) are performed here.
+ */
 struct Value: Codable, Hashable, CustomStringConvertible {
-    /** ValueType is the various types of values supported. Each enum has associated values per type. */
+    /**
+     `ValueType` are the various types of values supported.
+     Each enum has associated values per type.
+     */
     enum ValueType: Codable, Hashable {
         case empty
         case integer(Int)
@@ -16,18 +23,24 @@ struct Value: Codable, Hashable, CustomStringConvertible {
         case hms(hours: Int, minutes: Int, seconds: Int)
     }
     
-    /** Provide hint to init(parsing:) methods as to how to parse. */
+    /**
+     Provide hint to `init(parsing:)` methods as to how to parse the given string.
+     Use `.detect` to try and infer the value from the strong.
+     */
     enum ValueTypeHint {
         case empty
         case integer
         case dms
         case hms
-        /** Use .detect to infer the value type from the string. */
         case detect
     }
     
-    /** Exception enum for parser errors. */
-    enum ValueParseError: Error, CustomStringConvertible {
+    /**
+     Exception enum for parser errors.
+     NOTE: `Value.init(parsing:)` that throws this is not used in the code. It's
+     left here as a curiosum.
+     */
+    enum ValueParseError: Error, CustomStringConvertible, Equatable {
         case emptyInput
         case invalidInteger(String)
         case invalidDMS(String)
@@ -50,7 +63,9 @@ struct Value: Codable, Hashable, CustomStringConvertible {
         }
     }
     
-    /** The type of the enum, and the default is empty. */
+    /**
+     The type of the enum, and the default is empty.
+     */
     var type: ValueType = .empty
     
     private init(type: ValueType) {
@@ -74,7 +89,9 @@ struct Value: Codable, Hashable, CustomStringConvertible {
         self = Value(type: .hms(hours: hours, minutes: minutes, seconds: seconds)).normalised()
     }
     
-    /** Attemps to parse the given string, optionall using a hint. */
+    /**
+     Attempt to parse the given string, optionally using a hint.
+     */
     init?(parsing string: String, hint: ValueTypeHint = .detect) {
         let actualHint = (hint == .detect) ? Value.detectHint(parsing: string) : hint
         let trimmed = string.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -99,8 +116,6 @@ struct Value: Codable, Hashable, CustomStringConvertible {
 
     /** Sketch fallback to init?, which falls back to empty values or fails */
     init(parsing string: String, hint: ValueTypeHint = .detect, fallbackToEmpty: Bool = false) throws {
-        let _ = ExecutionTimer("thread: \(Thread.current): Value.init(parsing: \(string), hint: \(hint)", indent: 1)
-
         let actualHint = (hint == .detect) ? Self.detectHint(parsing: string) : hint
         let trimmed = string.trimmingCharacters(in: .whitespacesAndNewlines)
 
@@ -194,7 +209,9 @@ struct Value: Codable, Hashable, CustomStringConvertible {
         return Value(hours: hr, minutes: min, seconds: sec)
     }
     
-    /** Detect how to parse the string. Checks for presence of eg. degree or hour-minute symbols. */
+    /**
+     Detect how to parse the string. Checks for presence of eg. degree or hour-minute symbols.
+     */
     static func detectHint(parsing input: String) -> Value.ValueTypeHint {
         let trimmed = input.trimmingCharacters(in: .whitespacesAndNewlines)
         if trimmed.isEmpty {
@@ -248,7 +265,12 @@ struct Value: Codable, Hashable, CustomStringConvertible {
         }
     }
     
-    /** Normalise the value to eg. 61 seconds is 1 minute 1 second. */
+    /**
+     Normalise the value.
+     Examples
+     - 61 seconds is 1 minute 1 second.
+     - 61 minutes is 1 degree/hour 1 minutes
+     */
     mutating func normalise() -> Self {
         switch type {
         case .dms(let d, let m):
@@ -306,7 +328,9 @@ struct Value: Codable, Hashable, CustomStringConvertible {
         return self
     }
 
-    /** Non-mutating version of normalise */
+    /**
+     Non-mutating version of normalise.
+     */
     func normalised() -> Value {
         var copy = self
         _ = copy.normalise()
@@ -346,10 +370,9 @@ struct Value: Codable, Hashable, CustomStringConvertible {
     }
     
     func dividing(_ other: Value) -> Value? {
-
         switch (self.type, other.type) {
-            // Use pattern matching here to ensure we only use
-            // a denominator that's an integer and it's > 0
+        // Use pattern matching here to ensure we only use
+        // a denominator that's an integer and it's > 0
         case (_, .integer(let denom)) where denom != 0:
             // Now match on the numerator type
             switch(self.type) {
@@ -362,9 +385,12 @@ struct Value: Codable, Hashable, CustomStringConvertible {
                     raiseOnUnderflow: false,
                     raiseOnDivideByZero: false
                 )
+                
                 let unrounded = NSDecimalNumber(decimal: Decimal(v) / Decimal(denom))
                 let rounded = unrounded.rounding(accordingToBehavior: roundingBehavior)
+                
                 return Value(integer: rounded.intValue)
+                
             case .dms(let deg, let min):
                 let roundingBehavior = NSDecimalNumberHandler(
                     roundingMode: NSDecimalNumber.RoundingMode.plain,
@@ -374,6 +400,7 @@ struct Value: Codable, Hashable, CustomStringConvertible {
                     raiseOnUnderflow: false,
                     raiseOnDivideByZero: false
                 )
+                
                 let full_minutes = Decimal(deg * 60) + min
                 let unrounded = NSDecimalNumber(decimal: full_minutes / Decimal(denom))
                 let rounded = unrounded.rounding(accordingToBehavior: roundingBehavior)
@@ -392,6 +419,7 @@ struct Value: Codable, Hashable, CustomStringConvertible {
                     raiseOnUnderflow: false,
                     raiseOnDivideByZero: false
                 )
+                
                 let full_seconds = Decimal(h * 3600) + Decimal(m * 60) + Decimal(s)
                 let unrounded = NSDecimalNumber(decimal: full_seconds / Decimal(denom))
                 let rounded = unrounded.rounding(accordingToBehavior: roundingBehavior)
