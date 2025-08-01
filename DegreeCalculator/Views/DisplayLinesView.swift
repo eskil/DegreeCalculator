@@ -103,18 +103,17 @@ struct DisplayLinesView_Previews: PreviewProvider {
         let md = ObservableModelData(mode: mode)
 
         do {
-            try md.callFunction(CalculatorFunction.ENTRY, label: "1")
-            try md.callFunction(CalculatorFunction.ADD, label: "")
-            try md.callFunction(CalculatorFunction.ENTRY, label: "2")
-            try md.callFunction(CalculatorFunction.EQUAL, label: "")
+            switch mode {
+            case ModelData.ExprMode.DMS:
+                try md.inputString("1°2'3+4°5'6=")
+            case ModelData.ExprMode.HMS:
+                try md.inputString("20h2m3+4h5m6=")
+            }
         } catch {
             NSLog("Bad input: \(error)")
         }
             
         return DisplayLinesView(model: md)
-            .background(.black)
-            .previewLayout(.sizeThatFits)
-            .padding()
             .environmentObject(md)
             .previewDevice(PreviewDevice(rawValue: deviceName))
             .previewDisplayName(deviceName + " - \(mode)")
