@@ -45,27 +45,32 @@ struct DisplayLinesView: View {
             ScrollViewReader { scrollReader in
                 ForEach(model.displayLines, id: \.id) { line in
                     LazyVStack {
+                        let value = line.value
                         if let op = line.trailingOperator {
                             switch op {
                             case "=":
                                 Text(line.value + " " + op)
                                     .frame(maxWidth: .infinity, alignment: .leading)
                                     .foregroundColor(textColor)
+                                    .accessibilityIdentifier("result_line_\(op)_\(value)")
                                 Underscore
                             case "==":
                                 Text(line.value + " ")
                                     .frame(maxWidth: .infinity, alignment: .leading)
                                     .foregroundColor(textColor)
+                                    .accessibilityIdentifier("result_line_\(op)_\(value)")
                                 DoubleUnderscore
                             default:
                                 Text(line.value + " " + op)
                                     .frame(maxWidth: .infinity, alignment: .leading)
                                     .foregroundColor(textColor)
+                                    .accessibilityIdentifier("result_line_\(op)_\(value)")
                             }
                         } else {
                             Text(line.value)
                                 .frame(maxWidth: .infinity, alignment: .leading)
                                 .foregroundColor(activeTextColor)
+                                .accessibilityIdentifier("result_line_\(value)")
                         }
                     }
                     .id(line.id)
