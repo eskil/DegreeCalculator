@@ -9,6 +9,7 @@ import Foundation
 
 /**
  This extension is for `ObservableModelData.displayLines` to make left padding easier.
+ FIXME: this is an incredibly poor solution to properly positioning the text in the DisplayLinesView :-/
  */
 extension String {
     func leftPadding(toLength: Int, withPad: String = " ") -> String {
