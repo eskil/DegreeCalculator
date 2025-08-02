@@ -123,6 +123,7 @@ struct CalculatorButton: View {
         .buttonStyle(CalculatorButtonStyle(foregroundColor: foregroundColor, backgroundColor: backgroundColor))
         .disabled(isProcessing)
         .opacity(isProcessing ? 0.3 : 1.0)
+        .accessibilityIdentifier("button_\(label)")
     }
     
     var body: some View {
@@ -134,7 +135,7 @@ struct CalculatorButton: View {
                 isProcessing = true
                 Task {
                     do {
-                        try modelData.callFunction(function, label: label)
+                        try modelData.callFunction(fn, label: label)
                     } catch ModelData.InputError.tooLong {
                         flashRed()
                     }
